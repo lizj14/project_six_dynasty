@@ -1,0 +1,462 @@
+{
+  "json_version": 4,
+  "variables":
+  [
+    {
+      "code": "emp_defense",
+      "replacement": "加固"
+    },
+    {
+      "code": "emp_reform",
+      "replacement": "改革"
+    },
+    {
+      "code": "emp_culture",
+      "replacement": "文化"
+    },
+    {
+      "code": "emp_art",
+      "replacement": "艺术"
+    },
+    {
+      "code": "emp_expansion",
+      "replacement": "扩张"
+    },
+    {
+      "code": "newline",
+      "replacement": "\\n"
+    },
+    {
+      "code": "other",
+      "replacement": "\\n——或者——\\n",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "Buddhist",
+      "replacement": "佛学",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "Confusion",
+      "replacement": "儒学",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "NeoTaosim",
+      "replacement": "玄学",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "prestige",
+      "replacement": "威望",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "contirbution",
+      "replacement": "功绩",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "start_order",
+      "replacement": "先动值",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "order",
+      "replacement": "顺位",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "affair",
+      "replacement": "[内政]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "power",
+      "replacement": "[权谋]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "military",
+      "replacement": "[军事]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "art",
+      "replacement": "[艺术]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "culture",
+      "replacement": "[文化]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "execute",
+      "replacement": "执行",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "free",
+      "replacement": "免费执行",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "control",
+      "replacement": "控制",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "occupy",
+      "replacement": "占据",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "district",
+      "replacement": "区域",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "capital",
+      "replacement": "首都",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "neutral",
+      "replacement": "中立",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "location",
+      "replacement": "地点",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "neighbor",
+      "replacement": "相邻",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "expedition",
+      "replacement": "[北伐]标记",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "refugee",
+      "replacement": "[流民]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "save",
+      "replacement": "存档",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "choose",
+      "replacement": "选择一项：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "occupy_action",
+      "replacement": "占据",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "remove",
+      "replacement": "返回游戏盒中",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "march",
+      "replacement": "进军",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "supplant",
+      "replacement": "转化",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "abandon",
+      "replacement": "弃置",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "army",
+      "replacement": "部队",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "supple",
+      "replacement": "补充",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "discard",
+      "replacement": "弃",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "search",
+      "replacement": "检索",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "play",
+      "replacement": "打出",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "pay",
+      "replacement": "支付",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "fee",
+      "replacement": "费用",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "fast",
+      "replacement": "快速行动",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "this",
+      "replacement": "此牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "urusp",
+      "replacement": "[僭越]",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "only",
+      "replacement": "仅限",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "force",
+      "replacement": "强制：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "passive",
+      "replacement": "被动：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "end",
+      "replacement": "终局：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "resource",
+      "replacement": "资源：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "enter",
+      "replacement": "登场：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "decision",
+      "replacement": "行动：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "action",
+      "replacement": "主动：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "friend_area",
+      "replacement": "幕僚区",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "display",
+      "replacement": "展示区",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "court",
+      "replacement": "朝堂区",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "candidate",
+      "replacement": "候选策略牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "reserve",
+      "replacement": "部队储备区",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "north_panel",
+      "replacement": "[北方]面板",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "jin_panel",
+      "replacement": "[晋]面板",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "hand",
+      "replacement": "手牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "sima",
+      "replacement": "司马家",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "jin",
+      "replacement": "东晋",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "north",
+      "replacement": "北方",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "player",
+      "replacement": "玩家",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "friend_player",
+      "replacement": "友方",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "vp",
+      "replacement": "vp",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_public",
+      "replacement": "公共事件牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_emperor",
+      "replacement": "君主牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_mechanism",
+      "replacement": "强制性事件牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_goal",
+      "replacement": "目标牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_event",
+      "replacement": "事件牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_friend",
+      "replacement": "幕僚牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_strategy",
+      "replacement": "策略牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "card_hero",
+      "replacement": "角色牌",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "battle",
+      "replacement": "军力",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    }
+  ]
+}

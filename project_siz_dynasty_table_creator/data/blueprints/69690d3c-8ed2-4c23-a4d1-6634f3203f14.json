@@ -1,0 +1,136 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "blueprint_001",
+      "type": "card",
+      "layout_size_mm": "57, 89",
+      "bleeding_size_mm": "0",
+      "main_panel_name": "",
+      "hint_order_index": 0,
+      "shape_settings":
+      {
+        "radius": "5"
+      },
+      "front_layers":
+      [
+        {
+          "name": "default_front",
+          "panels":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "layout_position": "7, 5",
+                "layout_size": "43, 19.75",
+                "layout_constraint_h": "left_and_right",
+                "panel_type": "text",
+                "value": "新建卡牌",
+                "text_font": "Satoshi",
+                "text_wrapping": "False",
+                "text_size": "3",
+                "text_autosize": "True",
+                "text_size_max": "30",
+                "color": "#292929"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "layout_position": "28.5, 64.25",
+                "layout_size": "21.5, 19.75",
+                "layout_constraint_h": "right",
+                "layout_constraint_v": "bottom",
+                "panel_type": "text",
+                "value": "{layout|mm}\n{layout|in}",
+                "text_font": "Satoshi",
+                "text_wrapping": "False",
+                "text_size": "2",
+                "text_autosize": "True",
+                "text_alignment_h": "right",
+                "color": "#292929"
+              }
+            },
+            {
+              "name": "logo",
+              "data":
+              {
+                "layout_position": "5, 24.75",
+                "layout_size": "47, 39.5",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "value": "TC/IconWhite",
+                "color": "#9891FF"
+              }
+            },
+            {
+              "name": "color",
+              "data":
+              {
+                "layout_position": "5, 5",
+                "layout_size": "47, 79",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "color": "#FFFFFF"
+              }
+            },
+            {
+              "name": "border",
+              "data":
+              {
+                "layout_position": "-5, -5",
+                "layout_size": "67, 99",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_size": "57, 89",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "panel_editable": "False",
+                "value": "TC/Logo",
+                "img_zoom": "0.75"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-25, -25",
+                "layout_size": "107, 139",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

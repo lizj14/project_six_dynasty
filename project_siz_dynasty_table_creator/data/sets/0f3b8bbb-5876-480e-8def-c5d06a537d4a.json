@@ -1,0 +1,59 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "东晋起始",
+      "blueprint_name": "策略牌",
+      "hint_order_index": 5,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1777335266,
+          "last_modification_date_unix": 1777335407,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "东晋-初始"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}。\n{resource}1{battle}。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

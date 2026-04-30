@@ -1,0 +1,170 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "目标牌",
+      "type": "card",
+      "layout_size_mm": "57, 89",
+      "bleeding_size_mm": "1",
+      "main_panel_name": "",
+      "hint_order_index": 4,
+      "shape_settings":
+      {
+        "radius": "5"
+      },
+      "front_layers":
+      [
+        {
+          "name": "default_front",
+          "panels":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "layout_position": "8.658833, 5",
+                "layout_size": "40.52919, 9.079527",
+                "layout_constraint_h": "left_and_right",
+                "panel_type": "text",
+                "value": "目标牌标题",
+                "text_font": "Satoshi",
+                "text_wrapping": "False",
+                "text_size": "3",
+                "text_autosize": "True",
+                "color": "#FFFFFFFF",
+                "text_size_min": "5"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "layout_position": "9.324972, 46.58813",
+                "layout_size": "39.19691, 6.624577",
+                "layout_constraint_h": "right",
+                "layout_constraint_v": "bottom",
+                "panel_type": "text",
+                "value": "<align=\"center\">{card_goal}</align>",
+                "text_font": "Satoshi",
+                "text_wrapping": "False",
+                "text_size": "2",
+                "text_autosize": "True",
+                "text_alignment_h": "right",
+                "color": "#292929",
+                "text_size_max": "5",
+                "text_size_min": "5"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "layout_position": "5, 55.7483",
+                "layout_size": "47, 26.90933",
+                "layout_constraint_h": "right",
+                "layout_constraint_v": "bottom",
+                "panel_type": "text",
+                "value": "目标牌能力",
+                "text_font": "Satoshi",
+                "text_size": "2",
+                "text_autosize": "True",
+                "color": "#292929",
+                "text_size_max": "3",
+                "text_size_min": "3"
+              }
+            },
+            {
+              "name": "logo",
+              "data":
+              {
+                "layout_position": "8.094915, 14.07953",
+                "layout_size": "40.81017, 31.81864",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "value": "UI/9Slice/Pack-SciFi/panel_glass_extra",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "layout_position": "0, 5.676132",
+                "layout_size": "57, 8.403385",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "color": "#543A7AFF",
+                "procedural_rectangle_radius_free": "True"
+              }
+            },
+            {
+              "name": "color",
+              "data":
+              {
+                "layout_position": "5, 5",
+                "layout_size": "47, 79",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "color": "#F5EDDAFF"
+              }
+            },
+            {
+              "name": "border",
+              "data":
+              {
+                "layout_position": "-5, -5",
+                "layout_size": "67, 99",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#F5EDDAFF"
+              }
+            }
+          ]
+        }
+      ],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_size": "57, 89",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "panel_editable": "False",
+                "value": "TC/Logo",
+                "img_zoom": "0.75"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-25, -25",
+                "layout_size": "107, 139",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "角色-事件牌",
+      "blueprint_name": "事件牌",
+      "hint_order_index": 6,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1777334951,
+          "last_modification_date_unix": 1777421793,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "5"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "漠北征伐"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_event}-{military}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{control}[塞外]时，可以{play}。{save}{this}。\t将{reserve}中的1个{army}{remove}。"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "拓跋\n",
+                "text_alignment_h": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "角色-幕僚牌",
+      "blueprint_name": "幕僚牌",
+      "hint_order_index": 7,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1777334315,
+          "last_modification_date_unix": 1777335173,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "崔宏"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{affair}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}{choose}\n{discard}1张{hand}，然后摸1张牌；{other}{free}1次{occupy_action}。\n"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "慕容",
+                "text_alignment_h": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
