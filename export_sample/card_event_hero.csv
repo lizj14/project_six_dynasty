@@ -1,0 +1,10 @@
+[Item Amount],vp数字,text_top,text_owner,text_owner:text_alignment_h,text_card_type,text_bottom,[Item Note]
+1,5,漠北征伐,拓跋,center,"<align=""center"">{card_event}-{military}</align>",{control}[塞外]时，可以{play}。{save}{this}。将{reserve}的1个{army}放回游戏盒中。
+1,1,高卧东山,谢安,center,"<align=""center"">{card_event}-{military}</align>",{search}[策略]，然后{save}{this}。
+1,0,流民帅,郗鉴,center,"<align=""center"">{card_event}-{military}</align>",获得2{battle}。{supplant}1个非[江南][荆襄]{district}的{neutral}{location}。
+1,12,通使建康,张轨,center,"<align=""center"">{card_event}-{military}</align>",如果有一条从[姑臧]到[建康]的全部{location}被{jin}势力{occupy}的线路，可以{play}，然后{save}{this}。
+1,1,入幕之宾,桓温,center,"<align=""center"">{card_event}-{military}</align>",{search}[幕僚]，然后{save}{this}。
+1,4,伊霍之事,桓温,center,"<align=""center"">{card_event}-{military}</align>",{only}{jin}{player}{play}。{urusp}重洗当前{card_emperor}，并根据牌面描述重置{sima}{prestige}，获得1{prestige}，然后{save}{this}。
+1,0,刘琨,祖逖,center,"<align=""center"">{card_event}-{military}</align>",{only}{jin}{player}{play}。{supplant}[太原][平阳]，然后{save}{this}。{end}如果{friend_player}{occupy}[太原][平阳]，获得7{vp}。
+1,2,击楫中流,祖逖,center,"<align=""center"">{card_event}-{military}</align>",获得6{battle}，{save}{this}。
+1,2,周处除三害,周玘,center,"<align=""center"">{card_event}-{military}</align>",{save}1张{candidate}，然后{save}{this}。

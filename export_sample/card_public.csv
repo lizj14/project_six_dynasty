@@ -1,0 +1,6 @@
+[Item Amount],费用数字,text_top,text_bottom,text_bottom:text_size_min,text_bottom:text_size_max,[Item Note]
+1,0,告老还乡,{force}选择1个[幕僚]最多的{player}，该{player}选择1个{fee}最高的[幕僚]{save}。摸1张牌。,2.5,2.5
+1,0,功高不赏,{force}选择1个[{contirbution}]最高的{player}，该{player}-1[{contirbution}]并+5{vp}。摸1张牌。,2.5,2.5
+1,0,流民四起,{force}在{jin}和{north}{discard}牌区各放置1张{refugee}。摸1张牌。,2.5,2.5
+1,0,农民起义,{force}{jin}行动{order}最高的{player}和{north}{player}，各选择1个非{friend_player}{location}转为{neutral}{control}。在{jin}和{north}{discard}牌区各放置1张{refugee}。摸1张牌。,2.5,2.5
+1,0,木犹如此,{force}在{jin}和{north}{discard}牌区各放置1张{refugee}。将主版图{discard}牌区洗回牌库。摸1张牌。,2.5,2.5

@@ -1,0 +1,10 @@
+[Item Amount],费用数字,text_top,text_owner,text_bottom,资源,[Item Note]
+1,2,招抚,苻坚,{decision}{supplant}1个{neighbor}{location}。,1军力2vp
+1,1,尊奉江东,慕容,{decision}2{battle}，{save}{this}。{passive}{this}在{court}中时，{north}和晋势力不能相互使用[{march}]。{only}{north}势力{play}。,东晋获得3vp
+1,3,幽州突骑,慕容,{decision}5{battle}。{passive}需要{control}[蓟]及{neighbor}的一个地区，才能作为{card_strategy}{play}。,3军力-1vp
+1,2,草原部落,拓跋,{decision}3{battle}，{save}{this}。{passive}{this}在{court}中时，使用{fast}{execute}[{march}]时，减少1点{fee}。使用{fast}{execute}[{occupy}]时，增加1点{fee}或{pay}2{vp}。,2军力
+1,2,侨州郡县,王导,{only}{jin}{player}{play}。{decision}{supplant}1个{neighbor}{neutral}{location}。获得1{battle}。,1军力2vp
+1,2,京口重镇,郗鉴,{decision}4{battle}。{passive}{friend_player}{occupy}[京口]时，才能{play}。,2军力
+1,3,凉州大马,张轨,{decision}5{battle}。{passive}需要{friend_player}{occupy}[姑臧]及{neighbor}的1个{location}，才能{play}。,3军力-1vp
+1,2,土断,刘裕,{only}{jin}{player}{play}。{decision}3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。2{battle}。,2军力
+1,2,兴修水利,周玘,{decision}2{battle}2{vp}，然后{supple}一张牌到{court}。,1军力2vp
