@@ -1,0 +1,6 @@
+[Item Amount],vp数字,费用数字,text_top,text_top:color,text_owner,text_card_type,text_bottom,牌面背景:color,[Item Note]
+1,0,0,清君侧,#292929FF,{common},"<align=""center"">{card_public}</align>",{only}{jin}{player}{play}。{pay}7{battle}，每{occupy}1个和{capital}{neighbor}的{location}，减少1点{battle}{fee}。获得1{prestige}。{choose}选择1个{jin}{player}，失去2{prestige}；或者其他{jin}{player}和{sima}各失去1{prestige}。,#F5EDDAFF,
+1,0,2,文化传播,#292929FF,{common},"<align=""center"">{card_public}</align>",提高1级{emp_culture}，获得1{vp}。,#F5EDDAFF,
+1,0,2,艺术创作,#292929FF,{common},"<align=""center"">{card_public}</align>",获得5{vp}。,#F5EDDAFF,
+1,0,2,整顿军队,#292929FF,{common},"<align=""center"">{card_public}</align>",3{battle}。,#F5EDDAFF,
+1,0,2,广开言路,#292929FF,{common},"<align=""center"">{card_public}</align>",摸2张牌。,#F5EDDAFF,

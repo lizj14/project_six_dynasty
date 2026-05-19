@@ -1,0 +1,145 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "蓝图_区域控制",
+      "type": "token",
+      "layout_size_mm": "25.3, 25.3",
+      "bleeding_size_mm": "0.1",
+      "main_panel_name": "",
+      "hint_order_index": 11,
+      "shape_settings":
+      {
+        "radius": "2"
+      },
+      "front_layers":
+      [
+        {
+          "name": "default_front",
+          "panels":
+          [
+            {
+              "name": "vp",
+              "data":
+              {
+                "layout_position": "5.295322, 12.91679",
+                "layout_size": "16.20384, 8.433333",
+                "panel_type": "text",
+                "value": "部分控制：2vp",
+                "text_size": "2.4"
+              }
+            },
+            {
+              "name": "区域",
+              "data":
+              {
+                "layout_position": "6.76886, 4.747715",
+                "layout_size": "11.76228, 8.433333",
+                "panel_type": "text",
+                "value": "区域"
+              }
+            },
+            {
+              "name": "color",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "21.3, 21.3",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "panel_editable": "False",
+                "color": "#FFFFFF"
+              }
+            },
+            {
+              "name": "border",
+              "data":
+              {
+                "layout_position": "-2, -2",
+                "layout_size": "29.3, 29.3",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "layout_position": "5.295322, 12.91679",
+                "layout_size": "16.20384, 8.433333",
+                "panel_type": "text",
+                "value": "已计分",
+                "text_size": "2.4"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "layout_position": "6.76886, 4.747715",
+                "layout_size": "11.76228, 8.433333",
+                "panel_type": "text",
+                "value": "区域"
+              }
+            },
+            {
+              "name": "color_001",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "21.3, 21.3",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "panel_editable": "False",
+                "color": "#FFFFFF"
+              }
+            },
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_size": "25.3, 25.3",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "value": "TC/IconWhite",
+                "img_zoom": "0.75",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-25, -25",
+                "layout_size": "75.3, 75.3",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#FF2C2CFF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

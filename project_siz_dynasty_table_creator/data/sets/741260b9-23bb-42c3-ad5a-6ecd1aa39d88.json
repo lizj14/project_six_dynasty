@@ -1,0 +1,148 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "君主牌_导入",
+      "blueprint_name": "君主牌",
+      "hint_order_index": 3,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "纯质"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：4"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "纯质"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：4"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "雅好"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：6{newline}1-2：{emp_expansion}{newline}3-4：{emp_culture}{newline}5-6：{emp_art}"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "守成"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：5{newline}1-2：{emp_defense}{newline}3：{emp_expansion}{newline}4：{emp_reform}{newline}5：{emp_culture}{newline}6：{emp_art}"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "躬亲"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：7{newline}1-2：{emp_expansion}{newline}3：{emp_defense}{newline}4-5：{emp_reform}{newline}6：{emp_culture}"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200199,
+          "last_modification_date_unix": 1779200199,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "安逸"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "初始威望：5{newline}每回合-1司马家军力，+3vp{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3：{emp_art}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

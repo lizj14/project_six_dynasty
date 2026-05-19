@@ -1,0 +1,130 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "蓝图_001",
+      "type": "token",
+      "layout_size_mm": "12.8, 12.8",
+      "bleeding_size_mm": "0",
+      "main_panel_name": "",
+      "hint_order_index": 12,
+      "shape_settings":
+      {
+        "radius": "2"
+      },
+      "front_layers":
+      [
+        {
+          "name": "default_front",
+          "panels":
+          [
+            {
+              "name": "面板",
+              "data":
+              {
+                "layout_position": "1.850139, 3.675764",
+                "layout_size": "9.099723, 5.448472",
+                "panel_type": "text",
+                "value": "北伐",
+                "text_size": "4",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "logo",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "8.8, 8.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "value": "TC/IconWhite",
+                "color": "#9891FF",
+                "img_zoom": "0.75",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "color",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "8.8, 8.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "panel_editable": "False",
+                "color": "#FFFFFF",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "border",
+              "data":
+              {
+                "layout_position": "-2, -2",
+                "layout_size": "16.8, 16.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#FF0000FF"
+              }
+            }
+          ]
+        }
+      ],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "面板_001",
+              "data":
+              {
+                "layout_position": "1.850139, 3.675764",
+                "layout_size": "9.099723, 5.448472",
+                "panel_type": "text",
+                "value": "北伐",
+                "text_size": "4",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_size": "12.8, 12.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "panel_editable": "False",
+                "value": "TC/IconWhite",
+                "img_zoom": "0.75",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-25, -25",
+                "layout_size": "62.8, 62.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#FF0000FF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

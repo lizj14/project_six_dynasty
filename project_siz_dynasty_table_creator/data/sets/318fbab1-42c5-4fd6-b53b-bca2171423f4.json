@@ -1,0 +1,516 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "北方起始_导入",
+      "blueprint_name": "通用事件牌模板",
+      "hint_order_index": 9,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "宫廷"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}{save}1张{candidate}。{newline}{resource}2{vp}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "征辟人才"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}摸2张牌{newline}{resource}2{vp}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778543320,
+          "last_modification_date_unix": 1778543320,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-6"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "骑兵"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}4{battle}{newline}{resource}2{battle}。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

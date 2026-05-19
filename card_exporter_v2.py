@@ -443,29 +443,23 @@ def write_emperor_csv(file_path, emperors):
         # 4-6：{emp_art}
         effect_lines = [f"初始威望：{emperor['prestige']}"]
         
-        # 处理选项，按照1-6的顺序分组
+        # 处理选项，按照1-6的顺序分组（相邻相同的合并）
         options = emperor['options']
         if options:
-            # 选项1
-            if len(options) >= 1:
-                var_name = option_mapping.get(options[0], f"emp_{options[0]}")
-                effect_lines.append(f"1：{{{var_name}}}")
-            
-            # 选项2-3
-            if len(options) >= 3:
-                var_name = option_mapping.get(options[2], f"emp_{options[2]}")
-                effect_lines.append(f"2-3：{{{var_name}}}")
-            elif len(options) >= 2:
-                var_name = option_mapping.get(options[1], f"emp_{options[1]}")
-                effect_lines.append(f"2：{{{var_name}}}")
-            
-            # 选项4-6
-            if len(options) >= 6:
-                var_name = option_mapping.get(options[5], f"emp_{options[5]}")
-                effect_lines.append(f"4-6：{{{var_name}}}")
-            elif len(options) >= 4:
-                var_name = option_mapping.get(options[3], f"emp_{options[3]}")
-                effect_lines.append(f"4：{{{var_name}}}")
+            i = 0
+            while i < len(options):
+                current = options[i]
+                start = i + 1  # 骰子从1开始
+                # 找到连续相同的选项
+                while i + 1 < len(options) and options[i + 1] == current:
+                    i += 1
+                end = i + 1
+                var_name = option_mapping.get(current, f"emp_{current}")
+                if start == end:
+                    effect_lines.append(f"{start}：{{{var_name}}}")
+                else:
+                    effect_lines.append(f"{start}-{end}：{{{var_name}}}")
+                i += 1
         
         # 添加特效
         if emperor['effect']:

@@ -1,0 +1,368 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "目标牌_导入",
+      "blueprint_name": "目标牌",
+      "hint_order_index": 4,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "天府之土"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[巴蜀]{district}：7vp{newline}{player}{control}[巴蜀]{district}：14vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "江汉之固"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[荆襄]{district}：6vp{newline}{player}{control}[荆襄]{district}：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "河洛旧都"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[中原]{district}：16vp{newline}{player}{control}[中原]{district}：22vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "关中故畿"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[关中]{district}：14vp{newline}{player}{control}[关中]{district}：20vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "海岱之地"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[山东]{district}：7vp{newline}{player}{control}[山东]{district}：14vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "淮甸重镇"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[淮南]{district}：6vp{newline}{player}{control}[淮南]{district}：14vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "赵魏雄藩"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[河北]{district}：14vp{newline}{player}{control}[河北]{district}：20vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "表里山河"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{jin}{control}[山西]{district}：11vp{newline}{player}{control}[山西]{district}：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流芳百世"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "功绩超过5：8vp{newline}功绩最高，且超过7：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "加九锡"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "威望超过7：12vp{newline}威望最高，且超过第二名、第三名之和。：30vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "加九锡"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "威望超过7：12vp{newline}威望最高，且超过第二名、第三名之和。：30vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "琴书继美"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "幕僚区和存档区有3个艺术标记：7vp{newline}幕僚区和存档区有5个艺术标记：14vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "遗臭万年"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "幕僚区和存档区有3个权谋标记：7vp{newline}幕僚区和存档区有5个权谋标记：14vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "敦悦五经"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "儒学等级超过3：6vp{newline}儒学等级超过5，且儒学是第一名文化：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "清言世业"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "玄学等级超过3：6vp{newline}玄学等级超过5，且玄学是第一名文化：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1779150521,
+          "last_modification_date_unix": 1779150521,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "崇奉三宝"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "佛学等级超过3：6vp{newline}佛学等级超过5，且佛学是第一名文化：16vp"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

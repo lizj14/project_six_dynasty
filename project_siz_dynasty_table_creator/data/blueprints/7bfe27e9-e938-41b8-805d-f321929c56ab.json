@@ -79,7 +79,7 @@
                 "layout_constraint_h": "right",
                 "layout_constraint_v": "bottom",
                 "panel_type": "text",
-                "value": "归属",
+                "value": "{common}",
                 "text_font": "Satoshi",
                 "text_wrapping": "False",
                 "text_size": "2",

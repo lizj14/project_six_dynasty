@@ -2,6 +2,12 @@
   "json_version": 4,
   "export_settings":
   [
-    {}
+    {
+      "export_pdf": "False",
+      "export_images": "False",
+      "export_tts": "True",
+      "export_tts_grid_size": "8, 6",
+      "export_tts_export_to_tts_folder": "False"
+    }
   ]
 }

@@ -1,0 +1,7 @@
+﻿[Item Amount],text_top,text_bottom,[Item Note]
+1,纯质,初始威望：4,
+1,纯质,初始威望：4,
+1,雅好,初始威望：6{newline}1-2：{emp_expansion}{newline}3-4：{emp_culture}{newline}5-6：{emp_art},
+1,守成,初始威望：5{newline}1-2：{emp_defense}{newline}3：{emp_expansion}{newline}4：{emp_reform}{newline}5：{emp_culture}{newline}6：{emp_art},
+1,躬亲,初始威望：7{newline}1-2：{emp_expansion}{newline}3：{emp_defense}{newline}4-5：{emp_reform}{newline}6：{emp_culture},
+1,安逸,初始威望：5{newline}每回合-1司马家军力，+3vp{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3：{emp_art},

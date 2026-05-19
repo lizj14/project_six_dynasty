@@ -1,0 +1,295 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "北方可选幕僚_导入",
+      "blueprint_name": "通用事件牌模板",
+      "hint_order_index": 8,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1778371691,
+          "last_modification_date_unix": 1778371691,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "6"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "姚苌"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{military}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}获得1{battle}。{enter}{supplant}2个{neutral}{location}。{passive}{this}离开{friend_area}时，将1个己方{control}{location}{supplant}为{neutral}{location}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778371691,
+          "last_modification_date_unix": 1778371691,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "5"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "鸠摩罗什"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{culture}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}每次{play}{culture}牌或者{execute}{culture}策略时，获得3{vp}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778371691,
+          "last_modification_date_unix": 1778371691,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "5"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "司马道子"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{only}{north}{player}{play}。{action}{abandon}1张{jin}的{candidate}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778371691,
+          "last_modification_date_unix": 1778371691,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "6"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "孙恩"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}{pay}2{battle}，将一个[江南]{location}{supplant}为{neutral}{location}。[江南][荆襄]{district}每有一个{neutral}{location}，获得1{vp}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778371691,
+          "last_modification_date_unix": 1778371691,
+          "details":
+          [
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "慕容垂",
+                "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_event}-{military}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{friend_area}有空位时，可以{play}。获得7{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#F5EDDAFF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

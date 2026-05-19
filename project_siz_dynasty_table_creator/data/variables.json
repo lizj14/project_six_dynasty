@@ -3,28 +3,58 @@
   "variables":
   [
     {
+      "code": "owner_refugee",
+      "replacement": "流民",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "init",
+      "replacement": "起始",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
+      "code": "common",
+      "replacement": "通用",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
       "code": "emp_defense",
-      "replacement": "加固"
+      "replacement": "加固",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "emp_reform",
-      "replacement": "改革"
+      "replacement": "改革",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "emp_culture",
-      "replacement": "文化"
+      "replacement": "文化",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "emp_art",
-      "replacement": "艺术"
+      "replacement": "艺术",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "emp_expansion",
-      "replacement": "扩张"
+      "replacement": "扩张",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "newline",
-      "replacement": "\\n"
+      "replacement": "\\n",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
     },
     {
       "code": "other",
@@ -34,19 +64,19 @@
     },
     {
       "code": "Buddhist",
-      "replacement": "佛学",
+      "replacement": "[佛学]",
       "force_tint": "False",
       "color": "#FFFFFF00"
     },
     {
       "code": "Confusion",
-      "replacement": "儒学",
+      "replacement": "[儒学]",
       "force_tint": "False",
       "color": "#FFFFFF00"
     },
     {
       "code": "NeoTaosim",
-      "replacement": "玄学",
+      "replacement": "[玄学]",
       "force_tint": "False",
       "color": "#FFFFFF00"
     },

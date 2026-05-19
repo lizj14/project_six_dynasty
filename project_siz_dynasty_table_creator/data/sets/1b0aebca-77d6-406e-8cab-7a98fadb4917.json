@@ -1,0 +1,448 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "控制标记",
+      "blueprint_name": "蓝图_区域控制",
+      "hint_order_index": 5,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459142,
+          "last_modification_date_unix": 1779147137,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "西凉"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "西凉"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "1/2vp\n"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459165,
+          "last_modification_date_unix": 1779147128,
+          "details":
+          [
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "3/5vp"
+              }
+            },
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "关中"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "关中"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459189,
+          "last_modification_date_unix": 1779147148,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "巴蜀"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "巴蜀"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "2/3vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459200,
+          "last_modification_date_unix": 1779147162,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "荆襄"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "3/5vp"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "荆襄"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459221,
+          "last_modification_date_unix": 1779147205,
+          "details":
+          [
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "4/6vp"
+              }
+            },
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "江南"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "江南"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459244,
+          "last_modification_date_unix": 1779147221,
+          "details":
+          [
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "6/8vp"
+              }
+            },
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "中原"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "中原"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459245,
+          "last_modification_date_unix": 1779147230,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "山西"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "山西"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "2/3vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459273,
+          "last_modification_date_unix": 1779147309,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "山东"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "山东"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "2/3vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459283,
+          "last_modification_date_unix": 1779147317,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "淮南"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "淮南"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "2/3vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459294,
+          "last_modification_date_unix": 1779147327,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "河北"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "3/5vp"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "河北"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459313,
+          "last_modification_date_unix": 1779147337,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "幽燕"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "幽燕"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "1/2vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778459347,
+          "last_modification_date_unix": 1779147346,
+          "details":
+          [
+            {
+              "name": "区域",
+              "data":
+              {
+                "value": "塞外"
+              }
+            },
+            {
+              "name": "vp_001",
+              "data":
+              {
+                "value": "已计分"
+              }
+            },
+            {
+              "name": "区域_001",
+              "data":
+              {
+                "value": "塞外"
+              }
+            },
+            {
+              "name": "vp",
+              "data":
+              {
+                "value": "1/2vp"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

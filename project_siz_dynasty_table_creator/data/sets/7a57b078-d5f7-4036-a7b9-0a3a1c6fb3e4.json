@@ -1,0 +1,21 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "北伐标记",
+      "blueprint_name": "蓝图_001",
+      "hint_order_index": 0,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1779200342,
+          "last_modification_date_unix": 1779200342
+        }
+      ]
+    }
+  ]
+}
