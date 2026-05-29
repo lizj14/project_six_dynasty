@@ -1,9 +1,0 @@
-[Item Amount],vp数字,费用数字,text_top,text_top:color,text_owner,text_card_type,text_bottom,牌面背景:color,[Item Note]
-1,,,王导,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}任意{player}提高行动{order}时，获得2{vp}。{newline}{enter}{start_order}1。获得2{order}，2{contirbution}和2{prestige}，{supplant}[合肥][寿春]。,,
-1,,,谢安,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}每次获得{contirbution}后，摸1张牌。{newline}{enter}{start_order}8。获得2{contirbution}。在其他{jin}{player}完成登场效果后，{supplant}2个[建康]以外的{sima}{location}。,,
-1,,,郗鉴,,{common},"<align=""center"">{card_hero}-{jin}</align>",{action}{abandon}1张{court}的{refugee}，然后{supple}1张牌到{court}，获得1{battle}。{newline}{enter}{start_order}5。{supplant}[京口][广陵]。获得1{contirbution}和1{prestige}。,,
-1,,,张轨,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}每次{play}{culture}牌或者{execute}{culture}策略时，获得2{vp}。{newline}{enter}{start_order}3。{supplant}[张掖][姑臧]。获得1{contirbution}和1{prestige}。,,
-1,,,桓温,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}每次{save}1张没有{art}标记的牌时，获得3{vp}。{newline}{enter}{start_order}4。{supplant}[南郡][襄阳]。获得1{contirbution}和1{prestige}。,,
-1,,,刘裕,,{common},"<align=""center"">{card_hero}-{jin}</align>",{action}{execute}1次免费[{march}]。{newline}{enter}{start_order}7。,,
-1,,,祖逖,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}每次{execute}{supplant}后，摸1张牌并获得1{vp}。{newline}{enter}{start_order}6。获得4{battle}。获得2{prestige}。,,
-1,,,周玘,,{common},"<align=""center"">{card_hero}-{jin}</align>",{passive}每次{execute}{affair}策略或者{play}{affair}牌时，获得2{vp}。{newline}{enter}{start_order}2。{supplant}[吴][会稽]。获得1{contirbution}和1{prestige}。,,
