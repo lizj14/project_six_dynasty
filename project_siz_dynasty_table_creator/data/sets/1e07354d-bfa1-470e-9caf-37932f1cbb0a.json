@@ -1,0 +1,82 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "集_001",
+      "blueprint_name": "蓝图_003",
+      "hint_order_index": 0,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1780106071,
+          "last_modification_date_unix": 1780106683,
+          "details":
+          [
+            {
+              "name": "面板_001",
+              "data":
+              {
+                "value": "佛"
+              }
+            },
+            {
+              "name": "面板_002",
+              "data":
+              {
+                "value": "佛"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780106075,
+          "last_modification_date_unix": 1780106688,
+          "details":
+          [
+            {
+              "name": "面板_001",
+              "data":
+              {
+                "value": "玄"
+              }
+            },
+            {
+              "name": "面板_002",
+              "data":
+              {
+                "value": "玄"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780106080,
+          "last_modification_date_unix": 1780106692,
+          "details":
+          [
+            {
+              "name": "面板_001",
+              "data":
+              {
+                "value": "儒"
+              }
+            },
+            {
+              "name": "面板_002",
+              "data":
+              {
+                "value": "儒"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

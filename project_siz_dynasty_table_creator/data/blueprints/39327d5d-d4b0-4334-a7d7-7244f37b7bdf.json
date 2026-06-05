@@ -1,0 +1,126 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "蓝图_003",
+      "type": "token",
+      "layout_size_mm": "12.8, 12.8",
+      "bleeding_size_mm": "0",
+      "main_panel_name": "",
+      "hint_order_index": 14,
+      "shape_settings":
+      {
+        "radius": "2"
+      },
+      "front_layers":
+      [
+        {
+          "name": "default_front",
+          "panels":
+          [
+            {
+              "name": "面板_001",
+              "data":
+              {
+                "layout_position": "4.266667, 4.266667",
+                "layout_size": "4.266667, 4.266667",
+                "panel_type": "text",
+                "value": "文"
+              }
+            },
+            {
+              "name": "logo",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "8.8, 8.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "value": "TC/IconWhite",
+                "color": "#9891FF",
+                "img_zoom": "0.75",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "color",
+              "data":
+              {
+                "layout_position": "2, 2",
+                "layout_size": "8.8, 8.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_rectangle_radius": "3",
+                "panel_editable": "False",
+                "color": "#FFFFFF"
+              }
+            },
+            {
+              "name": "border",
+              "data":
+              {
+                "layout_position": "-2, -2",
+                "layout_size": "16.8, 16.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "procedural_type": "circleellipse",
+                "panel_editable": "False",
+                "color": "#FF91FAFF"
+              }
+            }
+          ]
+        }
+      ],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "面板_002",
+              "data":
+              {
+                "layout_position": "4.266667, 4.266667",
+                "layout_size": "4.266667, 4.266667",
+                "panel_type": "text",
+                "value": "文"
+              }
+            },
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_position": "7.546525, 0.8113893",
+                "layout_size": "4.509723, 4.668473",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "panel_editable": "False",
+                "value": "Lock/padlock",
+                "img_zoom": "0.75"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-24.08278, -24.22389",
+                "layout_size": "62.8, 62.8",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

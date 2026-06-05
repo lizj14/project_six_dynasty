@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -34,7 +34,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "告老还乡"
+                "value": "人何以堪"
               }
             },
             {
@@ -48,7 +48,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{power}</align>"
+                "value": "<align=\"center\">{card_mechanism}</align>"
               }
             },
             {
@@ -69,8 +69,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -105,14 +105,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{affair}</align>"
+                "value": "<align=\"center\">{card_mechanism}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{force}选择1个[{contirbution}]最高的{player}，该{player}-1[{contirbution}]并+5{vp}。摸1张牌。"
+                "value": "{force}选择1个[{contirbution}]最高的{player}，该{player}-1[{contirbution}]并+6{vp}。摸1张牌。"
               }
             },
             {
@@ -126,8 +126,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -183,8 +183,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -205,64 +205,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "农民起义"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{common}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_event}-{affair}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{force}{jin}行动{order}最高的{player}和{north}{player}，各选择1个非{friend_player}{location}转为{neutral}{control}。在{jin}和{north}{discard}牌区各放置1张{refugee}。摸1张牌。"
-              }
-            },
-            {
-              "name": "牌面背景",
-              "data":
-              {
-                "color": "#882420FF"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
-          "details":
-          [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "木犹如此"
+                "value": "天师道"
               }
             },
             {
@@ -283,7 +226,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{force}在{jin}和{north}{discard}牌区各放置1张{refugee}。将主版图{discard}牌区洗回牌库。摸1张牌。"
+                "value": "{force}选择1个{NeoTaosim}{district}的{location}，转为{neutral}{control}。摸1张牌。"
               }
             },
             {
@@ -297,8 +240,122 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "衣冠南渡"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_mechanism}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{force}在{jin}{discard}牌区各放置1张{refugee}，{north}{player}{discard}1张{hand}。将主版图{discard}牌区洗回牌库。摸1张牌。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#882420FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "名教之争"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_mechanism}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{force}如果{Confusion}{district}数>={NeoTaosim}{district}数，{sima}{prestige}+1；否则{sima}{prestige}-1。摸1张牌。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#882420FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -334,7 +391,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}</align>"
+                "value": "<align=\"center\">{card_event}-{power}</align>"
               }
             },
             {
@@ -355,8 +412,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -413,8 +470,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -471,8 +528,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -515,7 +572,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{control}[洛阳]时，可以{play}。{save}{this}。{urusp}交换{jin}{capital}和洛阳的{army}。获得1[{prestige}]。"
+                "value": "{only}{jin}{player}{play}。{occupy}[洛阳]时，可以{play}。{save}{this}。{urusp}交换{jin}{capital}和洛阳的{army}。获得1[{prestige}]。"
               }
             },
             {
@@ -529,15 +586,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "4"
               }
             },
             {
@@ -573,7 +630,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{friend_player}{control}[巴蜀]时，可以{play}。{save}{this}，提高1级{Confusion}。"
+                "value": "{friend_player}{control}[巴蜀]时，可以{play}。{save}{this}，传播1次{Confusion}。"
               }
             },
             {
@@ -587,8 +644,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -631,7 +688,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "史书区和{friend_area}有至少4个不同的符号时，可以{play}。{save}{this}。"
+                "value": "有至少4个不同的符号时，可以{play}。{save}{this}。"
               }
             },
             {
@@ -645,8 +702,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -703,8 +760,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -740,14 +797,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "史书区和{friend_area}有至少3个{emp_art}符号时，可以{play}，{save}{this}。"
+                "value": "有至少3个{culture}符号时，可以{play}，{save}{this}。"
               }
             },
             {
@@ -761,8 +818,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -818,8 +875,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -875,8 +932,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -911,14 +968,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}-{military}</align>"
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}1{battle}。{newline}{enter}{supplant}1个{sima}{occupy}{location}。"
+                "value": "{action}{pay}2{battle}，免费[{march}]1次。{newline}{enter}{supplant}1个{sima}{occupy}{location}。"
               }
             },
             {
@@ -932,15 +989,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -969,14 +1026,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "提高1级{NeoTaosim}，然后{save}{this}。"
+                "value": "传播1次{NeoTaosim}，然后{save}{this}。"
               }
             },
             {
@@ -990,15 +1047,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "12"
+                "value": "7"
               }
             },
             {
@@ -1027,14 +1084,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{save}{this}。"
+                "value": "传播1次{Confusion}，然后{save}{this}。"
               }
             },
             {
@@ -1048,8 +1105,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1085,7 +1142,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
@@ -1106,8 +1163,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1143,14 +1200,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{save}{this}。{end}{north}和{jin}国家牌库中，每有1张{refugee}，获得1{vp}"
+                "value": "{save}{this}。{end}{north}和{jin}国家牌库中，每有1张{refugee}，获得1{vp}。"
               }
             },
             {
@@ -1164,8 +1221,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1201,7 +1258,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{power}</align>"
               }
             },
             {
@@ -1222,8 +1279,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1259,7 +1316,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
@@ -1280,8 +1337,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1317,7 +1374,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
@@ -1338,15 +1395,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "4"
               }
             },
             {
@@ -1375,14 +1432,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "提高1级{Buddhist}，然后{save}{this}。"
+                "value": "传播1次{Buddhist}，然后{save}{this}。"
               }
             },
             {
@@ -1396,8 +1453,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1433,7 +1490,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
@@ -1454,15 +1511,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "12"
+                "value": "6"
               }
             },
             {
@@ -1491,14 +1548,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{friend_player}{control}[江南]时，可以{play}。{save}{this}。"
+                "value": "{friend_player}{control}[江南]时，可以{play}。传播1次{Confusion}，{save}{this}。"
               }
             },
             {
@@ -1512,8 +1569,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1555,15 +1612,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}选择另一名{player}，提高1级{Buddhist}。获得8{vp}。{newline}{resource}3{vp}。"
+                "value": "{decision}提高1级{Buddhist}贡献度，从供应轨移除1个{Buddhist}标记，获得3{vp}。{newline}{resource}3{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1605,15 +1662,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{emp_culture}。获得4{vp}。{newline}{resource}4{vp}。"
+                "value": "{decision}传播1次{emp_culture}。获得4{vp}。{newline}{resource}1{battle}2{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1655,29 +1712,29 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{Buddhist}。获得3{vp}。{newline}{resource}3{vp}。"
+                "value": "{decision}传播1次{Buddhist}，获得1{vp}。{newline}{resource}X {vp}，X={Buddhist}{district}数。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-9"
+                "value": "-12"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -1705,29 +1762,29 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{discard}1张{hand}，{save}1张{candidate}，提高1级{Confusion}。{newline}{resource}4{vp}。"
+                "value": "{decision}{pay}1张{hand}，{save}1张{candidate}，传播1次{Confusion}。{newline}{resource}1{battle}3{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-9"
+                "value": "-12"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -1755,15 +1812,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{Buddhist}，获得4{vp}。{newline}{resource}4{vp}。"
+                "value": "{decision}传播1次{Buddhist}。获得X {vp}，X={culture}标记数。{newline}{resource}5{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1777,14 +1834,14 @@
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "礼乐制度"
+                "value": "官僚制度"
               }
             },
             {
@@ -1798,22 +1855,22 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{Confusion}，获得3{vp}。{newline}{passive}{play}时，提高1级{Confusion}。{newline}{resource}3{vp}。"
+                "value": "{decision}{pay}1张{hand}，传播1次{Confusion}，征发1张{affair}{candidate}。{newline}{resource}3{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1855,15 +1912,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{emp_culture}。每有1级{emp_culture}等级，获得1{vp}。{newline}{resource}5{vp}。"
+                "value": "{decision}传播1次{emp_culture}。获得X {vp}，X={emp_culture}贡献等级之和。{newline}{resource}5{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1905,15 +1962,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{NeoTaosim}，提高1级{order}。{newline}{passive}{only}{jin}{player}{play}。{newline}{resource}4{vp}。"
+                "value": "{decision}传播1次{NeoTaosim}。获得X {vp}，X={save}区牌数。{newline}{resource}4{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1956,7 +2013,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "选择一个{jin}{player}，失去1{battle}。然后，获得1{battle}。{urusp}{save}{this}，获得1{battle}。"
+                "value": "选择1个{jin}{player}，该{player}失去1{battle}。然后，获得1{battle}。{urusp}{save}{this}，获得1{battle}。"
               }
             },
             {
@@ -1970,8 +2027,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -1985,7 +2042,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2014,7 +2071,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{pay}2{vp}，然后{supplant}1个{jin}{location}。"
+                "value": "{only}{jin}{player}{play}。{Buddhist}贡献度>1时，可以{play}。{pay}2{vp}，然后{supplant}1个{jin}{location}。"
               }
             },
             {
@@ -2028,8 +2085,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -2086,8 +2143,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -2144,8 +2201,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105260,
           "details":
           [
             {
@@ -2202,15 +2259,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105260,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "1"
               }
             },
             {
@@ -2224,7 +2281,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "皮里阳秋",
+                "value": "焉能有功",
                 "color": "#292929FF"
               }
             },
@@ -2246,7 +2303,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。提高1级{order}。"
+                "value": "{order}最低时可以{play}。提高2级{order}，然后{save}{this}。"
               }
             },
             {
@@ -2260,17 +2317,10 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
             {
               "name": "费用数字",
               "data":
@@ -2282,7 +2332,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "王国宝",
+                "value": "鸩酒",
                 "color": "#292929FF"
               }
             },
@@ -2304,7 +2354,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "选择1个{jin}{player}，随机{discard}掉他的1张{hand}。获得2{vp}。{urusp}改为随机{discard}掉2张。"
+                "value": "{only}{jin}{player}{play}。{save}1个幕僚，然后{save}1个{friend_player}{player}的幕僚。{urusp}改为移除1个{friend_player}{player}的幕僚。"
               }
             },
             {
@@ -2318,15 +2368,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "2"
               }
             },
             {
@@ -2362,7 +2412,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "[{prestige}]最高的{jin}{player}，失去2[{prestige}]，获得2{vp}。"
+                "value": "[{prestige}]最高的{jin}{player}，失去2[{prestige}]，获得2{vp}。{urusp}改为选择1个{jin}{player}，失去2[{prestige}]，{save}{this}。"
               }
             },
             {
@@ -2376,8 +2426,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -2434,15 +2484,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2471,14 +2521,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}</align>"
+                "value": "<align=\"center\">{card_event}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{search}{art}，然后{save}{this}。"
+                "value": "{search}2次{culture}，然后{save}{this}。"
               }
             },
             {
@@ -2492,15 +2542,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2536,7 +2586,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{search}{power}，然后{save}{this}。"
+                "value": "{search}2次{power}，然后{save}{this}。"
               }
             },
             {
@@ -2550,15 +2600,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "2"
               }
             },
             {
@@ -2572,8 +2622,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "郭璞",
-                "color": "#292929FF"
+                "value": "郭璞"
               }
             },
             {
@@ -2587,29 +2636,29 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{art}</align>"
+                "value": "<align=\"center\">{card_friend}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{search}{card_mechanism}，然后{save}{this}。"
+                "value": "{action}{pay}1张{hand}，选择{culture}{affair}{military}或{power}标记，{search}该标记。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "color": "#F5EDDAFF"
+                "color": "#3E5F91FF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -2623,7 +2672,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "2"
               }
             },
             {
@@ -2652,7 +2701,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{pay}1{battle}，然后提高1级{order}，提高1级{NeoTaosim}。"
+                "value": "提高1级{order}，传播1次{NeoTaosim}。"
               }
             },
             {
@@ -2666,8 +2715,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -2681,7 +2730,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -2710,7 +2759,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{occupy}[长安]时，可以{play}。提高2级{Buddhist}，{save}{this}。"
+                "value": "{control}[关中]时，可以{play}。传播2次{Buddhist}，{save}{this}。"
               }
             },
             {
@@ -2724,8 +2773,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -2761,14 +2810,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{culture}</align>"
+                "value": "<align=\"center\">{card_event}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{Confusion}等级大于等于1时，可以作为事件{play}。{save}1张{candidate}，提高1级{Confusion}。"
+                "value": "{Confusion}贡献度>1时，可以作为事件{play}。{save}1张{candidate}，传播1次{Confusion}。"
               }
             },
             {
@@ -2782,15 +2831,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "6"
               }
             },
             {
@@ -2826,7 +2875,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "提高1级{NeoTaosim}，获得6{vp}，{save}{this}。"
+                "value": "传播1次{NeoTaosim}，{save}{this}。"
               }
             },
             {
@@ -2840,15 +2889,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "7"
               }
             },
             {
@@ -2884,7 +2933,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "选择一个你在所有{player}中等级最低的{emp_culture}轨道，提升2级，然后{save}{this}。"
+                "value": "{vp}条上最低的{player}可以{play}，{save}{this}。"
               }
             },
             {
@@ -2898,8 +2947,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -2913,7 +2962,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2955,8 +3004,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3012,8 +3061,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3055,7 +3104,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次提高{order}等级时，{discard}1张牌，然后摸1张牌。{newline}{enter}{discard}1张牌，然后摸1张牌。"
+                "value": "{action}{pay}2{battle}，提高1级{order}等级。"
               }
             },
             {
@@ -3069,8 +3118,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3126,8 +3175,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3169,7 +3218,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "每当{friend_player}提高1级{emp_culture}等级时，获得1{vp}。"
+                "value": "{passive}每当{friend_player}传播1次{emp_culture}时，获得1{vp}。{newline}{action}选择1个版图上的{emp_culture}标记翻面。"
               }
             },
             {
@@ -3183,8 +3232,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3226,7 +3275,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "每当{Buddhist}等级提高时，摸1张牌。"
+                "value": "{passive}每当{Buddhist}标记放置到版图上时，摸1张牌。{newline}{action}选择1个版图上的{emp_culture}标记翻面。"
               }
             },
             {
@@ -3240,8 +3289,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3255,7 +3304,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -3276,14 +3325,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}-{art}</align>"
+                "value": "<align=\"center\">{card_friend}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "每当任意{player}{play}{art}牌时，获得2{vp}。"
+                "value": "{action}从{hand}免费{play}1张[幕僚]，然后{save}{this}。"
               }
             },
             {
@@ -3297,8 +3346,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3340,7 +3389,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{newline}{passive}{execute}{urusp}效果时，获得2{vp}。"
+                "value": "{only}{jin}{player}{play}。{newline}{passive}结算{urusp}效果时，获得2{vp}。"
               }
             },
             {
@@ -3354,8 +3403,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3397,15 +3446,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}获得2{battle}。{execute}1次免费[{emp_defense}]行动。{newline}{resource}[{emp_defense}]1次。1{vp}。。"
+                "value": "{decision}获得2{battle}。免费[{emp_defense}]2次。{newline}{resource}[{emp_defense}]1次。1{vp}。。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3447,15 +3496,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{discard}1张{hand}，获得5{battle}。{newline}{resource}1{battle}。"
+                "value": "{decision}{pay}1张{hand}，获得5{battle}。{newline}{resource}2{battle}-1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3476,7 +3525,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "誓师北伐"
+                "value": "分久必合"
               }
             },
             {
@@ -3497,15 +3546,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}4{battle}。从{jin_panel}获得{expedition}。{newline}{passive}{only}{jin}{player}{play}。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}5{battle}。从{jin_panel}获得{expedition}。{newline}{passive}{Confusion}等级>1时，可以{play}或{execute}。{newline}{resource}2{battle}2{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3547,15 +3596,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。{discard}掉1张{refugee}并在{display}补1张牌，获得2{battle}。{newline}{resource}2{battle}。"
+                "value": "{decision}2{battle}。{abandon}1{court}的{refugee}并在{court}补1张牌，获得2{battle}。{newline}{resource}2{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3597,15 +3646,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}4{battle}{newline}{resource}2{battle}。"
+                "value": "{decision}4{battle}。{newline}{resource}2{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3647,15 +3696,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{jin}{newline}{decision}2{battle}。{execute}1次免费[{emp_defense}]行动。{north}{newline}{decision}{supplant}1个{neighbor}{neutral}{location}。{newline}{resource}1{battle}1{vp}。"
+                "value": "{jin}{newline}{decision}2{battle}。免费[{emp_defense}]2次。{north}{newline}{decision}{supplant}1个{neighbor}{neutral}{location}。{newline}{resource}2{battle}-1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3697,15 +3746,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}。指定1个{player}，随机{discard}掉1张{hand}。{newline}{passive}需要{occupy}至少5个[巴蜀][荆襄][江南][淮南]以外的{location}，才能{play}。{newline}{resource}2{battle}。"
+                "value": "{decision}3{battle}。选择1个{player}，随机{abandon}1张{hand}。{newline}{passive}需要{control}[幽燕]或[塞外]，才能{play}或{execute}。{newline}{resource}2{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3726,7 +3775,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "广纳贤才"
+                "value": "总督区"
               }
             },
             {
@@ -3747,15 +3796,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}摸3张牌。{newline}{resource}1{battle}2{vp}。"
+                "value": "{decision}征发2张{candidate}。获得1{battle}。{newline}{resource}1{battle}2{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3790,7 +3839,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}-{art}</align>"
+                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
               }
             },
             {
@@ -3804,8 +3853,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3826,7 +3875,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "著作郎"
+                "value": "土断"
               }
             },
             {
@@ -3840,36 +3889,36 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}，获得1{vp}。{newline}{passive}{play}时，提高1级{Confusion}。{newline}{resource}4{vp}。"
+                "value": "{only}{jin}{player}{play}。{newline}{decision}3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。2{battle}。{newline}{resource}2{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-9"
+                "value": "-12"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -3890,22 +3939,22 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}进行1次免费[{occupy}]，放置{sima}{army}，提高1级{sima}[{prestige}]。获得1{battle}，提高1级{Confusion}，获得5{vp}。{newline}{resource}1{battle}2{vp}。"
+                "value": "{decision}进行1次免费[{occupy}]，放置{sima}{army}，提高1级{sima}[{prestige}]。然后获得2{battle}，传播1次{Confusion}，获得3{vp}。{newline}{resource}2{battle}1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3947,15 +3996,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}，{discard}1张{hand}，然后摸1张牌。{newline}{resource}1{battle}2{vp}。"
+                "value": "{decision}{pay}1{vp}，{save}1张{candidate}，征发1张{candidate}。{newline}{resource}1{battle}2{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -3990,7 +4039,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}-{art}</align>"
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
               }
             },
             {
@@ -4004,8 +4053,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4062,8 +4111,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4084,7 +4133,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "草木皆兵",
+                "value": "风声鹤唳，草木皆兵",
                 "color": "#292929FF"
               }
             },
@@ -4120,8 +4169,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4178,8 +4227,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4236,8 +4285,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4280,7 +4329,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "在国家板{discard}牌区加入1张{refugee}，然后获得4{battle}。如果是{north}{player}，额外获得1{battle}。"
+                "value": "在本国{discard}牌区加入1张{refugee}，然后获得4{battle}。如果是{north}{player}，额外获得1{battle}。"
               }
             },
             {
@@ -4294,15 +4343,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "10"
+                "value": "11"
               }
             },
             {
@@ -4352,8 +4401,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4410,15 +4459,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "10"
+                "value": "12"
               }
             },
             {
@@ -4468,15 +4517,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "9"
               }
             },
             {
@@ -4512,7 +4561,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "将[巴蜀]{district}的1个{location}转为{neutral}{occupy}，然后{save}{this}。"
+                "value": "{choose}将[巴蜀]{district}的1个{location}转为{neutral}{occupy}，然后将{this}洗回牌库；或者{pay}3{battle}，然后{save}{this}。"
               }
             },
             {
@@ -4526,8 +4575,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4570,7 +4619,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "选择1个非{jin}{occupy}的{location}，转为{sima}{occupy}。获得3{vp}。{urusp}改为{player}{occupy}。"
+                "value": "选择1个非{jin}{occupy}的{Confusion}{district}的{location}，转为{sima}{occupy}。获得3{vp}。{urusp}改为{player}{occupy}。"
               }
             },
             {
@@ -4584,8 +4633,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4628,7 +4677,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "拥有至少7{battle}时，可以作为事件{play}。{supplant}1个{neighbor}{location}。"
+                "value": "拥有至少7{battle}时，可以作为事件{play}。{supplant}1个{neighbor}非{friend_player}{location}。"
               }
             },
             {
@@ -4642,15 +4691,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "2"
               }
             },
             {
@@ -4686,7 +4735,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "摸两张牌。"
+                "value": "摸2张牌，然后{save}{this}。"
               }
             },
             {
@@ -4700,15 +4749,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -4744,7 +4793,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "提高1级{order}，提高1级{Buddhist}，{save}{this}"
+                "value": "提高1级{order}，传播1次{Buddhist}，{save}{this}"
               }
             },
             {
@@ -4758,8 +4807,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {
@@ -4816,8 +4865,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150616,
-          "last_modification_date_unix": 1779150616,
+          "creation_date_unix": 1780105261,
+          "last_modification_date_unix": 1780105261,
           "details":
           [
             {

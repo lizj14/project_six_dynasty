@@ -1,3 +1,6 @@
 old_file/
 ~$*
 .claude/
+__pycache__/
+images/ai/
+**/assets/images/ai/

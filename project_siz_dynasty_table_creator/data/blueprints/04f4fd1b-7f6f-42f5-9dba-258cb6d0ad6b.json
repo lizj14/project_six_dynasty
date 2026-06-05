@@ -1,0 +1,55 @@
+{
+  "json_version": 4,
+  "blueprints":
+  [
+    {
+      "name": "蓝图_002",
+      "type": "token",
+      "layout_size_mm": "19, 19",
+      "bleeding_size_mm": "0",
+      "main_panel_name": "",
+      "hint_order_index": 13,
+      "shape_settings":
+      {
+        "radius": "2"
+      },
+      "front_layers":
+      [],
+      "back_layers":
+      [
+        {
+          "name": "default_back",
+          "panels":
+          [
+            {
+              "name": "back_logo",
+              "data":
+              {
+                "layout_size": "19, 19",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "image",
+                "panel_editable": "False",
+                "value": "TC/IconWhite",
+                "img_zoom": "0.75"
+              }
+            },
+            {
+              "name": "back_color",
+              "data":
+              {
+                "layout_position": "-25, -25",
+                "layout_size": "69, 69",
+                "layout_constraint_h": "left_and_right",
+                "layout_constraint_v": "top_and_bottom",
+                "panel_type": "procedural",
+                "panel_editable": "False",
+                "color": "#9891FF"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

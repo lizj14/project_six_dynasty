@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1779150598,
-          "last_modification_date_unix": 1779150598,
+          "creation_date_unix": 1780108819,
+          "last_modification_date_unix": 1780108839,
           "details":
           [
             {
@@ -34,22 +34,22 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}</align>"
+                "value": "<align=\"center\">{card_hero}-{north}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后从{display}获得2张牌。{newline}{enter}{supplant}[长安][弘农][安定]"
+                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定]"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150598,
-          "last_modification_date_unix": 1779150598,
+          "creation_date_unix": 1780108819,
+          "last_modification_date_unix": 1780108819,
           "details":
           [
             {
@@ -70,22 +70,22 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}</align>"
+                "value": "<align=\"center\">{card_hero}-{north}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，获得1{battle}并{supple}1张牌到{court}。{newline}{enter}{supplant}[蓟][龙城][中山]。"
+                "value": "{action}{discard}1张{hand}，然后{execute}1个牌组行动。{newline}{enter}{supplant}[蓟][龙城][中山]。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150598,
-          "last_modification_date_unix": 1779150598,
+          "creation_date_unix": 1780108819,
+          "last_modification_date_unix": 1780108819,
           "details":
           [
             {
@@ -106,14 +106,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}</align>"
+                "value": "<align=\"center\">{card_hero}-{north}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后获得2{battle}。{newline}{enter}{supplant}[盛乐][平城]，获得4{battle}。"
+                "value": "{action}{discard}1张{hand}，获得X{battle}，X=你的{military}标记数（最多4）。{newline}{enter}{supplant}[盛乐][平城]，获得4{battle}。"
               }
             }
           ]

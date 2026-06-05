@@ -12,15 +12,15 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1778371691,
-          "last_modification_date_unix": 1778371691,
+          "creation_date_unix": 1780106922,
+          "last_modification_date_unix": 1780106922,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "8"
               }
             },
             {
@@ -55,7 +55,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}获得1{battle}。{enter}{supplant}2个{neutral}{location}。{passive}{this}离开{friend_area}时，将1个己方{control}{location}{supplant}为{neutral}{location}。"
+                "value": "{action}1{battle}。{newline}{enter}{supplant}2个{neutral}{location}。{newline}{passive}{this}离开{friend_area}时，将2个己方{control}{location}{supplant}为{neutral}{location}。"
               }
             },
             {
@@ -69,15 +69,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1778371691,
-          "last_modification_date_unix": 1778371691,
+          "creation_date_unix": 1780106922,
+          "last_modification_date_unix": 1780106922,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "6"
               }
             },
             {
@@ -112,7 +112,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{play}{culture}牌或者{execute}{culture}策略时，获得3{vp}。"
+                "value": "{action}{pay}2{battle}，提高1级{emp_culture}等级。"
               }
             },
             {
@@ -126,22 +126,22 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1778371691,
-          "last_modification_date_unix": 1778371691,
+          "creation_date_unix": 1780106922,
+          "last_modification_date_unix": 1780106922,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "4"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -169,7 +169,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{north}{player}{play}。{action}{abandon}1张{jin}的{candidate}。"
+                "value": "{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{jin}{court}每有1张{refugee}，获得2{vp}。"
               }
             },
             {
@@ -183,22 +183,22 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1778371691,
-          "last_modification_date_unix": 1778371691,
+          "creation_date_unix": 1780106922,
+          "last_modification_date_unix": 1780106922,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "4"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "3"
+                "value": "1"
               }
             },
             {
@@ -219,14 +219,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}</align>"
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}2{battle}，将一个[江南]{location}{supplant}为{neutral}{location}。[江南][荆襄]{district}每有一个{neutral}{location}，获得1{vp}。"
+                "value": "{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，[江南][荆襄][淮南]每有1个{neutral}{location}，获得2{vp}。"
               }
             },
             {
@@ -240,8 +240,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1778371691,
-          "last_modification_date_unix": 1778371691,
+          "creation_date_unix": 1780106922,
+          "last_modification_date_unix": 1780106922,
           "details":
           [
             {
@@ -277,7 +277,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{friend_area}有空位时，可以{play}。获得7{battle}。"
+                "value": "{friend_area}有空位时，可以{play}。获8{battle}，然后将{this}洗回牌库。"
               }
             },
             {

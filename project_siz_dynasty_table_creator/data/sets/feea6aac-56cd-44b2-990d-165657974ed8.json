@@ -5,15 +5,15 @@
     {
       "name": "目标牌_导入",
       "blueprint_name": "目标牌",
-      "hint_order_index": 4,
+      "hint_order_index": 5,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -34,30 +34,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
-          "details":
-          [
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "江汉之固"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{jin}{control}[荆襄]{district}：6vp{newline}{player}{control}[荆襄]{district}：16vp"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -78,8 +56,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -100,8 +78,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -122,30 +100,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
-          "details":
-          [
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "淮甸重镇"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{jin}{control}[淮南]{district}：6vp{newline}{player}{control}[淮南]{district}：14vp"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -166,8 +122,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -188,52 +144,30 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
               "name": "text_top",
               "data":
               {
-                "value": "流芳百世"
+                "value": "配享文庙"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "功绩超过5：8vp{newline}功绩最高，且超过7：16vp"
+                "value": "功绩大于等于7：10vp{newline}功绩等于10：18vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
-          "details":
-          [
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "加九锡"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "威望超过7：12vp{newline}威望最高，且超过第二名、第三名之和。：30vp"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -247,37 +181,59 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "威望超过7：12vp{newline}威望最高，且超过第二名、第三名之和。：30vp"
+                "value": "威望超过7：12vp{newline}威望最高，且超过第二名至少4点。：30vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
               "name": "text_top",
               "data":
               {
-                "value": "琴书继美"
+                "value": "加九锡"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "幕僚区和存档区有3个艺术标记：7vp{newline}幕僚区和存档区有5个艺术标记：14vp"
+                "value": "威望超过7：12vp{newline}威望最高，且超过第二名至少4点。：30vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "家财万贯"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "手牌超过5张：6vp{newline}手牌超过8张：12vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -298,8 +254,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -313,15 +269,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "儒学等级超过3：6vp{newline}儒学等级超过5，且儒学是第一名文化：16vp"
+                "value": "儒学贡献超过3：6vp{newline}儒学贡献超过5，且儒学区域最多：16vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -335,15 +291,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "玄学等级超过3：6vp{newline}玄学等级超过5，且玄学是第一名文化：16vp"
+                "value": "玄学贡献超过3：6vp{newline}玄学贡献超过5，且玄学区域最多：16vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150521,
-          "last_modification_date_unix": 1779150521,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
           "details":
           [
             {
@@ -357,7 +313,51 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "佛学等级超过3：6vp{newline}佛学等级超过5，且佛学是第一名文化：16vp"
+                "value": "佛学贡献超过3：6vp{newline}佛学贡献超过5，且佛学区域最多：16vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "配享武庙"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "威望超过7，且没有完成[加九锡]：10vp{newline}威望等于10，且没有完成[加九锡]：18vp"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780356402,
+          "last_modification_date_unix": 1780356402,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "世说新语"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "史书区有5张牌：8vp{newline}史书区有8张牌：16vp"
               }
             }
           ]

@@ -78,12 +78,11 @@ def parse_card_design(csv_path):
                 '史书vp': row[7] if len(row) > 7 else '',
                 '文化标记': get_int(row[8]) if len(row) > 8 else 0,
                 '军事标记': get_int(row[9]) if len(row) > 9 else 0,
-                '艺术标记': get_int(row[10]) if len(row) > 10 else 0,
-                '权谋标记': get_int(row[11]) if len(row) > 11 else 0,
-                '内政标记': get_int(row[12]) if len(row) > 12 else 0,
-                '限定东晋': get_int(row[13]) if len(row) > 13 else 0,
-                '限定北方': get_int(row[14]) if len(row) > 14 else 0,
-                '僭越': get_int(row[15]) if len(row) > 15 else 0,
+                '权谋标记': get_int(row[10]) if len(row) > 10 else 0,
+                '内政标记': get_int(row[11]) if len(row) > 11 else 0,
+                '限定东晋': get_int(row[12]) if len(row) > 12 else 0,
+                '限定北方': get_int(row[13]) if len(row) > 13 else 0,
+                '僭越': get_int(row[14]) if len(row) > 14 else 0,
                 '公共': get_int(row[30]) if len(row) > 30 else 0,
                 '儒学': get_int(row[33]) if len(row) > 33 else 0,
                 '玄学': get_int(row[34]) if len(row) > 34 else 0,
@@ -172,12 +171,23 @@ def get_card_type_tag(card):
     if '公共' in card['卡牌分类']:
         return '{card_public}'
     
-    # 角色牌特殊处理：添加北方/东晋标识
+    # 角色牌特殊处理：添加北方/东晋标识 + 标记后缀
     if card_type == '角色牌':
+        base = '{card_hero}'
         if '北方' in card_category:
-            return '{card_hero}-{north}'
+            base += '-{north}'
         else:
-            return '{card_hero}-{jin}'
+            base += '-{jin}'
+        # 添加标记后缀
+        if card['文化标记']:
+            base += '-{culture}'
+        elif card['军事标记']:
+            base += '-{military}'
+        elif card['权谋标记']:
+            base += '-{power}'
+        elif card['内政标记']:
+            base += '-{affair}'
+        return base
     
     # 确定类型前缀
     type_prefix = {
@@ -194,8 +204,6 @@ def get_card_type_tag(card):
         tag_suffix = '-{culture}'
     elif card['军事标记']:
         tag_suffix = '-{military}'
-    elif card['艺术标记']:
-        tag_suffix = '-{art}'
     elif card['权谋标记']:
         tag_suffix = '-{power}'
     elif card['内政标记']:
@@ -567,8 +575,8 @@ def main():
     }
     
     jin_counts = {
-        '士卒': 4,
-        '流民': 2,
+        '士卒': 3,
+        '流民': 3,
         '宫廷': 1,
         '加官进爵': 1,
         '北伐': 1,

@@ -5,15 +5,15 @@
     {
       "name": "公共_导入",
       "blueprint_name": "通用事件牌模板",
-      "hint_order_index": 2,
+      "hint_order_index": 3,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150463,
+          "creation_date_unix": 1780105764,
+          "last_modification_date_unix": 1780105764,
           "details":
           [
             {
@@ -56,10 +56,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{pay}7{battle}，每{occupy}1个和{capital}{neighbor}的{location}，减少1点{battle}{fee}。获得1{prestige}。{choose}选择1个{jin}{player}，失去2{prestige}；或者其他{jin}{player}和{sima}各失去1{prestige}。{urusp}获得4{vp}。",
-                "text_size_min": "2.7",
-                "text_size_max": "2.7",
-                "text_alignment_h": "left"
+                "value": "{only}{jin}{player}{play}。{pay}7{battle}。选择{prestige}、{contirbution}或者{order}，提高1级，其他所有{jin}{player}降低1级。{urusp}{sima}{prestige}降低1级，获得4{vp}。"
               }
             },
             {
@@ -73,8 +70,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150440,
+          "creation_date_unix": 1780105764,
+          "last_modification_date_unix": 1780105764,
           "details":
           [
             {
@@ -88,7 +85,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -117,7 +114,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "提高1级{emp_culture}，获得2{vp}。"
+                "value": "传播1次{emp_culture}，获得2{vp}。"
               }
             },
             {
@@ -131,66 +128,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150440,
-          "details":
-          [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "value": "2"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "艺术创作",
-                "color": "#292929FF"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{common}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_public}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "获得6{vp}。"
-              }
-            },
-            {
-              "name": "牌面背景",
-              "data":
-              {
-                "color": "#F5EDDAFF"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150440,
+          "creation_date_unix": 1780105764,
+          "last_modification_date_unix": 1780105764,
           "details":
           [
             {
@@ -247,66 +186,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150440,
-          "details":
-          [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "value": "2"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "广开言路",
-                "color": "#292929FF"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{common}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_public}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{discard}1张{hand}，然后摸3张牌。"
-              }
-            },
-            {
-              "name": "牌面背景",
-              "data":
-              {
-                "color": "#F5EDDAFF"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1779150440,
-          "last_modification_date_unix": 1779150440,
+          "creation_date_unix": 1780105764,
+          "last_modification_date_unix": 1780105764,
           "details":
           [
             {
@@ -349,7 +230,65 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。降低1[{prestige}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+                "value": "{only}{jin}{player}{play}。降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#F5EDDAFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1780105764,
+          "last_modification_date_unix": 1780105764,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "求田问舍",
+                "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_public}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "7{vp}。如果{NeoTaosim}贡献度>1，额外获得4{vp}"
               }
             },
             {

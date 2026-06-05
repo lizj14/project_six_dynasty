@@ -5,15 +5,15 @@
     {
       "name": "君主牌_导入",
       "blueprint_name": "君主牌",
-      "hint_order_index": 3,
+      "hint_order_index": 4,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -27,15 +27,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：4"
+                "value": "初始威望：4{newline}不投掷君主骰"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -49,15 +49,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：4"
+                "value": "初始威望：4{newline}不投掷君主骰"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -71,15 +71,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：6{newline}1-2：{emp_expansion}{newline}3-4：{emp_culture}{newline}5-6：{emp_art}"
+                "value": "初始威望：6{newline}1-2：{emp_expansion}{newline}3：{emp_reform}{newline}4：{emp_culture}{newline}5-6：{emp_art}"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -100,8 +100,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -122,8 +122,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1779200199,
-          "last_modification_date_unix": 1779200199,
+          "creation_date_unix": 1780105295,
+          "last_modification_date_unix": 1780105295,
           "details":
           [
             {
@@ -137,7 +137,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：5{newline}每回合-1司马家军力，+3vp{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3：{emp_art}"
+                "value": "初始威望：5{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3：{emp_art}{newline}4-6：{emp_culture}"
               }
             }
           ]
