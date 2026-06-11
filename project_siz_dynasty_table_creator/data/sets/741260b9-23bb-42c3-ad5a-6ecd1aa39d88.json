@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -34,8 +34,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -56,8 +56,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -78,8 +78,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -100,8 +100,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -122,8 +122,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105295,
-          "last_modification_date_unix": 1780105295,
+          "creation_date_unix": 1780834785,
+          "last_modification_date_unix": 1780834785,
           "details":
           [
             {
@@ -137,7 +137,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：5{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3：{emp_art}{newline}4-6：{emp_culture}"
+                "value": "初始威望：5{newline}1：{emp_expansion}{newline}2：{emp_defense}{newline}3-4：{emp_art}{newline}5-6：{emp_culture}"
               }
             }
           ]

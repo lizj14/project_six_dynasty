@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -62,8 +62,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -112,8 +112,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -162,8 +162,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -212,8 +212,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -262,8 +262,58 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}{newline}{resource}1{battle}。"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -312,58 +362,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
-          "details":
-          [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "2"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "value": "0"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "流民"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{north}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_strategy}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -405,15 +405,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}。{newline}{resource}2{vp}。"
+                "value": "{decision}{save}1张{candidate}。{newline}{resource}1{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
@@ -448,29 +448,29 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}</align>"
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}摸2张牌{newline}{resource}2{vp}。"
+                "value": "{decision}摸2张牌。如果{affair}标记数>3，额外摸1张牌。{newline}{resource}1{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105750,
-          "last_modification_date_unix": 1780105750,
+          "creation_date_unix": 1781137121,
+          "last_modification_date_unix": 1781137121,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-6"
+                "value": "-9"
               }
             },
             {
@@ -484,7 +484,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "骑兵"
+                "value": "轻骑兵"
               }
             },
             {
@@ -505,7 +505,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}4{battle}{newline}{resource}2{battle}。"
+                "value": "{decision}2{battle}。选择1个{player}，随机抽取他的1张{hand}。{newline}{resource}2{battle}1{vp}。"
               }
             }
           ]

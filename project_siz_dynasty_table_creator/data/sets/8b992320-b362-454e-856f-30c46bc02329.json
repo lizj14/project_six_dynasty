@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -48,8 +48,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -84,8 +84,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108782,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -106,7 +106,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{power}</align>"
+                "value": "<align=\"center\">{card_hero}-{jin}-{affair}</align>"
               }
             },
             {
@@ -120,8 +120,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -156,8 +156,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -185,15 +185,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{save}1张没有{art}标记的牌时，获得3{vp}。{newline}{enter}{start_order}4。{supplant}[南郡][襄阳]。获得1{contirbution}和1{prestige}。"
+                "value": "{passive}每次{save}1张牌时，获得2{vp}。{newline}{enter}{start_order}4。{supplant}[南郡][襄阳]。获得1{contirbution}和1{prestige}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -221,15 +221,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{execute}1次免费[{march}]。{newline}{enter}{start_order}7。"
+                "value": "{passive}{friend_area}空位总数为6。{newline}{action}如果拥有4种不同的标记各1个，获得1个朝堂行动；否则，可以{play}1张{card_friend}，然后摸1张牌。{newline}{enter}{start_order}7。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {
@@ -257,15 +257,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次[{supplant}]后，摸1张牌并获得1{vp}。{newline}{enter}{start_order}6。获得4{battle}。获得2{prestige}。"
+                "value": "{passive}每次结算[{supplant}]后，摸1张牌并获得1{vp}。{newline}{enter}{start_order}6。获得4{battle}。获得2{prestige}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108764,
-          "last_modification_date_unix": 1780108764,
+          "creation_date_unix": 1781137150,
+          "last_modification_date_unix": 1781137150,
           "details":
           [
             {

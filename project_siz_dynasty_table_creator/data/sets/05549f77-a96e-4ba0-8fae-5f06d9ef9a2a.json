@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -55,7 +55,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}获得X{battle}，X=你的{military}标记数（最多4）。"
+                "value": "{action}获得X{battle}，X={military}标记数（最多4）。"
               }
             },
             {
@@ -69,8 +69,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -126,15 +126,15 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-6"
+                "value": "-9"
               }
             },
             {
@@ -169,29 +169,29 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{supplant}1个{neighbor}非{friend_player}{location}。{newline}{resource}1{battle}2{vp}。"
+                "value": "{decision}{pay}3{vp}，{supplant}2个{neighbor}{neutral}{location}。{newline}{resource}2{battle}1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "2"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -226,8 +226,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -269,15 +269,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}5{battle}。{newline}{passive}需要{occupy}[蓟]及{neighbor}的1个{location}，才能{play}或{execute}。{newline}{resource}3{battle}-1{vp}。"
+                "value": "{decision}2{battle}。本回合{execute}[{march}]时，{fee}减1。{newline}{passive}需要{control}[幽燕]，才能{play}、{execute}或征发。{newline}{resource}3{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -333,8 +333,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -376,15 +376,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}，{save}{this}。{newline}{passive}{this}在{court}中时，使用{fast}{execute}[{march}]时，减少1点{fee}。使用{fast}{execute}[{occupy}]时，增加1点{fee}或{pay}3{vp}。{only}{north}{player}{play}。{newline}{resource}2{battle}。"
+                "value": "{decision}3{battle}，{save}{this}。{newline}{passive}{this}在{court}中时，使用{fast}{execute}[{march}]时，{fee}减1。使用{fast}{execute}[{occupy}]时，{fee}加1或{pay}2{vp}。{only}{north}{player}{play}。{newline}{resource}2{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -440,8 +440,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -498,8 +498,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -541,7 +541,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}获得X {vp}，X=你的{culture}标记数。然后，可以{pay}2{vp}，摸1张牌。"
+                "value": "{action}获得X {vp}，X={culture}标记数。然后，可以{pay}2{vp}，摸1张牌。"
               }
             },
             {
@@ -555,8 +555,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -612,8 +612,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -655,15 +655,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{newline}{decision}选择1项：{supplant}1个{neighbor}{neutral}{location}。获得1{battle}。或者{abandon}1张{court}的{refugee}牌，获得4{battle}。{newline}{resource}1{battle}2{vp}。"
+                "value": "{only}{jin}{player}{play}。{newline}{decision}选择1项：{supplant}1个{neighbor}{neutral}{location}。获得2{battle}。或者{abandon}1张{court}的{refugee}牌并{supple}1张牌到{court}，获得4{battle}。{newline}{resource}2{battle}1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -705,7 +705,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{play}{military}牌或{execute}{military}策略，摸1张牌。"
+                "value": "{passive}每次{play}{military}牌或{execute}{military}策略，摸1张牌并获得1{vp}。"
               }
             },
             {
@@ -719,8 +719,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -776,8 +776,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -834,8 +834,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -870,7 +870,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}</align>"
+                "value": "<align=\"center\">{card_friend}-{affair}</align>"
               }
             },
             {
@@ -891,8 +891,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -934,15 +934,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}1{vp}，获得5{battle}。{newline}{passive}{occupy}[京口]时，才能{play}或{execute}。{newline}{resource}2{battle}。"
+                "value": "{decision}获得5{battle}。{newline}{passive}{occupy}[京口]时，才能{play}、{execute}或征发。{newline}{resource}2{battle}1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -956,7 +956,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -978,7 +978,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}-{military}</align>"
+                "value": "<align=\"center\">{card_event}-{power}</align>"
               }
             },
             {
@@ -999,8 +999,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1057,8 +1057,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1100,15 +1100,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}5{battle}。{newline}{passive}{occupy}[姑臧]及{neighbor}的1个{location}，才能{play}或{execute}。{newline}{resource}3{battle}-1{vp}。"
+                "value": "{decision}2{battle}。本回合{execute}[{march}]时，{fee}减1。{newline}{passive}{control}[西凉]时，才能{play}、{execute}或征发。{newline}{resource}3{battle}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1164,8 +1164,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1222,8 +1222,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1279,8 +1279,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1337,8 +1337,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1380,7 +1380,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{execute}[{march}]，{fee}减2。{newline}{passive}每次{execute}[{march}]后，获得1{vp}。"
+                "value": "{action}[{march}]1次，{fee}减2。{newline}{passive}每次结算[{march}]后，获得1{vp}。"
               }
             },
             {
@@ -1394,8 +1394,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1451,8 +1451,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1487,22 +1487,22 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}</align>"
+                "value": "<align=\"center\">{card_strategy}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{newline}{decision}3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。2{battle}。{newline}{resource}2{battle}。"
+                "value": "{only}{jin}{player}{play}。{newline}{decision}3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。3{battle}。{newline}{resource}3{battle}-1{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1559,8 +1559,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1595,7 +1595,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}</align>"
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
               }
             },
             {
@@ -1616,8 +1616,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1653,7 +1653,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_event}</align>"
+                "value": "<align=\"center\">{card_event}-{military}</align>"
               }
             },
             {
@@ -1674,8 +1674,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1732,8 +1732,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
@@ -1775,22 +1775,22 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}2{vp}，然后{supple}1张牌到{court}。{newline}{resource}1{battle}2{vp}。"
+                "value": "{decision}2{battle}2{vp}，然后{supple}1张牌到{court}。{newline}{resource}1{battle}3{vp}。"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780356431,
-          "last_modification_date_unix": 1780356431,
+          "creation_date_unix": 1781137047,
+          "last_modification_date_unix": 1781137047,
           "details":
           [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "4"
               }
             },
             {
@@ -1825,7 +1825,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}免费[{emp_defense}]1次。"
+                "value": "{action}免费[{emp_defense}]{friend_player}{location}1次。如果[{emp_defense}]的目标不是你{occupy}的{location}，额外获得1{vp}。"
               }
             },
             {

@@ -1,6 +1,6 @@
 [Item Amount],vp数字,费用数字,text_top,text_top:color,text_owner,text_card_type,text_bottom,牌面背景:color,[Item Note]
-1,8,3,姚苌,,{common},"<align=""center"">{card_friend}-{military}</align>",{action}1{battle}。{newline}{enter}{supplant}2个{neutral}{location}。{newline}{passive}{this}离开{friend_area}时，将2个己方{control}{location}{supplant}为{neutral}{location}。,#3E5F91FF,
-1,6,2,鸠摩罗什,,{common},"<align=""center"">{card_friend}-{culture}</align>",{action}{pay}2{battle}，传播1级{emp_culture}。,#3E5F91FF,
-1,4,1,司马道子,,{common},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{jin}{court}每有1张{refugee}，获得2{vp}。,#3E5F91FF,
-1,4,1,孙恩,,{common},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，[江南][荆襄][淮南]每有1个{neutral}{location}，获得2{vp}。,#3E5F91FF,
-1,,3,慕容垂,#292929FF,{common},"<align=""center"">{card_event}-{military}</align>",{friend_area}有空位时，可以{play}。获8{battle}，然后将{this}洗回牌库。,#F5EDDAFF,
+1,6,2,姚苌,,{common},"<align=""center"">{card_friend}-{military}</align>",{action}1{battle}。{newline}{enter}{supplant}2个{neighbor}{neutral}{location}。{newline}{passive}{this}离开{friend_area}时，将2个己方{control}{location}{supplant}为{neutral}{location}。,#3E5F91FF,
+1,6,2,鸠摩罗什,,{common},"<align=""center"">{card_friend}-{culture}</align>",{action}{pay}3{battle}，传播1次{emp_culture}。然后，获得X {vp}，X={emp_culture}贡献等级之和。,#3E5F91FF,
+1,4,1,司马道子,,{common},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{sima}和宰辅各失去X {vp}，X={jin}{court}的{refugee}数。,#3E5F91FF,
+1,4,1,孙恩,,{common},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，{sima}和宰辅各失去X {vp}，X=[江南][荆襄][淮南]的{neutral}{location}数。,#3E5F91FF,
+1,,3,慕容垂,#292929FF,{common},"<align=""center"">{card_event}-{military}</align>",{friend_area}有空位时，可以{play}。获得8{battle}，然后将{this}洗回牌库。,#F5EDDAFF,

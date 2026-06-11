@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780108819,
-          "last_modification_date_unix": 1780108839,
+          "creation_date_unix": 1780835167,
+          "last_modification_date_unix": 1780835167,
           "details":
           [
             {
@@ -41,15 +41,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定]"
+                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定]（不获得{vp}）"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108819,
-          "last_modification_date_unix": 1780108819,
+          "creation_date_unix": 1780835167,
+          "last_modification_date_unix": 1780835167,
           "details":
           [
             {
@@ -77,15 +77,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后{execute}1个牌组行动。{newline}{enter}{supplant}[蓟][龙城][中山]。"
+                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个牌组行动。{newline}{enter}{supplant}[蓟][龙城][中山]（不获得{vp}）"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780108819,
-          "last_modification_date_unix": 1780108819,
+          "creation_date_unix": 1780835167,
+          "last_modification_date_unix": 1780835167,
           "details":
           [
             {
@@ -113,7 +113,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，获得X{battle}，X=你的{military}标记数（最多4）。{newline}{enter}{supplant}[盛乐][平城]，获得4{battle}。"
+                "value": "{action}{discard}1张{hand}，然后摸1张牌，获得X{battle}，X=你的{military}标记数（最多6）。{newline}{enter}{supplant}[盛乐][平城]（不获得{vp}），获得4{battle}。"
               }
             }
           ]
