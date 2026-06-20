@@ -3,31 +3,61 @@
   "sets":
   [
     {
-      "name": "通用事件牌_导入",
-      "blueprint_name": "通用事件牌模板",
-      "hint_order_index": 20,
+      "name": "通用牌_新版导入",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 6,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -35,6 +65,13 @@
               "data":
               {
                 "value": "人何以堪"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -55,7 +92,21 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{force}选择1个[幕僚]区空位最少的{player}，该{player}选择1个{fee}最高的[幕僚]{save}。将主版图{discard}牌区洗回牌库。摸1张牌。"
+                "value": "{force}选择1个[幕僚]区空位最少的{player}，该{player}选择1个{fee}最高的[幕僚]{save}。摸1张牌。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -69,22 +120,52 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -92,6 +173,13 @@
               "data":
               {
                 "value": "功高不赏"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -116,6 +204,20 @@
               }
             },
             {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "牌面背景",
               "data":
               {
@@ -126,22 +228,52 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -149,6 +281,13 @@
               "data":
               {
                 "value": "流民四起"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -173,6 +312,20 @@
               }
             },
             {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "牌面背景",
               "data":
               {
@@ -183,22 +336,52 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -206,6 +389,13 @@
               "data":
               {
                 "value": "天师道"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -230,6 +420,20 @@
               }
             },
             {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "牌面背景",
               "data":
               {
@@ -240,22 +444,52 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -263,6 +497,13 @@
               "data":
               {
                 "value": "衣冠南渡"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -283,7 +524,21 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{force}在{jin}{discard}牌区各放置1张{refugee}，{north}{player}{discard}1张{hand}。将主版图{discard}牌区洗回牌库。摸1张牌。"
+                "value": "{force}在{jin}{discard}牌区各放置1张{refugee}，{north}{player}{discard}1张{hand}。摸1张牌。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -297,22 +552,52 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -320,6 +605,13 @@
               "data":
               {
                 "value": "名教之争"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -344,6 +636,20 @@
               }
             },
             {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "牌面背景",
               "data":
               {
@@ -354,10 +660,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -381,6 +715,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{control}[巴蜀]"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -398,7 +739,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{control}[巴蜀]时，可以{play}。{save}{this}。"
+                "value": "{save}{this}。"
               }
             },
             {
@@ -412,10 +753,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -439,6 +808,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{control}[西凉]"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -456,7 +832,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{control}[西凉]时，可以{play}。{save}{this}。将{reserve}的2个{army}放回游戏盒中。"
+                "value": "{save}{this}。将{reserve}的2个{army}放回游戏盒中。"
               }
             },
             {
@@ -470,10 +846,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -497,6 +901,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{control}[幽燕]"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -514,7 +925,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{control}[幽燕]时，可以{play}。{save}{this}。将{reserve}的2个{army}放回游戏盒中。"
+                "value": "{save}{this}。将{reserve}的2个{army}放回游戏盒中。"
               }
             },
             {
@@ -528,10 +939,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -555,6 +994,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -572,7 +1018,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{occupy}[洛阳]时，可以{play}。{save}{this}。{urusp}交换{jin}{capital}和洛阳的{army}。获得1[{prestige}]。"
+                "value": "{occupy}[洛阳]时，可以{play}。{save}{this}。{urusp}交换{jin}{capital}和洛阳的{army}。获得1[{prestige}]。"
               }
             },
             {
@@ -586,10 +1032,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -610,6 +1084,13 @@
               {
                 "value": "华阳国志",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -644,10 +1125,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -668,6 +1177,13 @@
               {
                 "value": "孙子算经",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -702,10 +1218,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -726,6 +1270,13 @@
               {
                 "value": "流芳百世",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -760,10 +1311,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -784,6 +1363,13 @@
               {
                 "value": "一往情深",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -818,10 +1404,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -841,6 +1455,13 @@
               "data":
               {
                 "value": "毛宝"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -875,10 +1496,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -898,6 +1547,13 @@
               "data":
               {
                 "value": "朱龄石"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -932,10 +1588,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -955,6 +1639,13 @@
               "data":
               {
                 "value": "陶侃"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -989,10 +1680,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1013,6 +1732,13 @@
               {
                 "value": "兰亭集序",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1047,10 +1773,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1071,6 +1825,13 @@
               {
                 "value": "洛神赋图",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1105,10 +1866,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1120,7 +1909,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -1129,6 +1918,13 @@
               {
                 "value": "吕他墓表",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1149,7 +1945,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{save}{this}。"
+                "value": "{save}1张{card_friend}，然后{save}{this}。"
               }
             },
             {
@@ -1163,10 +1959,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1187,6 +2011,13 @@
               {
                 "value": "桃花源记",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1221,10 +2052,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1245,6 +2104,13 @@
               {
                 "value": "北征赋",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -1279,10 +2145,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1306,6 +2200,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -1337,15 +2238,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "9"
+                "value": "4"
               }
             },
             {
@@ -1364,6 +2293,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -1381,7 +2317,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{save}{this}。"
+                "value": "传播1次{NeoTaosim}，然后{save}{this}。"
               }
             },
             {
@@ -1395,10 +2331,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1419,6 +2383,13 @@
               {
                 "value": "菩萨木像",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1453,10 +2424,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1477,6 +2476,13 @@
               {
                 "value": "胡笳羌笛",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1511,10 +2517,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1535,6 +2569,13 @@
               {
                 "value": "清商乐",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1569,10 +2610,31 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1591,7 +2653,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "佛经翻译"
+                "value": "佛经翻译",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1612,122 +2682,43 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{Buddhist}贡献度，从供应轨移除1个{Buddhist}标记，获得4{vp}。{newline}{resource}4{vp}。"
+                "value": "{decision}提高1级{Buddhist}贡献度，从供应轨移除1个{Buddhist}标记，获得4{vp}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
             {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "-9"
-              }
-            },
-            {
-              "name": "费用数字",
+              "name": "vp产能数字",
               "data":
               {
                 "value": "2"
               }
             },
             {
-              "name": "text_top",
+              "name": "军力数字",
               "data":
               {
-                "value": "国子学"
+                "value": "2"
               }
             },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{common}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{decision}传播1次{emp_culture}。获得4{vp}。{newline}{resource}1{battle}3{vp}。"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
-          "details":
-          [
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-6"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "value": "1"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "佛寺"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "{common}"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{decision}传播1次{Buddhist}，获得2{vp}。{newline}{resource}X {vp}，X={Buddhist}{district}数。"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
-          "details":
-          [
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "-12"
+                "value": "-9"
               }
             },
             {
@@ -1741,7 +2732,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "史官"
+                "value": "国子学",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1762,36 +2761,72 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}1{battle}，{save}1张{candidate}，传播1次{Confusion}。{newline}{resource}2{battle}2{vp}。"
+                "value": "{decision}传播1次{emp_culture}，然后可以{play}1张{hand}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-12"
+                "value": "-6"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "3"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "千佛洞"
+                "value": "佛寺",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1812,36 +2847,65 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}传播1次{Buddhist}。获得X {vp}，X={culture}标记数。{newline}{resource}6{vp}。"
+                "value": "{decision}传播1次{Buddhist}，获得2{vp}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "-6"
+                "value": "-12"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "3"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "官僚制度"
+                "value": "史官",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1862,17 +2926,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}1{battle}，传播1次{Confusion}，征发1张{affair}{candidate}。{newline}{resource}2{battle}。"
+                "value": "{decision}{pay}1{battle}，{save}1张{candidate}，传播1次{Confusion}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "6"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1891,7 +2983,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "太学"
+                "value": "千佛洞",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -1912,17 +3012,217 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}提高1级{emp_culture}贡献度，从{emp_culture}轨上移除1个对应的{emp_culture}标记。获得X {vp}，X={emp_culture}贡献度之和。{newline}{resource}6{vp}。"
+                "value": "{decision}传播1次{Buddhist}。获得X {vp}，X={culture}标记数。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-6"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "官僚制度",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}{pay}1{vp}，传播1次{Confusion}，可以{play}1张{hand}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "6"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-12"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "太学",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}提高1级{emp_culture}贡献度，从{emp_culture}轨上移除1个对应的{emp_culture}标记。获得X {vp}，X={emp_culture}贡献度之和。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1941,7 +3241,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "新亭清谈"
+                "value": "新亭清谈",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -1962,17 +3270,52 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}传播1次{NeoTaosim}。获得X {vp}，X={save}区牌数。{newline}{resource}4{vp}。"
+                "value": "{decision}传播1次{NeoTaosim}。获得X {vp}，X={save}区牌数。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -1993,6 +3336,13 @@
               {
                 "value": "刘牢之",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2027,10 +3377,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2054,6 +3432,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -2071,7 +3456,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{Buddhist}贡献度>1时，可以{play}。{pay}2{vp}，然后{supplant}1个{jin}{location}。"
+                "value": "{Buddhist}贡献度>1时，可以{play}。{pay}2{vp}，然后{supplant}1个{jin}{location}。"
               }
             },
             {
@@ -2085,10 +3470,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2112,6 +3525,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -2129,7 +3549,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{supplant}1个{jin}{location}，然后{save}{this}。{urusp}获得1{prestige}。"
+                "value": "{supplant}1个{jin}{location}，然后{save}{this}。{urusp}获得1{prestige}。"
               }
             },
             {
@@ -2143,10 +3563,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2170,6 +3618,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -2187,7 +3642,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。提高1级{order}，然后{save}{this}。{urusp}额外提高1级{order}。"
+                "value": "提高1级{order}，然后{save}{this}。{urusp}额外提高1级{order}。"
               }
             },
             {
@@ -2201,10 +3656,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2216,7 +3699,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2225,6 +3708,13 @@
               {
                 "value": "不越雷池半步",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2245,7 +3735,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。选择1个{jin}{player}，降低1级{order}，然后{save}{this}。{urusp}额外降低1级{order}。"
+                "value": "选择1个{jin}{player}，降低1级{order}，然后{save}{this}。{urusp}额外降低1级{order}。"
               }
             },
             {
@@ -2259,10 +3749,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2283,6 +3801,13 @@
               {
                 "value": "焉能有功",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -2317,10 +3842,45 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "费用数字",
               "data":
@@ -2334,6 +3894,13 @@
               {
                 "value": "鸩酒",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -2354,7 +3921,14 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{save}1个幕僚，然后选择1个{friend_player}{player}的幕僚，该{player}{save}被选择的幕僚。{urusp}改为选择1个{friend_player}{player}的幕僚，该{player}{save}被选择的幕僚。"
+                "value": "{save}1个幕僚，然后选择1个{friend_player}{player}的幕僚，该{player}{save}被选择的幕僚。{urusp}改为选择1个{friend_player}{player}的幕僚，该{player}{save}被选择的幕僚。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2368,10 +3942,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2392,6 +3994,13 @@
               {
                 "value": "刘隗",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -2426,10 +4035,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2450,6 +4087,13 @@
               {
                 "value": "杨佺期",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -2484,10 +4128,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2508,6 +4180,13 @@
               {
                 "value": "陶渊明",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2542,10 +4221,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2566,6 +4273,13 @@
               {
                 "value": "戴洋",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2600,10 +4314,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2623,6 +4365,13 @@
               "data":
               {
                 "value": "郭璞"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2657,10 +4406,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2681,6 +4458,13 @@
               {
                 "value": "玄言清谈",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2715,10 +4499,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2742,6 +4554,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{control}[关中]"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -2759,7 +4578,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{control}[关中]时，可以{play}。提高2级佛学贡献度，从供应轨移除2个{Buddhist}标记，{save}{this}。"
+                "value": "提高2级佛学贡献度，从供应轨移除2个{Buddhist}标记，{save}{this}。"
               }
             },
             {
@@ -2773,10 +4592,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2797,6 +4644,13 @@
               {
                 "value": "良吏",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2831,15 +4685,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "7"
               }
             },
             {
@@ -2855,6 +4737,13 @@
               {
                 "value": "葛洪",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2889,10 +4778,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -2913,6 +4830,13 @@
               {
                 "value": "凿壁偷光",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -2947,15 +4871,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "2"
               }
             },
             {
@@ -2970,6 +4922,13 @@
               "data":
               {
                 "value": "尹纬"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3004,22 +4963,50 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "2"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -3027,6 +5014,13 @@
               "data":
               {
                 "value": "阳骛"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3047,7 +5041,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{discard}{hand}时，获得2{vp}。"
+                "value": "{action}选择1项：{discard}1张{hand}，然后摸1张牌；或者{abandon}1张{candidate}，然后{supple}1张牌到{court}。"
               }
             },
             {
@@ -3061,10 +5055,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3087,6 +5109,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -3104,7 +5133,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}2{battle}，提高1级{order}等级。"
+                "value": "{action}{pay}1{battle}，提高1级{order}等级。{newline}{passive}需要{Confusion}等级>1，才能{play}。"
               }
             },
             {
@@ -3118,10 +5147,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3144,6 +5201,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -3161,7 +5225,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}没有{hand}时可以使用，摸1张牌。"
+                "value": "{action}没有{hand}时可以使用，摸1张牌，获得1{battle}。"
               }
             },
             {
@@ -3175,15 +5239,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "4"
               }
             },
             {
@@ -3198,6 +5290,13 @@
               "data":
               {
                 "value": "慧远"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3232,15 +5331,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "4"
               }
             },
             {
@@ -3255,6 +5382,13 @@
               "data":
               {
                 "value": "道安"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3289,10 +5423,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3312,6 +5474,13 @@
               "data":
               {
                 "value": "卫夫人"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3346,15 +5515,43 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "4"
               }
             },
             {
@@ -3369,6 +5566,13 @@
               "data":
               {
                 "value": "钱凤"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3389,7 +5593,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{newline}{passive}结算{urusp}效果时，获得2{vp}。"
+                "value": "{passive}结算{urusp}效果时，获得3{vp}。"
               }
             },
             {
@@ -3403,10 +5607,31 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3425,7 +5650,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "修缮城防"
+                "value": "修缮城防",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3446,17 +5679,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}获得2{battle}。免费[{emp_defense}]2次。{newline}{resource}[{emp_defense}]1次。1{battle}。。"
+                "value": "{decision}获得2{battle}。免费[{emp_defense}]2次。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3475,7 +5736,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "募兵"
+                "value": "募兵",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3496,17 +5765,38 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}2{vp}，获得5{battle}。{newline}{resource}2{battle}。"
+                "value": "{decision}{pay}2{vp}，获得5{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3525,7 +5815,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "分久必合"
+                "value": "分久必合",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3546,17 +5844,38 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}5{battle}。从{jin_panel}获得{expedition}。{newline}{passive}{Confusion}等级>1时，可以{play}或{execute}。{newline}{resource}2{battle}2{vp}。"
+                "value": "{decision}5{battle}。从{jin_panel}获得{expedition}。{newline}{passive}{Confusion}等级>1时，可以{play}或{execute}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3575,7 +5894,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "军屯"
+                "value": "军屯",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3596,17 +5923,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。{abandon}1{court}的{refugee}并在{court}补1张牌，然后获得2{battle}。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}3{battle}。摸1张牌。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3625,7 +5980,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "具装甲骑"
+                "value": "具装甲骑",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3646,17 +6009,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}免费[{march}]1次。获得3{battle}。{newline}{resource}3{battle}。"
+                "value": "{decision}免费[{march}]1次。获得3{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3675,7 +6066,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "坞堡"
+                "value": "坞堡",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3696,36 +6095,65 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{jin}{newline}{decision}2{battle}。免费[{emp_defense}]2次。{north}{newline}{decision}{supplant}1个{neutral}{location}，获得1{battle}。{newline}{resource}2{battle}。"
+                "value": "{jin}{newline}{decision}3{battle}。免费[{emp_defense}]1次。{north}{newline}{decision}{supplant}1个{neutral}{location}，获得1{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
             {
-              "name": "vp数字",
-              "data":
-              {
-                "value": "-9"
-              }
-            },
-            {
-              "name": "费用数字",
+              "name": "vp产能数字",
               "data":
               {
                 "value": "2"
               }
             },
             {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-6"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
               "name": "text_top",
               "data":
               {
-                "value": "招抚"
+                "value": "招抚",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3746,17 +6174,38 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}3{vp}，{supplant}2个{neighbor}{neutral}{location}。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}{supplant}1个{neighbor}{neutral}{location}，然后可以{play}1张{card_friend}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3775,7 +6224,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "总督区"
+                "value": "总督区",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3796,17 +6253,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}征发2张{candidate}并{supple}1张牌到{court}。获得1{battle}。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}征发2张{candidate}并{supple}1张牌到{court}。获得1{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "5"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3825,7 +6310,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "华林苑"
+                "value": "华林苑",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3846,17 +6339,38 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}9{vp}{newline}{resource}5{vp}。"
+                "value": "{decision}9{vp}"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3875,7 +6389,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "选贤举能"
+                "value": "选贤举能",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3896,17 +6418,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}摸3张牌。如果你的{affair}标记数>3，额外摸1张牌。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}摸3张牌。如果你的{affair}标记数>2，额外摸1张牌。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3925,7 +6475,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "具装甲骑"
+                "value": "具装甲骑",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3946,17 +6504,38 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}免费[{march}]1次。获得3{battle}。{newline}{resource}3{battle}。"
+                "value": "{decision}免费[{march}]1次。获得3{battle}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -3975,7 +6554,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "革除弊政"
+                "value": "革除弊政",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -3996,17 +6583,45 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}，征发1张{candidate}。{newline}{resource}2{battle}1{vp}。"
+                "value": "{decision}{save}1张{candidate}，征发1张{candidate}。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "5"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4025,7 +6640,15 @@
               "name": "text_top",
               "data":
               {
-                "value": "营造宫殿"
+                "value": "营造宫殿",
+                "color": "#FFFFFFFF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4046,17 +6669,52 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{jin}{newline}{decision}6{vp}，{sima}获得7{vp}；{north}{newline}{decision}9{vp}{newline}{resource}5{vp}。"
+                "value": "{jin}{newline}{decision}6{vp}，{sima}获得7{vp}；{north}{newline}{decision}9{vp}"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4077,6 +6735,13 @@
               {
                 "value": "荀灌",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4111,10 +6776,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4138,6 +6831,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -4155,7 +6855,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。获得7{battle}。{save}{this}。"
+                "value": "获得7{battle}。{save}{this}。"
               }
             },
             {
@@ -4169,10 +6869,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4196,6 +6924,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{north}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -4213,7 +6948,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{north}{player}{play}。获得7{battle}。{save}{this}。"
+                "value": "获得7{battle}。{save}{this}。"
               }
             },
             {
@@ -4227,10 +6962,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4251,6 +7014,13 @@
               {
                 "value": "赫连勃勃",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4285,10 +7055,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4309,6 +7107,13 @@
               {
                 "value": "掠夺",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4343,10 +7148,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4367,6 +7200,13 @@
               {
                 "value": "徐道覆",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4401,10 +7241,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4425,6 +7293,13 @@
               {
                 "value": "朱序",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4459,10 +7334,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4483,6 +7386,13 @@
               {
                 "value": "苏峻",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4517,10 +7427,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4541,6 +7479,13 @@
               {
                 "value": "谯纵",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4575,10 +7520,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4599,6 +7572,13 @@
               {
                 "value": "遣使请降",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4633,10 +7613,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4657,6 +7665,13 @@
               {
                 "value": "望风而降",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4691,10 +7706,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4715,6 +7758,13 @@
               {
                 "value": "闻鸡起舞",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4749,10 +7799,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4773,6 +7851,13 @@
               {
                 "value": "何充",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -4807,10 +7892,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4834,6 +7947,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -4851,7 +7971,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{abandon}任意数量的{hand}，然后摸{abandon}数量+1的{hand}。"
+                "value": "可以依次{play}2张{hand}。"
               }
             },
             {
@@ -4865,10 +7985,38 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781137164,
-          "last_modification_date_unix": 1781137164,
+          "creation_date_unix": 1781876500,
+          "last_modification_date_unix": 1781876500,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
@@ -4889,6 +8037,13 @@
               {
                 "value": "大阅户人",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {

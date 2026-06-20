@@ -1,0 +1,700 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "通用事件牌范例_v1",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 21,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1778200180,
+          "last_modification_date_unix": 1781655613,
+          "details":
+          [
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "佛经翻译"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}提高1级{Buddhist}贡献度，从供应轨移除1个{Buddhist}标记，获得4{vp}。"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778200276,
+          "last_modification_date_unix": 1781655588,
+          "details":
+          [
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "洛神赋图",
+                "color": "#292929FF"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#F5EDDAFF"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_event}-{art}</align>"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "7"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "传播1次{Confusion}，然后{save}{this}。"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778200509,
+          "last_modification_date_unix": 1781874012,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "阳骛"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{affair}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}选择1项：{discard}1张{hand}，然后摸1张牌；或者{abandon}1张{candidate}，然后{supple}1张牌到{court}。"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1778248198,
+          "last_modification_date_unix": 1781656060,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "0",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "人何以堪"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_mechanism}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{force}选择1个[幕僚]区空位最少的{player}，该{player}选择1个{fee}最高的[幕僚]{save}。摸1张牌。"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0",
+                "visible": "False"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#882420FF"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用token",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781873821,
+          "last_modification_date_unix": 1781874163,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "幽州突骑"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "行动：2{battle}。本回合{execute}{march}时，获得1vp。"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "True"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-12"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "控制[幽燕]"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "慕容"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781874046,
+          "last_modification_date_unix": 1781874129,
+          "details":
+          [
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "-12"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "国子学"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "3"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "行动：传播1次文化，然后可以{play}1张{hand}。"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{common}"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781874190,
+          "last_modification_date_unix": 1781874261,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781874265,
+          "last_modification_date_unix": 1781874355,
+          "details":
+          [
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "color": "#2E2815FF",
+                "value": "出任藩镇"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_public}</align>"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

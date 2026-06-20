@@ -3,24 +3,53 @@
   "sets":
   [
     {
-      "name": "公共_导入",
-      "blueprint_name": "通用事件牌模板",
-      "hint_order_index": 10,
+      "name": "公共堆_新版导入",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 2,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780105764,
-          "last_modification_date_unix": 1780105764,
+          "creation_date_unix": 1781911941,
+          "last_modification_date_unix": 1781911941,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -36,6 +65,13 @@
               {
                 "value": "清君侧",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
               }
             },
             {
@@ -56,7 +92,14 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。{pay}7{battle}。选择{prestige}、{contirbution}或者{order}，提高1级，其他所有{jin}{player}降低1级。{urusp}{sima}{prestige}降低1级，获得4{vp}。"
+                "value": "{pay}7{battle}。选择{prestige}、{contirbution}或者{order}，提高1级，其他所有{jin}{player}降低1级。{urusp}{sima}{prestige}降低1级，获得4{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -70,15 +113,44 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105764,
-          "last_modification_date_unix": 1780105764,
+          "creation_date_unix": 1781911941,
+          "last_modification_date_unix": 1781911941,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -94,6 +166,13 @@
               {
                 "value": "著书立说",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -118,6 +197,13 @@
               }
             },
             {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
               "name": "牌面背景",
               "data":
               {
@@ -128,30 +214,66 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105764,
-          "last_modification_date_unix": 1780105764,
+          "creation_date_unix": 1781911941,
+          "last_modification_date_unix": 1781911941,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "整顿军队",
+                "value": "拔才取士",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -172,7 +294,14 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "3{battle}。"
+                "value": "摸2张牌。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -186,15 +315,44 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105764,
-          "last_modification_date_unix": 1780105764,
+          "creation_date_unix": 1781911941,
+          "last_modification_date_unix": 1781911941,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -213,6 +371,13 @@
               }
             },
             {
+              "name": "text_limit",
+              "data":
+              {
+                "value": "{only}{jin}"
+              }
+            },
+            {
               "name": "text_owner",
               "data":
               {
@@ -230,7 +395,14 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{only}{jin}{player}{play}。降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+                "value": "降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -244,15 +416,44 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780105764,
-          "last_modification_date_unix": 1780105764,
+          "creation_date_unix": 1781911941,
+          "last_modification_date_unix": 1781911941,
           "details":
           [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "0"
+                "value": "0",
+                "visible": "False"
               }
             },
             {
@@ -268,6 +469,13 @@
               {
                 "value": "求田问舍",
                 "color": "#292929FF"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {
@@ -289,6 +497,13 @@
               "data":
               {
                 "value": "7{vp}。如果{NeoTaosim}贡献度>1，额外获得4{vp}"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
               }
             },
             {

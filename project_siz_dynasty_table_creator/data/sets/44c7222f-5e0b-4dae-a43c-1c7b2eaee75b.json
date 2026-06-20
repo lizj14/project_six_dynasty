@@ -3,17 +3,17 @@
   "sets":
   [
     {
-      "name": "北方角色_导入",
-      "blueprint_name": "角色牌",
-      "hint_order_index": 19,
+      "name": "北方幕僚_新版导入",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 0,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1781912108,
+          "last_modification_date_unix": 1781912108,
           "details":
           [
             {
@@ -48,21 +48,21 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "6"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "苻坚"
+                "value": "姚苌"
               }
             },
             {
@@ -76,50 +76,36 @@
               "name": "text_owner",
               "data":
               {
-                "value": "苻坚"
+                "value": "{north}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}-{affair}</align>"
+                "value": "<align=\"center\">{card_friend}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定]（不获得{vp}）"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{action}1{battle}。{newline}{enter}{supplant}2个{neighbor}{neutral}{location}。{newline}{passive}{this}离开{friend_area}时，将2个己方{control}{location}{supplant}为{neutral}{location}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#3E5F91FF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1781912108,
+          "last_modification_date_unix": 1781912108,
           "details":
           [
             {
@@ -154,21 +140,21 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "6"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "慕容儁"
+                "value": "鸠摩罗什"
               }
             },
             {
@@ -182,50 +168,220 @@
               "name": "text_owner",
               "data":
               {
-                "value": "慕容"
+                "value": "{north}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}-{military}</align>"
+                "value": "<align=\"center\">{card_friend}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个牌组行动。{newline}{enter}{supplant}[蓟][龙城][中山]（不获得{vp}）"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{action}{pay}3{battle}，传播1次{emp_culture}。然后，获得X {vp}，X={emp_culture}贡献等级之和。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#3E5F91FF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1781912108,
+          "last_modification_date_unix": 1781912108,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "司马道子"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{sima}和宰辅各失去X {vp}，X={jin}{court}的{refugee}数。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912108,
+          "last_modification_date_unix": 1781912108,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "4"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "孙恩"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{north}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_friend}-{power}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，{sima}和宰辅各失去X {vp}，X=[江南][荆襄][淮南]的{neutral}{location}数。"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#3E5F91FF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912108,
+          "last_modification_date_unix": 1781912108,
           "details":
           [
             {
@@ -267,14 +423,15 @@
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "拓跋珪"
+                "value": "慕容垂",
+                "color": "#292929FF"
               }
             },
             {
@@ -288,21 +445,21 @@
               "name": "text_owner",
               "data":
               {
-                "value": "拓跋"
+                "value": "{north}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{north}-{military}</align>"
+                "value": "<align=\"center\">{card_event}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，获得X{battle}，X={military}标记数（最多6）。{newline}{enter}{supplant}[盛乐][平城]（不获得{vp}），获得4{battle}。"
+                "value": "{friend_area}有空位时，可以{play}。获得8{battle}，然后将{this}洗回牌库。"
               }
             },
             {
@@ -313,17 +470,10 @@
               }
             },
             {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#F5EDDAFF"
               }
             }
           ]

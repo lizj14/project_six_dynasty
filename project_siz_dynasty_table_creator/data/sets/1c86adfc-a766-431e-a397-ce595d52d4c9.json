@@ -1,0 +1,1376 @@
+{
+  "json_version": 4,
+  "sets":
+  [
+    {
+      "name": "流民堆_新版导入",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 5,
+      "zoom": 0,
+      "collapsed": false,
+      "items":
+      [
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912471,
+          "last_modification_date_unix": 1781912471,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "流民"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

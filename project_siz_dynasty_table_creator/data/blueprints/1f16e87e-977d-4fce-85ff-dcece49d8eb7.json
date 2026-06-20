@@ -3,12 +3,12 @@
   "blueprints":
   [
     {
-      "name": "幕僚牌",
+      "name": "通用事件牌模板_v1",
       "type": "card",
       "layout_size_mm": "57, 89",
       "bleeding_size_mm": "1",
       "main_panel_name": "",
-      "hint_order_index": 10,
+      "hint_order_index": 4,
       "shape_settings":
       {
         "radius": "5"
@@ -20,6 +20,52 @@
           "panels":
           [
             {
+              "name": "vp产能数字",
+              "data":
+              {
+                "layout_position": "24.51996, 73.47951",
+                "layout_size": "4.457052, 5.072666",
+                "panel_type": "text",
+                "value": "1",
+                "text_size": "3",
+                "color": "#2E2815FF"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "layout_position": "13.1796, 73.27343",
+                "layout_size": "4.457052, 5.072666",
+                "panel_type": "text",
+                "value": "1",
+                "text_size": "3",
+                "color": "#2E2815FF"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "layout_position": "17.63665, 71.83499",
+                "layout_size": "6.883307, 8.079062",
+                "panel_type": "image",
+                "value": "Book/paint-brush",
+                "color": "#1E90FFFF"
+              }
+            },
+            {
+              "name": "军力符号",
+              "data":
+              {
+                "layout_position": "7.373683, 71.77023",
+                "layout_size": "6.883307, 8.079062",
+                "panel_type": "image",
+                "value": "Weapon/gladius",
+                "color": "#FF002EFF"
+              }
+            },
+            {
               "name": "vp数字",
               "data":
               {
@@ -27,7 +73,7 @@
                 "layout_size": "10.16937, 9.079527",
                 "layout_constraint_h": "left_and_right",
                 "panel_type": "text",
-                "value": "2",
+                "value": "-6",
                 "text_font": "Satoshi",
                 "text_wrapping": "False",
                 "text_size": "3",
@@ -61,7 +107,7 @@
                 "layout_size": "40.52919, 9.079527",
                 "layout_constraint_h": "left_and_right",
                 "panel_type": "text",
-                "value": "幕僚牌标题",
+                "value": "策略牌标题",
                 "text_font": "Satoshi",
                 "text_wrapping": "False",
                 "text_size": "3",
@@ -71,21 +117,39 @@
               }
             },
             {
-              "name": "text_owner",
+              "name": "text_limit",
               "data":
               {
-                "layout_position": "4.999999, 79.34534",
-                "layout_size": "16.26174, 6.624577",
+                "layout_position": "19.68649, 80.10126",
+                "layout_size": "17.12723, 6.624577",
                 "layout_constraint_h": "right",
                 "layout_constraint_v": "bottom",
                 "panel_type": "text",
-                "value": "<align=\"center\">归属</align>",
+                "value": "限定东晋",
                 "text_font": "Satoshi",
                 "text_wrapping": "False",
                 "text_size": "2",
                 "text_autosize": "True",
-                "text_alignment_h": "right",
-                "color": "#292929FF",
+                "color": "#292929",
+                "text_size_max": "3",
+                "text_size_min": "3"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "layout_position": "4.615985, 79.84929",
+                "layout_size": "17.12723, 6.624577",
+                "layout_constraint_h": "right",
+                "layout_constraint_v": "bottom",
+                "panel_type": "text",
+                "value": "归属",
+                "text_font": "Satoshi",
+                "text_wrapping": "False",
+                "text_size": "2",
+                "text_autosize": "True",
+                "color": "#292929",
                 "text_size_max": "3",
                 "text_size_min": "3"
               }
@@ -99,13 +163,13 @@
                 "layout_constraint_h": "right",
                 "layout_constraint_v": "bottom",
                 "panel_type": "text",
-                "value": "<align=\"center\">{card_friend}</align>",
+                "value": "<align=\"center\">{card_strategy}</align>",
                 "text_font": "Satoshi",
                 "text_wrapping": "False",
                 "text_size": "2",
                 "text_autosize": "True",
                 "text_alignment_h": "right",
-                "color": "#292929FF",
+                "color": "#292929",
                 "text_size_max": "5",
                 "text_size_min": "5"
               }
@@ -114,33 +178,39 @@
               "name": "text_bottom",
               "data":
               {
-                "layout_position": "5, 55.7483",
-                "layout_size": "47, 26.90933",
+                "layout_position": "5, 53.21271",
+                "layout_size": "47, 19.423",
                 "layout_constraint_h": "right",
                 "layout_constraint_v": "bottom",
                 "panel_type": "text",
-                "value": "幕僚能力",
+                "value": "策略能力",
                 "text_font": "Satoshi",
                 "text_size": "2",
                 "text_autosize": "True",
                 "color": "#292929",
-                "text_size_max": "3",
-                "text_size_min": "3"
+                "text_size_max": "3"
               }
             },
             {
-              "name": "存档token",
+              "name": "归属符号",
               "data":
               {
-                "layout_position": "39.72863, 74.31371",
-                "layout_size": "17.58651, 12.20114",
-                "layout_constraint_h": "left_and_right",
-                "layout_constraint_v": "top_and_bottom",
+                "layout_position": "6.672711, 80.10126",
+                "layout_size": "13.01378, 6.12063",
                 "panel_type": "procedural",
-                "value": "TC/IconWhite",
-                "color": "#F4D572FF",
-                "procedural_type": "polygonstar",
-                "procedural_polygon_vertices": "5"
+                "value": "文本",
+                "color": "#F4D572FF"
+              }
+            },
+            {
+              "name": "分数符号",
+              "data":
+              {
+                "layout_position": "42.41167, 74.86684",
+                "layout_size": "12.22041, 11.85899",
+                "panel_type": "image",
+                "value": "Book/white-book",
+                "color": "#F4D572FF"
               }
             },
             {
@@ -162,7 +232,7 @@
               "data":
               {
                 "layout_position": "8.094915, 14.07953",
-                "layout_size": "40.81017, 31.81864",
+                "layout_size": "40.81017, 32.5086",
                 "layout_constraint_h": "left_and_right",
                 "layout_constraint_v": "top_and_bottom",
                 "panel_type": "image",
@@ -180,7 +250,7 @@
                 "layout_constraint_v": "top_and_bottom",
                 "panel_type": "procedural",
                 "procedural_rectangle_radius": "3",
-                "color": "#3E5F91FF",
+                "color": "#292929CF",
                 "procedural_rectangle_radius_free": "True"
               }
             },

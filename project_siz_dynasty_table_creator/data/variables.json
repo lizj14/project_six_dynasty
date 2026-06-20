@@ -3,6 +3,12 @@
   "variables":
   [
     {
+      "code": "mark_culture",
+      "replacement": "Book/paint-brush",
+      "force_tint": "True",
+      "color": "#1E90FFFF"
+    },
+    {
       "code": "owner_refugee",
       "replacement": "流民",
       "force_tint": "False",

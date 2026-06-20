@@ -3,17 +3,272 @@
   "sets":
   [
     {
-      "name": "东晋角色_导入",
-      "blueprint_name": "角色牌",
-      "hint_order_index": 18,
+      "name": "东晋起始_新版导入",
+      "blueprint_name": "通用事件牌模板_v1",
+      "hint_order_index": 3,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{jin}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{jin}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
+          "details":
+          [
+            {
+              "name": "vp产能数字",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "军力数字",
+              "data":
+              {
+                "value": "1"
+              }
+            },
+            {
+              "name": "vp符号",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "vp数字",
+              "data":
+              {
+                "value": "2"
+              }
+            },
+            {
+              "name": "费用数字",
+              "data":
+              {
+                "value": "0"
+              }
+            },
+            {
+              "name": "text_top",
+              "data":
+              {
+                "value": "士卒"
+              }
+            },
+            {
+              "name": "text_limit",
+              "data":
+              {
+                "visible": "False"
+              }
+            },
+            {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{jin}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
+              "name": "text_bottom",
+              "data":
+              {
+                "value": "{decision}3{battle}"
+              }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
+            }
+          ]
+        },
+        {
+          "amount": 1,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
@@ -55,14 +310,14 @@
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "王导"
+                "value": "流民"
               }
             },
             {
@@ -73,42 +328,14 @@
               }
             },
             {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "王导"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_hero}-{jin}-{power}</align>"
-              }
-            },
-            {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}任意{player}提高行动{order}时，获得2{vp}。{newline}{enter}{start_order}1。获得2{order}，2{contirbution}和2{prestige}，{supplant}[合肥][寿春]。"
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
               }
             },
             {
               "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "牌面背景",
               "data":
               {
                 "visible": "False"
@@ -118,8 +345,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
@@ -161,14 +388,14 @@
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "谢安"
+                "value": "流民"
               }
             },
             {
@@ -179,42 +406,14 @@
               }
             },
             {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "谢安"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_hero}-{jin}-{culture}</align>"
-              }
-            },
-            {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次获得{contirbution}后，摸1张牌。{newline}{enter}{start_order}8。获得2{contirbution}（不触发被动效果）。在其他{jin}{player}完成登场效果后，{supplant}2个[建康]以外的{sima}{location}。"
+                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
               }
             },
             {
               "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "牌面背景",
               "data":
               {
                 "visible": "False"
@@ -224,8 +423,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
@@ -239,7 +438,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
@@ -250,31 +449,24 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "郗鉴"
+                "value": "宫廷"
               }
             },
             {
@@ -288,99 +480,71 @@
               "name": "text_owner",
               "data":
               {
-                "value": "郗鉴"
+                "value": "{jin}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{affair}</align>"
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{save}或{abandon}{refugee}时，获得1{battle}。{newline}{enter}{start_order}5。{supplant}[京口][广陵]。获得1{contirbution}和1{prestige}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{decision}{save}1张{candidate}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "张轨"
+                "value": "加官进爵"
               }
             },
             {
@@ -394,50 +558,36 @@
               "name": "text_owner",
               "data":
               {
-                "value": "张轨"
+                "value": "{jin}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{culture}</align>"
+                "value": "<align=\"center\">{card_strategy}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{play}{culture}牌或者{execute}{culture}策略时，获得2{vp}。{newline}{enter}{start_order}3。{supplant}[张掖][姑臧]。获得1{contirbution}和1{prestige}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{decision}{pay}1张{hand}，提高1级{order}，传播1次{NeoTaosim}。{newline}{passive}[加官进爵]不能被{save}、征发或{abandon}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
@@ -451,7 +601,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
@@ -462,31 +612,24 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "桓温"
+                "value": "北伐"
               }
             },
             {
@@ -500,50 +643,36 @@
               "name": "text_owner",
               "data":
               {
-                "value": "桓温"
+                "value": "{jin}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{power}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次{save}1张牌时，获得2{vp}。{newline}{enter}{start_order}4。{supplant}[南郡][襄阳]。获得1{contirbution}和1{prestige}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{decision}2{battle}。从{jin}面板获得{expedition}。{newline}{passive}[北伐]不能被{save}、征发或{abandon}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
@@ -557,7 +686,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
@@ -568,31 +697,24 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "刘裕"
+                "value": "征辟人才"
               }
             },
             {
@@ -606,68 +728,47 @@
               "name": "text_owner",
               "data":
               {
-                "value": "刘裕"
+                "value": "{jin}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{military}</align>"
+                "value": "<align=\"center\">{card_strategy}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}{friend_area}空位总数为6。{newline}{action}如果拥有4种不同的标记各1个，获得1个朝堂行动；否则，可以{play}1张{card_friend}。{newline}{enter}{start_order}7。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{decision}摸2张牌。如果{affair}标记数>2，额外摸1张牌。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
+                "color": "#1a1a1aFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
+          "creation_date_unix": 1781912449,
+          "last_modification_date_unix": 1781912449,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
               "data":
               {
                 "visible": "False"
@@ -684,21 +785,21 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "祖逖"
+                "value": "清谈"
               }
             },
             {
@@ -712,148 +813,28 @@
               "name": "text_owner",
               "data":
               {
-                "value": "祖逖"
+                "value": "{jin}"
               }
             },
             {
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_hero}-{jin}-{military}</align>"
+                "value": "<align=\"center\">{card_strategy}-{culture}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}每次结算[{supplant}]后，摸1张牌并获得1{vp}。{newline}{enter}{start_order}6。获得4{battle}。获得2{prestige}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
+                "value": "{decision}6{vp}"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "visible": "False"
-              }
-            }
-          ]
-        },
-        {
-          "amount": 1,
-          "creation_date_unix": 1781912173,
-          "last_modification_date_unix": 1781912173,
-          "details":
-          [
-            {
-              "name": "vp产能数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "text_top",
-              "data":
-              {
-                "value": "顾荣"
-              }
-            },
-            {
-              "name": "text_limit",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "text_owner",
-              "data":
-              {
-                "value": "顾荣"
-              }
-            },
-            {
-              "name": "text_card_type",
-              "data":
-              {
-                "value": "<align=\"center\">{card_hero}-{jin}-{affair}</align>"
-              }
-            },
-            {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}每次{execute}{affair}策略或者{play}{affair}牌时，获得2{vp}。{newline}{enter}{start_order}2。{supplant}[吴][会稽]。获得1{contirbution}和1{prestige}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "费用token",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "牌面背景",
-              "data":
-              {
-                "visible": "False"
+                "color": "#1a1a1aFF"
               }
             }
           ]
