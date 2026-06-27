@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912108,
-          "last_modification_date_unix": 1781912108,
+          "creation_date_unix": 1782344732,
+          "last_modification_date_unix": 1782344732,
           "details":
           [
             {
@@ -48,7 +48,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -104,8 +104,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912108,
-          "last_modification_date_unix": 1781912108,
+          "creation_date_unix": 1782344732,
+          "last_modification_date_unix": 1782344732,
           "details":
           [
             {
@@ -140,7 +140,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -196,8 +196,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912108,
-          "last_modification_date_unix": 1781912108,
+          "creation_date_unix": 1782344732,
+          "last_modification_date_unix": 1782344732,
           "details":
           [
             {
@@ -232,7 +232,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
@@ -288,8 +288,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912108,
-          "last_modification_date_unix": 1781912108,
+          "creation_date_unix": 1782344732,
+          "last_modification_date_unix": 1782344732,
           "details":
           [
             {
@@ -324,7 +324,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
@@ -380,8 +380,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912108,
-          "last_modification_date_unix": 1781912108,
+          "creation_date_unix": 1782344732,
+          "last_modification_date_unix": 1782344732,
           "details":
           [
             {
@@ -416,7 +416,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "0"
               }
             },
             {
@@ -460,13 +460,6 @@
               "data":
               {
                 "value": "{friend_area}有空位时，可以{play}。获得8{battle}，然后将{this}洗回牌库。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
               }
             },
             {

@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -41,7 +41,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -76,7 +76,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
@@ -97,8 +97,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -126,7 +126,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -161,7 +161,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
@@ -182,8 +182,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -211,7 +211,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -246,7 +246,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_strategy}</align>"
+                "value": "<align=\"center\">{card_strategy}-{military}</align>"
               }
             },
             {
@@ -267,8 +267,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -303,6 +303,7 @@
               "name": "vp数字",
               "data":
               {
+                "value": "-",
                 "visible": "False"
               }
             },
@@ -328,6 +329,20 @@
               }
             },
             {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{jin}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
               "name": "text_bottom",
               "data":
               {
@@ -340,13 +355,20 @@
               {
                 "visible": "False"
               }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -381,6 +403,7 @@
               "name": "vp数字",
               "data":
               {
+                "value": "-",
                 "visible": "False"
               }
             },
@@ -406,6 +429,20 @@
               }
             },
             {
+              "name": "text_owner",
+              "data":
+              {
+                "value": "{jin}"
+              }
+            },
+            {
+              "name": "text_card_type",
+              "data":
+              {
+                "value": "<align=\"center\">{card_strategy}</align>"
+              }
+            },
+            {
               "name": "text_bottom",
               "data":
               {
@@ -418,13 +455,20 @@
               {
                 "visible": "False"
               }
+            },
+            {
+              "name": "牌面背景",
+              "data":
+              {
+                "color": "#1a1a1aFF"
+              }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -452,7 +496,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -508,8 +552,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -586,8 +630,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -671,8 +715,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -700,7 +744,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -756,8 +800,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912449,
-          "last_modification_date_unix": 1781912449,
+          "creation_date_unix": 1782345548,
+          "last_modification_date_unix": 1782345548,
           "details":
           [
             {
@@ -785,7 +829,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {

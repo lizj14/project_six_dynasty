@@ -71,12 +71,13 @@ def extract_restriction(effect, card=None):
         if m:
             effect = effect[m.end():].lstrip()
 
-    # Pattern 2: 被动：需要控制[XX]，才能打出、执行或征发。
-    m = re.search(r'被动：需要控制\[([^\]]+)\]，才能打出[、，执行或征发]*[。.]?', effect)
+    # Pattern 2: 被动：(需要)?控制/占据[XX][，时]，才能打出、执行或征发。
+    m = re.search(r'被动：(?:需要)?(控制|占据)\[([^\]]+)\](?:，|时，)才能打出(?:、|执行|或|征发)*[。.]?', effect)
     if m:
-        loc = m.group(1)
+        action = m.group(1)  # 控制 or 占据
+        loc = m.group(2)
         if not restriction:
-            restriction = '控制[' + loc + ']'
+            restriction = action + '[' + loc + ']'
             effect = effect[:m.start()] + effect[m.end():]
             effect = effect.strip().rstrip('。').rstrip('.')
 
@@ -420,39 +421,37 @@ def write_card_csv(file_path, cards, variables, file_type='common'):
             score_sym_vis = '' if shishu_vp else 'False'
             cost_token_vis = '' if cost else 'False'
 
-        # Public cards: hide存档vp
-        if is_public:
+        # Public cards and 流民: hide存档vp
+        if is_public or card['卡牌名称'] == '流民':
             vp_num_vis = 'False'
             score_sym_vis = 'False'
 
         limit_vis = vis(restriction)
         bg_vis = '' if get_background_color(card) else 'False'
 
-        is_refugee = card['卡牌名称'] == '流民'
-
         row = [
             1,
-            vp_prod if not is_refugee else '',
-            vp_prod_vis if not is_refugee else 'False',
-            mil_prod if not is_refugee else '',
-            mil_vis if not is_refugee else 'False',
-            vp_sym_vis if not is_refugee else 'False',
-            mil_sym_vis if not is_refugee else 'False',
-            shishu_vp if not is_refugee else '',
-            vp_num_vis if not is_refugee else 'False',
-            cost if not is_refugee else '0',
-            cost_vis if not is_refugee else '',
+            vp_prod,
+            vp_prod_vis,
+            mil_prod,
+            mil_vis,
+            vp_sym_vis,
+            mil_sym_vis,
+            shishu_vp,
+            vp_num_vis,
+            cost,
+            cost_vis,
             card['卡牌名称'],
-            get_title_color(card) if not is_refugee else '',
-            restriction if not is_refugee else '',
-            limit_vis if not is_refugee else 'False',
-            owner_text if not is_refugee else '',
-            f'<align="center">{get_card_type_tag(card)}</align>' if not is_refugee else '',
+            get_title_color(card),
+            restriction,
+            limit_vis,
+            owner_text,
+            f'<align="center">{get_card_type_tag(card)}</align>',
             clean_effect,
-            score_sym_vis if not is_refugee else 'False',
-            cost_token_vis if not is_refugee else '',
-            bg_vis if not is_refugee else '',
-            get_background_color(card) if not is_refugee else '',
+            score_sym_vis,
+            cost_token_vis,
+            bg_vis,
+            get_background_color(card),
             '',
         ]
         rows.append(row)
@@ -553,7 +552,7 @@ def write_refugee_csv(file_path):
             '流民', '', '', 'False',
             '流民', '',
             '{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。',
-            'False', '', '', '', '',
+            'False', '', '', '#1a1a1aFF', '',
         ])
     headers = [
         '[Item Amount]', 'vp产能数字', 'vp产能数字:visible',

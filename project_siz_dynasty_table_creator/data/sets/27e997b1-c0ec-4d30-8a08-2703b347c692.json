@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -48,7 +48,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -104,8 +104,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -140,7 +140,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -196,8 +196,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -274,29 +274,22 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "value": "1"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
@@ -310,7 +303,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "1"
               }
             },
             {
@@ -345,7 +338,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}，{save}{this}。{newline}{passive}{this}在{court}中时，{north}和晋{player}不能相互使用[{march}]。"
+                "value": "{decision}选择1个{jin}{player}，给予其1张{hand}。传播1次{emp_culture}，{supplant}1个{neighbor}{neutral}{location}。"
               }
             },
             {
@@ -359,8 +352,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -444,8 +437,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -480,7 +473,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -536,8 +529,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -572,7 +565,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -607,7 +600,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}，{save}{this}。{newline}{passive}{this}在{court}中时，使用{fast}{execute}[{march}]时，{fee}减1。使用{fast}{execute}[{occupy}]时，{fee}加1或{pay}2{vp}。"
+                "value": "{decision}3{battle}，{save}{this}。{newline}{passive}每回合前3次[{march}]时，{fee}减1。{district}奖励改为0/1{vp}。"
               }
             },
             {
@@ -621,8 +614,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -657,7 +650,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -713,8 +706,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -749,7 +742,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "4"
               }
             },
             {
@@ -806,8 +799,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -842,7 +835,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -898,8 +891,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -934,7 +927,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -990,8 +983,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1068,8 +1061,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1104,7 +1097,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -1160,8 +1153,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1196,7 +1189,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "5"
               }
             },
             {
@@ -1252,8 +1245,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1345,8 +1338,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1381,7 +1374,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
@@ -1437,8 +1430,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1480,7 +1473,7 @@
               "name": "text_limit",
               "data":
               {
-                "visible": "False"
+                "value": "{occupy}[京口]"
               }
             },
             {
@@ -1501,7 +1494,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}获得5{battle}。{newline}{passive}{occupy}[京口]时，才能{play}、{execute}或征发。"
+                "value": "{decision}获得5{battle}"
               }
             },
             {
@@ -1515,8 +1508,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1608,8 +1601,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1701,8 +1694,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1751,7 +1744,7 @@
               "name": "text_limit",
               "data":
               {
-                "visible": "False"
+                "value": "{control}[西凉]"
               }
             },
             {
@@ -1772,7 +1765,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。本回合{execute}[{march}]时，获得1{vp}。{newline}{passive}{control}[西凉]时，才能{play}、{execute}或征发。"
+                "value": "{decision}2{battle}。本回合{execute}[{march}]时，获得1{vp}"
               }
             },
             {
@@ -1786,8 +1779,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1822,7 +1815,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -1878,8 +1871,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -1971,8 +1964,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2007,7 +2000,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -2063,8 +2056,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2156,8 +2149,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912045,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2192,7 +2185,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "8"
+                "value": "7"
               }
             },
             {
@@ -2248,8 +2241,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2284,7 +2277,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "6"
+                "value": "5"
               }
             },
             {
@@ -2340,8 +2333,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2418,8 +2411,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2454,7 +2447,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -2511,8 +2504,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2547,7 +2540,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
@@ -2603,8 +2596,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2639,7 +2632,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -2696,8 +2689,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2732,7 +2725,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2789,8 +2782,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2867,8 +2860,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912028,
-          "last_modification_date_unix": 1781912028,
+          "creation_date_unix": 1782345230,
+          "last_modification_date_unix": 1782345230,
           "details":
           [
             {
@@ -2903,7 +2896,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
