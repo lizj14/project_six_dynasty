@@ -5,7 +5,7 @@
 1,2,,1,,,,2,,1,,尊奉江东,,{only}{north},,慕容,"<align=""center"">{card_strategy}-{power}</align>",{decision}选择1个{jin}{player}，给予其1张{hand}。传播1次{emp_culture}，{supplant}1个{neighbor}{neutral}{location}。,,,,#1a1a1aFF,
 1,,False,3,,False,,-12,,3,,幽州突骑,,{control}[幽燕],,慕容,"<align=""center"">{card_strategy}-{military}</align>",{decision}2{battle}。本回合{execute}[{march}]时，获得1{vp},,,,#1a1a1aFF,
 1,,False,,False,False,False,7,,3,,慕容恪,,,False,慕容,"<align=""center"">{card_friend}-{affair}</align>",{action}2{battle}，{discard}1张{hand}，然后摸1张{hand}。,,,,#3E5F91FF,
-1,,False,2,,False,,4,,1,,草原部落,,{only}{north},,拓跋,"<align=""center"">{card_strategy}-{military}</align>",{decision}3{battle}，{save}{this}。{newline}{passive}每回合前3次[{march}]时，{fee}减1。{district}奖励改为0/1{vp}。,,,,#1a1a1aFF,
+1,,False,2,,False,,4,,1,,草原部落,,{only}{north},,拓跋,"<align=""center"">{card_strategy}-{military}</align>",{decision}3{battle}，{save}{this}。{newline}{passive}每回合前2次[{march}]时，{fee}减1。{district}奖励改为0/1{vp}。,,,,#1a1a1aFF,
 1,,False,,False,False,False,5,,2,,崔宏,,,False,拓跋,"<align=""center"">{card_friend}-{affair}</align>",{action}{discard}1张{hand}，然后摸1张牌。可以{pay}2{battle}，{supplant}1个{neighbor}{neutral}{location}。,,,,#3E5F91FF,
 1,,False,,False,False,False,4,,1,,漠北征伐,#292929FF,{control}[塞外],,拓跋,"<align=""center"">{card_event}-{military}</align>",{save}{this}。将{reserve}的1个{army}放回游戏盒中。,,,,#F5EDDAFF,
 1,,False,,False,False,False,7,,3,,王羲之,,,False,王导,"<align=""center"">{card_friend}-{culture}</align>",{action}获得X {vp}，X={culture}标记数。然后，可以{pay}2{vp}，摸1张牌。,,,,#3E5F91FF,

@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1782628496,
+          "last_modification_date_unix": 1782628496,
           "details":
           [
             {
@@ -90,7 +90,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定]（不获得{vp}）"
+                "value": "{action}{discard}1张{hand}，然后摸1张牌，可以{execute}1个{hand}行动。{newline}{enter}{supplant}[长安][弘农][安定][平阳]（不获得{vp}）"
               }
             },
             {
@@ -118,8 +118,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1782628496,
+          "last_modification_date_unix": 1782628496,
           "details":
           [
             {
@@ -224,8 +224,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781912191,
-          "last_modification_date_unix": 1781912191,
+          "creation_date_unix": 1782628496,
+          "last_modification_date_unix": 1782628496,
           "details":
           [
             {
@@ -302,7 +302,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌，获得X{battle}，X={military}标记数（最多6）。{newline}{enter}{supplant}[盛乐][平城]（不获得{vp}），获得4{battle}。"
+                "value": "{action}{discard}1张{hand}，然后获得X{battle}，X={military}标记数（最多5）。{newline}{enter}{supplant}[盛乐][平城]（不获得{vp}），获得4{battle}。"
               }
             },
             {

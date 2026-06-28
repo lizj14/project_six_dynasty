@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -34,8 +34,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -56,8 +56,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -78,8 +78,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -100,8 +100,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -122,8 +122,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -144,8 +144,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -166,8 +166,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -181,15 +181,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "威望超过7：8vp{newline}威望最高，且超过第二名至少3点。：30vp"
+                "value": "威望超过6：8vp{newline}威望最高，且超过第二名至少3点。：30vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -203,15 +203,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "威望超过7：8vp{newline}威望最高，且超过第二名至少3点。：30vp"
+                "value": "威望超过6：8vp{newline}威望最高，且超过第二名至少3点。：30vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -232,8 +232,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -247,15 +247,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "幕僚区和存档区有3个权谋标记：7vp{newline}幕僚区和存档区有5个权谋标记：14vp"
+                "value": "拥有3个权谋标记：7vp{newline}拥有5个权谋标记：14vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -269,15 +269,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "儒学贡献超过3：6vp{newline}儒学贡献超过5，且儒学区域最多：16vp"
+                "value": "儒学贡献超过3：6vp{newline}儒学贡献超过5，且儒学等级最高：16vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -291,15 +291,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "玄学贡献超过3：6vp{newline}玄学贡献超过5，且玄学区域最多：16vp"
+                "value": "玄学贡献超过3：6vp{newline}玄学贡献超过5，且玄学等级最高：16vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -313,15 +313,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "佛学贡献超过3：6vp{newline}佛学贡献超过5，且佛学区域最多：16vp"
+                "value": "佛学贡献超过3：6vp{newline}佛学贡献超过5，且佛学等级最高：16vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {
@@ -335,15 +335,15 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "威望超过7，且没有完成[加九锡]：10vp{newline}威望等于9，且没有完成[加九锡]：18vp"
+                "value": "威望超过6，且没有完成[加九锡]：10vp{newline}威望等于9，且没有完成[加九锡]：18vp"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1780834803,
-          "last_modification_date_unix": 1780834803,
+          "creation_date_unix": 1782628469,
+          "last_modification_date_unix": 1782628469,
           "details":
           [
             {

@@ -3,4 +3,4 @@
 1,,False,,False,False,False,5,,2,,鸠摩罗什,,,False,{north},"<align=""center"">{card_friend}-{culture}</align>",{action}{pay}3{battle}，传播1次{emp_culture}。然后，获得X {vp}，X={emp_culture}贡献等级之和。,,,,#3E5F91FF,
 1,,False,,False,False,False,3,,1,,司马道子,,,False,{north},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{sima}和宰辅各失去X {vp}，X={jin}{court}的{refugee}数。,,,,#3E5F91FF,
 1,,False,,False,False,False,3,,1,,孙恩,,,False,{north},"<align=""center"">{card_friend}-{power}</align>",{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，{sima}和宰辅各失去X {vp}，X=[江南][荆襄][淮南]的{neutral}{location}数。,,,,#3E5F91FF,
-1,,False,,False,False,False,0,,3,,慕容垂,#292929FF,,False,{north},"<align=""center"">{card_event}-{military}</align>",{friend_area}有空位时，可以{play}。获得8{battle}，然后将{this}洗回牌库。,,,,#F5EDDAFF,
+1,,False,,False,False,False,0,,3,,慕容垂,#292929FF,,False,{north},"<align=""center"">{card_event}-{military}</align>",{friend_area}有空位时，可以{play}。获得8{battle}。,,,,#F5EDDAFF,

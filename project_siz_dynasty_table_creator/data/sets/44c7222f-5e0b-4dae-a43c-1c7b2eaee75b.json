@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782344732,
-          "last_modification_date_unix": 1782344732,
+          "creation_date_unix": 1782628415,
+          "last_modification_date_unix": 1782628415,
           "details":
           [
             {
@@ -104,8 +104,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782344732,
-          "last_modification_date_unix": 1782344732,
+          "creation_date_unix": 1782628415,
+          "last_modification_date_unix": 1782628415,
           "details":
           [
             {
@@ -196,8 +196,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782344732,
-          "last_modification_date_unix": 1782344732,
+          "creation_date_unix": 1782628415,
+          "last_modification_date_unix": 1782628415,
           "details":
           [
             {
@@ -288,8 +288,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782344732,
-          "last_modification_date_unix": 1782344732,
+          "creation_date_unix": 1782628415,
+          "last_modification_date_unix": 1782628415,
           "details":
           [
             {
@@ -380,8 +380,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782344732,
-          "last_modification_date_unix": 1782344732,
+          "creation_date_unix": 1782628415,
+          "last_modification_date_unix": 1782628415,
           "details":
           [
             {
@@ -459,7 +459,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{friend_area}有空位时，可以{play}。获得8{battle}，然后将{this}洗回牌库。"
+                "value": "{friend_area}有空位时，可以{play}。获得8{battle}。"
               }
             },
             {
