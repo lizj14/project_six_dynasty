@@ -1,0 +1,172 @@
+# 六朝何事 — Map Adjacency Data
+# Manually encoded from the game map. Adjust to match the actual board.
+#
+# Terrain: simple (实线, normal march cost) / difficult (虚线, march cost +1)
+#
+# Regions and their locations:
+# 西凉: 张掖, 姑臧, 金城
+# 关中: 安定, 天水, 长安
+# 巴蜀: 汉中, 巴郡, 蜀郡
+# 荆襄: 襄阳, 南郡, 巴东, 武昌, 宛城
+# 江南: 豫章, 建康, 京口, 吴, 会稽
+# 中原: 弘农, 洛阳, 上洛, 雍丘, 彭城, 谯, 东平
+# 山西: 平阳, 太原, 上党
+# 山东: 济南, 广固, 琅琊
+# 淮南: 寿春, 合肥, 广陵
+# 河北: 中山, 襄国, 邺城, 信都
+# 幽燕: 蓟城, 龙城
+# 关外: 盛乐, 平城
+
+regions:
+  西凉:
+    locations: [张掖, 姑臧, 金城]
+    control_vp: 3
+    culture_slots: 1
+    initial_culture: buddhism  # 佛学
+
+  关中:
+    locations: [安定, 天水, 长安]
+    control_vp: 5
+    culture_slots: 1
+
+  巴蜀:
+    locations: [汉中, 巴郡, 蜀郡]
+    control_vp: 3
+    culture_slots: 1
+
+  荆襄:
+    locations: [襄阳, 南郡, 巴东, 武昌, 宛城]
+    control_vp: 4
+    culture_slots: 2
+
+  江南:
+    locations: [豫章, 建康, 京口, 吴, 会稽]
+    control_vp: 5
+    culture_slots: 2
+    initial_culture: taoism  # 玄学
+
+  中原:
+    locations: [弘农, 洛阳, 上洛, 雍丘, 彭城, 谯, 东平]
+    control_vp: 6
+    culture_slots: 2
+
+  山西:
+    locations: [平阳, 太原, 上党]
+    control_vp: 3
+    culture_slots: 1
+
+  山东:
+    locations: [济南, 广固, 琅琊]
+    control_vp: 3
+    culture_slots: 1
+    initial_culture: confucianism  # 儒学
+
+  淮南:
+    locations: [寿春, 合肥, 广陵]
+    control_vp: 4
+    culture_slots: 1
+
+  河北:
+    locations: [中山, 襄国, 邺城, 信都]
+    control_vp: 4
+    culture_slots: 1
+
+  幽燕:
+    locations: [蓟城, 龙城]
+    control_vp: 2
+    culture_slots: 1
+
+  关外:
+    locations: [盛乐, 平城]
+    control_vp: 2
+    culture_slots: 1
+
+# Adjacency data — approximate, needs verification against the actual board
+adjacencies:
+  # === 西凉 (Xiliang) ===
+  - [张掖, 姑臧, simple]
+  - [姑臧, 金城, simple]
+  - [金城, 天水, difficult]      # 跨区域
+
+  # === 关中 (Guanzhong) ===
+  - [安定, 天水, simple]
+  - [天水, 长安, simple]
+  - [长安, 弘农, difficult]      # 潼关/函谷关方向
+  - [安定, 平阳, difficult]      # 向北到山西
+  - [长安, 汉中, difficult]      # 秦岭/子午谷
+
+  # === 巴蜀 (Bashu) ===
+  - [汉中, 巴郡, simple]
+  - [巴郡, 蜀郡, simple]
+  - [汉中, 襄阳, difficult]      # 出川到荆襄
+  - [巴郡, 南郡, difficult]      # 长江沿线
+  - [巴郡, 巴东, simple]
+
+  # === 荆襄 (Jingxiang) ===
+  - [襄阳, 南郡, simple]
+  - [襄阳, 宛城, simple]
+  - [南郡, 武昌, simple]
+  - [南郡, 巴东, simple]
+  - [武昌, 豫章, simple]
+  - [宛城, 洛阳, simple]         # 北上中原
+
+  # === 江南 (Jiangnan) ===
+  - [豫章, 建康, difficult]
+  - [建康, 京口, simple]
+  - [建康, 吴, simple]
+  - [京口, 广陵, simple]         # 长江北岸
+  - [吴, 会稽, simple]
+
+  # === 中原 (Zhongyuan) ===
+  - [弘农, 洛阳, simple]
+  - [洛阳, 上洛, simple]
+  - [洛阳, 雍丘, simple]
+  - [上洛, 宛城, simple]         # 南下荆襄
+  - [雍丘, 彭城, simple]
+  - [雍丘, 谯, simple]
+  - [彭城, 谯, simple]
+  - [彭城, 寿春, simple]         # 南下淮南
+  - [谯, 寿春, simple]
+  - [彭城, 东平, simple]
+  - [谯, 合肥, simple]           # 南下淮南
+  - [洛阳, 平阳, difficult]      # 黄河以北到山西
+
+  # === 山西 (Shanxi) ===
+  - [平阳, 太原, simple]
+  - [太原, 上党, simple]
+  - [上党, 邺城, simple]         # 太行山东麓到河北
+  - [平阳, 上党, simple]
+
+  # === 山东 (Shandong) ===
+  - [济南, 广固, simple]
+  - [广固, 琅琊, simple]
+  - [济南, 东平, simple]         # 西连中原
+  - [琅琊, 彭城, simple]         # 南下中原
+
+  # === 淮南 (Huainan) ===
+  - [寿春, 合肥, simple]
+  - [合肥, 广陵, simple]
+  - [寿春, 武昌, difficult]      # 沿长江
+
+  # === 河北 (Hebei) ===
+  - [中山, 襄国, simple]
+  - [襄国, 邺城, simple]
+  - [邺城, 信都, simple]
+  - [中山, 蓟城, simple]         # 北上幽燕
+  - [信都, 济南, difficult]      # 过黄河到山东
+
+  # === 幽燕 (Youyan) ===
+  - [蓟城, 龙城, simple]
+  - [蓟城, 盛乐, difficult]      # 关外方向
+
+  # === 关外 (Guanwai) ===
+  - [盛乐, 平城, simple]
+  - [平城, 太原, difficult]      # 南下山西
+
+  # === Cross-region connections (补充跨区域连接) ===
+  - [建康, 合肥, difficult]      # 长江防线
+  - [弘农, 上洛, simple]
+  - [上洛, 襄阳, difficult]      # 武关道
+  - [京口, 广陵, simple]         # 长江渡口
+  - [琅琊, 广陵, simple]         # 苏北沿海
+  - [巴东, 巴郡, simple]

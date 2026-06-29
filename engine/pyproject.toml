@@ -1,0 +1,17 @@
+[project]
+name = "six-dynasties-engine"
+version = "0.1.0"
+description = "六朝何事 — Game Engine"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "hypothesis>=6.0",
+    "pyyaml>=6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-v", "--tb=short"]

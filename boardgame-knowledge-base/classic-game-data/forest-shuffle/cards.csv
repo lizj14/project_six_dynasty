@@ -1,0 +1,57 @@
+card_type,name,name_cn,cost,slot,vp,effect,quantity,verified
+Tree,Sycamore,悬铃木,,,1 per Sycamore,,,Y
+Tree,Birch,桦木,0,,1 per Birch,打出时抽1张牌,,Y
+Tree,Beech,山毛榉,2,,varies,与Violet Carpenter Bee配合成套收集计分(0-50),,Y
+Tree,Douglas Fir,花旗松,,,?,,,Y
+Tree,Oak,橡木,,,,,,Y
+Tree,Horse Chestnut,七叶树,,,,,,Y
+Tree,Linden,椴树,,,,,,Y
+Tree,Silver Fir,银冷杉,,,,,,Y
+Tree,Tree Sapling,树苗,N/A (任意手牌),,0,作为无树种树木使用,,Y
+,,Black Alder,黑桤木,2,,5 each,打出时可额外执行1个回合,,N
+,,Crab Apple,野苹果,1,,8(满槽时),4个槽位均被占据时获8VP,,N
+,,Common Hazel,榛树(灌木),2,,0,抽到鸟类牌时额外抽1张,,N
+,,Blackthorn,黑刺李(灌木),2,,0,抽到蝴蝶牌时额外抽1张,,N
+Forest Dweller,Red Deer,马鹿,,,,,鹿类成套计分,,Y
+Forest Dweller,Roe Deer,狍子,,,,,鹿类成套计分,,Y
+Forest Dweller,Fallow Deer,黇鹿,,,,,鹿类成套计分,,Y
+Forest Dweller,Wolf,狼,,,,,每只鹿提供5VP,,Y
+Forest Dweller,Lynx,猞猁,,,,,,Y
+Forest Dweller,Brown Bear,棕熊,,,,,洞穴中每张牌+1VP,,Y
+Forest Dweller,Red Fox,赤狐,,,,,,Y
+Forest Dweller,Beech Marten,石貂,,,,,每棵满槽树5VP,,Y
+Forest Dweller,Wild Boar,野猪,,,,,,Y
+Forest Dweller,European Hare,欧洲野兔,,,,,,Y
+Forest Dweller,Hedgehog,刺猬,,,,,,Y
+Forest Dweller,Greater Mouse-Eared Bat,大鼠耳蝠,,,,,3种不同蝙蝠各5VP,,Y
+Forest Dweller,Common Pipistrelle,普通伏翼蝠,,,,,3种不同蝙蝠各5VP,,Y
+Forest Dweller,Brown Long-Eared Bat,棕长耳蝠,,,,,3种不同蝙蝠各5VP,,Y
+Forest Dweller,Natterer's Bat,纳氏鼠耳蝠,,,,,3种不同蝙蝠各5VP,,Y
+Forest Dweller,Peacock Butterfly,孔雀蛱蝶,,,,,蝴蝶成套计分,,Y
+Forest Dweller,Swallowtail,燕尾蝶,,,,,蝴蝶成套计分,,Y
+Forest Dweller,Purple Emperor,紫皇蝶,,,,,蝴蝶成套计分,,Y
+Forest Dweller,Silver-Washed Fritillary,银斑豹蛱蝶,,,,,蝴蝶成套计分,,Y
+Forest Dweller,Great Spotted Woodpecker,大斑啄木鸟,,,,,,Y
+Forest Dweller,Black Woodpecker,黑啄木鸟,,,,,,Y
+Forest Dweller,Tawny Owl,灰林鸮,,,,,每只蝙蝠得分,,Y
+Forest Dweller,Common Lizard,普通蜥蜴,,,,,3种两栖类15VP,,Y
+Forest Dweller,Warty Newt,疣螈,,,,,3种两栖类15VP,,Y
+Forest Dweller,Adder,蝰蛇,,,,,3种两栖类15VP,,Y
+Forest Dweller,Fire Salamander,火蝾螈,,,,,,Y
+Forest Dweller,Grass Snake,草蛇,,,,,,Y
+Forest Dweller,Violet Carpenter Bee,紫木蜂,,,,,与Beech树配合,,Y
+Forest Dweller,Moss,苔藓,,,,,每棵树2VP,,Y
+Forest Dweller,Penny Bun,牛肝菌,,,,,每棵满槽树3VP,,Y
+Forest Dweller,Wild Strawberries,野草莓,,,,,每种不同树种2VP,,Y
+Forest Dweller,Mole,鼹鼠,,,,,,N
+Forest Dweller,Badger,獾,,,,,,N
+Forest Dweller,Dormouse,睡鼠,,,,,,N
+Forest Dweller,Wood Ant,木蚁,,,,,,N
+Forest Dweller,Stag Beetle,锹甲,,,,,,N
+Forest Dweller,Green Woodpecker,绿啄木鸟,,,,,,N
+Forest Dweller,Eagle Owl,雕鸮,,,,,,N
+Forest Dweller,Barn Owl,仓鸮,,,,,,N
+Forest Dweller,Jay,松鸦,,,,,,N
+Winter,Winter Card 1,冬季牌1,N/A,N/A,N/A,牌库剩余约1/3时出现,1,Y
+Winter,Winter Card 2,冬季牌2,N/A,N/A,N/A,混入牌库剩余1/3,1,Y
+Winter,Winter Card 3,冬季牌3,N/A,N/A,N/A,混入牌库剩余1/3;抽出时游戏结束,1,Y
