@@ -1502,13 +1502,7 @@ def _parse_place_refugee(text: str, orig: str) -> Optional[EffectStep]:
 
 
 def _parse_conditional_playable(text: str, orig: str) -> Optional[EffectStep]:
-    """X>1时，可以打出 / 拥有X时，可以打出 — play conditions, skip as step"""
-    if re.search(r'(可以打出|可以执行|可以作为事件打出)$', text):
-        return EffectStep(
-            effect_type="play_condition_note",
-            params={},
-            source_text=orig,
-        )
+    """X>1时，可以打出 / 拥有X时，可以打出 — play conditions handled by play_condition block"""
     return None
 
 
@@ -1779,8 +1773,8 @@ def _parse_archive_friend(text: str, orig: str) -> Optional[EffectStep]:
     m = re.search(r'存档\s*(\d+)\s*个\s*幕僚', text)
     if m:
         return EffectStep(
-            effect_type="archive_friend",
-            params={"count": int(m.group(1))},
+            effect_type="archive_card",
+            params={"count": int(m.group(1)), "card_type": "friend", "from": "staff"},
             source_text=orig,
         )
     return None
@@ -1877,14 +1871,7 @@ def _parse_change_to_player_control(text: str, orig: str) -> Optional[EffectStep
 
 
 def _parse_target_archive_friend(text: str, orig: str) -> Optional[EffectStep]:
-    """该玩家存档被选择的幕僚"""
-    m = re.search(r'(该玩家|其)\s*存档\s*(被选择的|该|其)?\s*幕僚', text)
-    if m:
-        return EffectStep(
-            effect_type="target_archive_friend",
-            params={},
-            source_text=orig,
-        )
+    """该玩家存档被选择的幕僚 — handled by targeted_effect + archive_card"""
     return None
 
 

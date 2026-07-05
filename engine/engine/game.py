@@ -349,6 +349,16 @@ def _check_event_condition(card, player, state) -> bool:
                 result = check_region_control(state, reg)
                 return result.full_controller == player.player_id
 
+    if cond.condition_type == "occupy_location_in_region":
+        region_name = cond.params.get("region", "")
+        from rules.area_control import REGION_CONFIG
+        friendly = state.get_friendly_locations(player.player_id)
+        for reg, cfg in REGION_CONFIG.items():
+            if reg.value == region_name:
+                region_locs = cfg.get("locations", [])
+                return any(loc in region_locs for loc in friendly)
+        return False
+
     if cond.condition_type == "has_expedition":
         return player.has_expedition_marker
 
