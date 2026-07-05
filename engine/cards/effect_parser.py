@@ -1790,9 +1790,11 @@ def _parse_play_card_tag_filter(text: str, orig: str) -> Optional[EffectStep]:
     """打出1张不含[军事]标记的手牌"""
     m = re.search(r'打出\s*(\d+)\s*张\s*不含\s*\[?(军事|文化|内政|权谋)\]?\s*标记的\s*手牌', text)
     if m:
+        marker_map = {'军事': 'military', '文化': 'culture', '内政': 'affair', '权谋': 'power'}
         return EffectStep(
-            effect_type="play_card_excluding_tag",
-            params={"count": int(m.group(1)), "exclude_tag": m.group(2)},
+            effect_type="play_card",
+            params={"count": int(m.group(1))},
+            filter={"exclude_marker": marker_map[m.group(2)]},
             source_text=orig,
         )
     return None

@@ -143,9 +143,7 @@
               {
                 "effect_type": "gain_military",
                 "params": {
-                  "amount": "X",
-                  "variable": true,
-                  "variable_source": "军事",
+                  "amount": "marker_count_military",
                   "max": 5
                 }
               }
@@ -315,55 +313,63 @@
         "blocks": [
           {
             "ability_type": "passive",
-            "steps": [],
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "gain_military",
+                      "params": {
+                        "amount": 1
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "gain_vp",
+                      "params": {
+                        "amount": 2
+                      }
+                    }
+                  ]
+                ]
+              }
+            ],
             "trigger": "on_archive",
             "trigger_filter": {
               "card": "流民"
-            },
-            "choice_options": [
-              [
-                {
-                  "effect_type": "gain_military",
-                  "params": {
-                    "amount": 1
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "gain_vp",
-                  "params": {
-                    "amount": 2
-                  }
-                }
-              ]
-            ]
+            }
           },
           {
             "ability_type": "passive",
-            "steps": [],
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "gain_military",
+                      "params": {
+                        "amount": 1
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "gain_vp",
+                      "params": {
+                        "amount": 2
+                      }
+                    }
+                  ]
+                ]
+              }
+            ],
             "trigger": "on_discard",
             "trigger_filter": {
               "card": "流民"
-            },
-            "choice_options": [
-              [
-                {
-                  "effect_type": "gain_military",
-                  "params": {
-                    "amount": 1
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "gain_vp",
-                  "params": {
-                    "amount": 2
-                  }
-                }
-              ]
-            ]
+            }
           },
           {
             "ability_type": "enter",
@@ -511,7 +517,103 @@
         "military": 1
       },
       "parsed_effect": {
-        "blocks": [],
+        "blocks": [
+          {
+            "ability_type": "active",
+            "steps": [
+              {
+                "effect_type": "extra_action",
+                "params": {
+                  "action_type": "court_action"
+                },
+                "condition": {
+                  "condition_type": "and",
+                  "params": {
+                    "conditions": [
+                      {
+                        "condition_type": "marker_count_gt",
+                        "params": {
+                          "marker": "military",
+                          "threshold": 0
+                        }
+                      },
+                      {
+                        "condition_type": "marker_count_gt",
+                        "params": {
+                          "marker": "affair",
+                          "threshold": 0
+                        }
+                      },
+                      {
+                        "condition_type": "marker_count_gt",
+                        "params": {
+                          "marker": "culture",
+                          "threshold": 0
+                        }
+                      },
+                      {
+                        "condition_type": "marker_count_gt",
+                        "params": {
+                          "marker": "power",
+                          "threshold": 0
+                        }
+                      }
+                    ]
+                  }
+                },
+                "source_text": "获得1个朝堂行动"
+              },
+              {
+                "effect_type": "play_card",
+                "params": {
+                  "card_type": "friend",
+                  "may": true
+                },
+                "condition": {
+                  "condition_type": "not",
+                  "params": {
+                    "condition": {
+                      "condition_type": "and",
+                      "params": {
+                        "conditions": [
+                          {
+                            "condition_type": "marker_count_gt",
+                            "params": {
+                              "marker": "military",
+                              "threshold": 0
+                            }
+                          },
+                          {
+                            "condition_type": "marker_count_gt",
+                            "params": {
+                              "marker": "affair",
+                              "threshold": 0
+                            }
+                          },
+                          {
+                            "condition_type": "marker_count_gt",
+                            "params": {
+                              "marker": "culture",
+                              "threshold": 0
+                            }
+                          },
+                          {
+                            "condition_type": "marker_count_gt",
+                            "params": {
+                              "marker": "power",
+                              "threshold": 0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "source_text": "可以打出1张幕僚牌"
+              }
+            ]
+          }
+        ],
         "restrictions": []
       }
     },
@@ -769,7 +871,7 @@
                 "condition": {
                   "condition_type": "marker_count_gt",
                   "params": {
-                    "marker": "内政",
+                    "marker": "affair",
                     "threshold": 2
                   }
                 }
@@ -969,9 +1071,7 @@
               {
                 "effect_type": "gain_military",
                 "params": {
-                  "amount": "X",
-                  "variable": true,
-                  "variable_source": "军事",
+                  "amount": "marker_count_military",
                   "max": 4
                 }
               }
@@ -1379,6 +1479,7 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
+                  "target": "troop",
                   "from_reserve": true
                 }
               }
@@ -1729,9 +1830,7 @@
               {
                 "effect_type": "gain_vp",
                 "params": {
-                  "amount": "X",
-                  "variable": true,
-                  "variable_source": "文化"
+                  "amount": "marker_count_culture"
                 }
               },
               {
@@ -1853,32 +1952,35 @@
             "ability_type": "active",
             "steps": [
               {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "play_card",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "military"
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "draft",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "military"
+                      }
+                    }
+                  ]
+                ]
+              },
+              {
                 "effect_type": "draw_cards"
               }
-            ],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "play_card",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "military"
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "draft",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "military"
-                  }
-                }
-              ]
             ]
           }
         ]
@@ -1903,30 +2005,34 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "play_card",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "culture"
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "draft",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "culture"
-                  }
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "play_card",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "culture"
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "draft",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "culture"
+                      }
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -2299,30 +2405,34 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "play_card",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "military"
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "draft",
-                  "params": {
-                    "count": 1
-                  },
-                  "filter": {
-                    "marker": "military"
-                  }
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "play_card",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "military"
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "draft",
+                      "params": {
+                        "count": 1
+                      },
+                      "filter": {
+                        "marker": "military"
+                      }
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -2442,18 +2552,22 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "draw_cards"
-                }
-              ],
-              [
-                {
-                  "effect_type": "draft"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "draw_cards"
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "draft"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -2842,24 +2956,16 @@
                       },
                       "condition": null,
                       "source_text": "该玩家-1[功绩]"
+                    },
+                    {
+                      "effect_type": "gain_vp",
+                      "params": {
+                        "amount": 6
+                      },
+                      "condition": null,
+                      "source_text": "该玩家+6vp"
                     }
                   ]
-                },
-                "sub_effects": [
-                  {
-                    "effect_type": "lose_contribution",
-                    "params": {
-                      "amount": 1
-                    },
-                    "condition": null,
-                    "source_text": "该玩家-1[功绩]"
-                  }
-                ]
-              },
-              {
-                "effect_type": "gain_vp",
-                "params": {
-                  "amount": 6
                 }
               },
               {
@@ -2933,8 +3039,7 @@
                         "type": "not_fortified"
                       },
                       {
-                        "type": "region",
-                        "value": "玄学"
+                        "culture_region": "taoism"
                       }
                     ],
                     "type": "location"
@@ -2947,15 +3052,7 @@
                       "source_text": "转为中立控制"
                     }
                   ]
-                },
-                "sub_effects": [
-                  {
-                    "effect_type": "convert_to_neutral",
-                    "params": {},
-                    "condition": null,
-                    "source_text": "转为中立控制"
-                  }
-                ]
+                }
               },
               {
                 "effect_type": "draw_cards"
@@ -2991,16 +3088,27 @@
                 }
               },
               {
-                "effect_type": "draw_cards"
-              }
-            ],
-            "costs": [
-              {
-                "cost_type": "discard_cards",
+                "effect_type": "targeted_effect",
                 "params": {
-                  "count": 1,
-                  "from_hand": true
+                  "target": {
+                    "type": "north_player",
+                    "selection": "each"
+                  },
+                  "sub_effects": [
+                    {
+                      "effect_type": "discard_cards",
+                      "params": {
+                        "count": 1,
+                        "from_hand": true
+                      },
+                      "condition": null,
+                      "source_text": "北方玩家弃1张手牌"
+                    }
+                  ]
                 }
+              },
+              {
+                "effect_type": "draw_cards"
               }
             ]
           }
@@ -3024,53 +3132,52 @@
             "ability_type": "forced",
             "steps": [
               {
-                "effect_type": "raise_prestige",
+                "effect_type": "targeted_effect",
                 "params": {
-                  "amount": 1
-                },
-                "condition": {
-                  "condition_type": "compare",
-                  "params": {
-                    "left": "culture_level_confucianism",
-                    "op": ">=",
-                    "right": "culture_level_taoism"
-                  }
+                  "target": {
+                    "type": "sima"
+                  },
+                  "sub_effects": [
+                    {
+                      "effect_type": "raise_prestige",
+                      "params": {
+                        "amount": 1
+                      },
+                      "condition": {
+                        "condition_type": "compare",
+                        "params": {
+                          "left": "culture_level_confucianism",
+                          "op": ">=",
+                          "right": "culture_level_taoism"
+                        }
+                      },
+                      "source_text": "司马家威望+1"
+                    },
+                    {
+                      "effect_type": "lower_prestige",
+                      "params": {
+                        "amount": 1
+                      },
+                      "condition": {
+                        "condition_type": "not",
+                        "params": {
+                          "condition": {
+                            "condition_type": "compare",
+                            "params": {
+                              "left": "culture_level_confucianism",
+                              "op": ">=",
+                              "right": "culture_level_taoism"
+                            }
+                          }
+                        }
+                      },
+                      "source_text": "司马家威望-1"
+                    }
+                  ]
                 }
               },
               {
-                "effect_type": "lower_prestige",
-                "params": {
-                  "amount": 1
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "compare",
-                      "params": {
-                        "left": "culture_level_confucianism",
-                        "op": ">=",
-                        "right": "culture_level_taoism"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "effect_type": "draw_cards",
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "compare",
-                      "params": {
-                        "left": "culture_level_confucianism",
-                        "op": ">=",
-                        "right": "culture_level_taoism"
-                      }
-                    }
-                  }
-                }
+                "effect_type": "draw_cards"
               }
             ]
           }
@@ -3137,6 +3244,7 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
+                  "target": "troop",
                   "count": 2,
                   "from_reserve": true
                 }
@@ -3178,6 +3286,7 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
+                  "target": "troop",
                   "count": 2,
                   "from_reserve": true
                 }
@@ -3217,6 +3326,18 @@
                 "effect_type": "archive_this"
               },
               {
+                "effect_type": "swap_troops",
+                "params": {
+                  "location_a": "jin_capital",
+                  "location_b": "洛阳"
+                },
+                "condition": {
+                  "condition_type": "can_usurp",
+                  "params": {}
+                },
+                "source_text": "交换东晋首都和洛阳的部队"
+              },
+              {
                 "effect_type": "raise_prestige",
                 "params": {
                   "amount": 1
@@ -3230,9 +3351,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "control_region",
+          "condition_type": "occupy_location",
           "params": {
-            "region": "洛阳"
+            "location": "洛阳"
           }
         }
       },
@@ -3272,7 +3393,7 @@
           }
         ],
         "play_condition": {
-          "condition_type": "control_region",
+          "condition_type": "friendly_control_region",
           "params": {
             "region": "巴蜀"
           }
@@ -3309,9 +3430,38 @@
           }
         ],
         "play_condition": {
-          "condition_type": "raw_text",
+          "condition_type": "and",
           "params": {
-            "text": "具有至少4个不同的标记时"
+            "conditions": [
+              {
+                "condition_type": "marker_count_gt",
+                "params": {
+                  "marker": "military",
+                  "threshold": 0
+                }
+              },
+              {
+                "condition_type": "marker_count_gt",
+                "params": {
+                  "marker": "affair",
+                  "threshold": 0
+                }
+              },
+              {
+                "condition_type": "marker_count_gt",
+                "params": {
+                  "marker": "culture",
+                  "threshold": 0
+                }
+              },
+              {
+                "condition_type": "marker_count_gt",
+                "params": {
+                  "marker": "power",
+                  "threshold": 0
+                }
+              }
+            ]
           }
         }
       },
@@ -3343,9 +3493,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "raw_text",
+          "condition_type": "archive_count_ge",
           "params": {
-            "text": "史书区有至少7张牌时"
+            "threshold": 7
           }
         }
       },
@@ -3377,9 +3527,10 @@
           }
         ],
         "play_condition": {
-          "condition_type": "raw_text",
+          "condition_type": "marker_count_gt",
           "params": {
-            "text": "有至少3个[文化]符号时"
+            "marker": "culture",
+            "threshold": 2
           }
         }
       },
@@ -3498,7 +3649,13 @@
             "ability_type": "enter",
             "steps": [
               {
-                "effect_type": "convert"
+                "effect_type": "convert",
+                "params": {
+                  "count": 1,
+                  "filter": {
+                    "controller": "sima"
+                  }
+                }
               }
             ]
           }
@@ -3602,7 +3759,8 @@
               {
                 "effect_type": "archive_card",
                 "params": {
-                  "card_type": "friend"
+                  "card_type": "friend",
+                  "from": "staff"
                 }
               },
               {
@@ -3635,15 +3793,23 @@
             "steps": [
               {
                 "effect_type": "archive_this"
-              },
+              }
+            ]
+          },
+          {
+            "ability_type": "passive",
+            "steps": [
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "X",
-                  "variable": true
+                  "variable": true,
+                  "variable_source": "refugee_count",
+                  "sources": ["jin_deck", "north_deck"]
                 }
               }
-            ]
+            ],
+            "trigger": "on_end_game"
           }
         ]
       },
@@ -3675,9 +3841,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "raw_text",
+          "condition_type": "has_token",
           "params": {
-            "text": "拥有[北伐]标记时"
+            "token": "expedition"
           }
         }
       },
@@ -3807,15 +3973,22 @@
             "steps": [
               {
                 "effect_type": "archive_this"
-              },
+              }
+            ]
+          },
+          {
+            "ability_type": "passive",
+            "steps": [
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "X",
-                  "variable": true
+                  "variable": true,
+                  "variable_source": "regions_with_troops"
                 }
               }
-            ]
+            ],
+            "trigger": "on_end_game"
           }
         ]
       },
@@ -3853,7 +4026,7 @@
           }
         ],
         "play_condition": {
-          "condition_type": "control_region",
+          "condition_type": "friendly_control_region",
           "params": {
             "region": "江南"
           }
@@ -3884,7 +4057,7 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "raise_culture_level",
+                "effect_type": "raise_culture_contribution",
                 "params": {
                   "amount": 1,
                   "culture": "buddhism"
@@ -3893,7 +4066,7 @@
               {
                 "effect_type": "remove_culture_marker",
                 "params": {
-                  "culture": "佛学"
+                  "culture": "buddhism"
                 }
               },
               {
@@ -4078,9 +4251,7 @@
               {
                 "effect_type": "gain_vp",
                 "params": {
-                  "amount": "X",
-                  "variable": true,
-                  "variable_source": "文化"
+                  "amount": "marker_count_culture"
                 }
               }
             ]
@@ -4161,16 +4332,62 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "raise_culture_level",
-                "params": {
-                  "amount": 1
-                }
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "raise_culture_contribution",
+                      "params": {
+                        "amount": 1,
+                        "culture": "confucianism"
+                      }
+                    },
+                    {
+                      "effect_type": "remove_culture_marker",
+                      "params": {
+                        "count": 1,
+                        "culture": "confucianism"
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "raise_culture_contribution",
+                      "params": {
+                        "amount": 1,
+                        "culture": "taoism"
+                      }
+                    },
+                    {
+                      "effect_type": "remove_culture_marker",
+                      "params": {
+                        "count": 1,
+                        "culture": "taoism"
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "raise_culture_contribution",
+                      "params": {
+                        "amount": 1,
+                        "culture": "buddhism"
+                      }
+                    },
+                    {
+                      "effect_type": "remove_culture_marker",
+                      "params": {
+                        "count": 1,
+                        "culture": "buddhism"
+                      }
+                    }
+                  ]
+                ]
               },
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "sum",
-                  "variable": true,
                   "sources": [
                     "confucianism_contribution",
                     "taoism_contribution",
@@ -4214,9 +4431,12 @@
                 }
               },
               {
-                "effect_type": "play_card_excluding_tag",
+                "effect_type": "play_card",
                 "params": {
-                  "exclude_tag": "军事"
+                  "count": 1
+                },
+                "filter": {
+                  "exclude_marker": "military"
                 }
               }
             ]
@@ -4253,9 +4473,19 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "lose_military",
+                "effect_type": "targeted_effect",
                 "params": {
-                  "amount": 1
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "type": "jin_player"
+                  }
+                },
+                "sub_effect": {
+                  "effect_type": "lose_military",
+                  "params": {
+                    "amount": 1
+                  }
                 }
               },
               {
@@ -4308,7 +4538,12 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "convert"
+                "effect_type": "convert",
+                "params": {
+                  "filter": {
+                    "controller": "jin"
+                  }
+                }
               }
             ]
           }
@@ -4316,7 +4551,7 @@
         "play_condition": {
           "condition_type": "culture_contribution_gt",
           "params": {
-            "culture": "佛学",
+            "culture": "buddhism",
             "threshold": 1
           }
         }
@@ -4346,10 +4581,25 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "convert"
+                "effect_type": "convert",
+                "params": {
+                  "filter": {
+                    "controller": "jin"
+                  }
+                }
               },
               {
                 "effect_type": "archive_this"
+              },
+              {
+                "effect_type": "gain_prestige",
+                "params": {
+                  "amount": 1
+                },
+                "condition": {
+                  "condition_type": "can_usurp",
+                  "params": {}
+                }
               }
             ]
           }
@@ -4424,23 +4674,35 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "lower_order",
+                "effect_type": "targeted_effect",
                 "params": {
-                  "amount": 1
-                }
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "type": "jin_player"
+                  }
+                },
+                "sub_effects": [
+                  {
+                    "effect_type": "lower_order",
+                    "params": {
+                      "amount": 1
+                    }
+                  },
+                  {
+                    "effect_type": "lower_order",
+                    "params": {
+                      "amount": 1
+                    },
+                    "condition": {
+                      "condition_type": "can_usurp",
+                      "params": {}
+                    }
+                  }
+                ]
               },
               {
                 "effect_type": "archive_this"
-              },
-              {
-                "effect_type": "lower_order",
-                "params": {
-                  "amount": 1
-                },
-                "condition": {
-                  "condition_type": "can_usurp",
-                  "params": {}
-                }
               }
             ]
           }
@@ -4594,23 +4856,46 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "lower_prestige",
+                "effect_type": "targeted_effect",
                 "params": {
-                  "amount": 2
-                }
-              },
-              {
-                "effect_type": "lower_prestige",
-                "params": {
-                  "amount": 2
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "filters": [
+                      {
+                        "type": "highest_prestige"
+                      }
+                    ],
+                    "type": "jin_player"
+                  }
                 },
-                "condition": {
-                  "condition_type": "can_usurp",
-                  "params": {}
+                "sub_effect": {
+                  "effect_type": "lower_prestige",
+                  "params": {
+                    "amount": 2
+                  }
                 }
               },
               {
-                "effect_type": "archive_this",
+                "effect_type": "targeted_effect",
+                "params": {
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "type": "jin_player"
+                  }
+                },
+                "sub_effects": [
+                  {
+                    "effect_type": "lower_prestige",
+                    "params": {
+                      "amount": 2
+                    }
+                  },
+                  {
+                    "effect_type": "archive_this"
+                  }
+                ],
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
@@ -4836,7 +5121,7 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "raise_culture_level",
+                "effect_type": "raise_culture_contribution",
                 "params": {
                   "amount": 2,
                   "culture": "buddhism"
@@ -4846,7 +5131,7 @@
                 "effect_type": "remove_culture_marker",
                 "params": {
                   "count": 2,
-                  "culture": "佛学"
+                  "culture": "buddhism"
                 }
               },
               {
@@ -4992,24 +5277,28 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "discard_cards"
-                },
-                {
-                  "effect_type": "draw_cards"
-                }
-              ],
-              [
-                {
-                  "effect_type": "abandon_court_card"
-                },
-                {
-                  "effect_type": "supply_court"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "discard_cards"
+                    },
+                    {
+                      "effect_type": "draw_cards"
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "abandon_court_card"
+                    },
+                    {
+                      "effect_type": "supply_court"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -5034,24 +5323,28 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "discard_cards"
-                },
-                {
-                  "effect_type": "draw_cards"
-                }
-              ],
-              [
-                {
-                  "effect_type": "abandon_court_card"
-                },
-                {
-                  "effect_type": "supply_court"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "discard_cards"
+                    },
+                    {
+                      "effect_type": "draw_cards"
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "abandon_court_card"
+                    },
+                    {
+                      "effect_type": "supply_court"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -5105,7 +5398,7 @@
               {
                 "effect_type": "play_requirement",
                 "params": {
-                  "culture": "儒学",
+                  "culture": "confucianism",
                   "threshold": 0
                 }
               }
@@ -5393,7 +5686,7 @@
         "play_condition": {
           "condition_type": "culture_level_gt",
           "params": {
-            "culture": "儒学",
+            "culture": "confucianism",
             "threshold": 1
           }
         }
@@ -5706,7 +5999,7 @@
                 "condition": {
                   "condition_type": "marker_count_gt",
                   "params": {
-                    "marker": "内政",
+                    "marker": "affair",
                     "threshold": 2
                   }
                 }
@@ -5984,29 +6277,33 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "convert",
-                  "params": {
-                    "specific_locations": [
-                      "关中"
-                    ]
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "pay_military",
-                  "params": {
-                    "amount": 5
-                  }
-                },
-                {
-                  "effect_type": "archive_this"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "convert",
+                      "params": {
+                        "specific_locations": [
+                          "关中"
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "pay_military",
+                      "params": {
+                        "amount": 5
+                      }
+                    },
+                    {
+                      "effect_type": "archive_this"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -6044,9 +6341,9 @@
                   "amount": 1
                 },
                 "condition": {
-                  "condition_type": "raw_text",
+                  "condition_type": "is_faction",
                   "params": {
-                    "text": "是北方玩家"
+                    "faction": "north"
                   }
                 }
               }
@@ -6073,31 +6370,35 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "convert",
-                  "params": {
-                    "count": 2,
-                    "specific_locations": [
-                      "江南",
-                      "荆襄"
-                    ]
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "pay_military",
-                  "params": {
-                    "amount": 4
-                  }
-                },
-                {
-                  "effect_type": "archive_this"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "convert",
+                      "params": {
+                        "count": 2,
+                        "specific_locations": [
+                          "江南",
+                          "荆襄"
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "pay_military",
+                      "params": {
+                        "amount": 4
+                      }
+                    },
+                    {
+                      "effect_type": "archive_this"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -6158,27 +6459,31 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "gain_military",
-                  "params": {
-                    "amount": 5
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "pay_military",
-                  "params": {
-                    "amount": 3
-                  }
-                },
-                {
-                  "effect_type": "archive_this"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "gain_military",
+                      "params": {
+                        "amount": 5
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "pay_military",
+                      "params": {
+                        "amount": 3
+                      }
+                    },
+                    {
+                      "effect_type": "archive_this"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -6203,29 +6508,33 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "convert",
-                  "params": {
-                    "specific_locations": [
-                      "巴蜀"
-                    ]
-                  }
-                }
-              ],
-              [
-                {
-                  "effect_type": "pay_military",
-                  "params": {
-                    "amount": 3
-                  }
-                },
-                {
-                  "effect_type": "archive_this"
-                }
-              ]
+            "steps": [
+              {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "convert",
+                      "params": {
+                        "specific_locations": [
+                          "巴蜀"
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "pay_military",
+                      "params": {
+                        "amount": 3
+                      }
+                    },
+                    {
+                      "effect_type": "archive_this"
+                    }
+                  ]
+                ]
+              }
             ]
           }
         ]
@@ -6617,24 +6926,27 @@
             "ability_type": "strategy_action",
             "steps": [
               {
+                "effect_type": "choice",
+                "choice_options": [
+                  [
+                    {
+                      "effect_type": "convert"
+                    }
+                  ],
+                  [
+                    {
+                      "effect_type": "convert"
+                    }
+                  ]
+                ]
+              },
+              {
                 "effect_type": "convert",
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
                 }
               }
-            ],
-            "choice_options": [
-              [
-                {
-                  "effect_type": "convert"
-                }
-              ],
-              [
-                {
-                  "effect_type": "convert"
-                }
-              ]
             ]
           }
         ]
@@ -6676,7 +6988,7 @@
                 "condition": {
                   "condition_type": "culture_contribution_gt",
                   "params": {
-                    "culture": "玄学",
+                    "culture": "taoism",
                     "threshold": 1
                   }
                 }
