@@ -12,7 +12,7 @@ def make_test_state():
     """Minimal test state with one north player and basic map."""
     locs = {
         "长安": LocationState(location_id="长安", controller=ControlState.NORTH),
-        "弘农": LocationState(location_id="弘农", controller=ControlState.NEUTRAL),
+        "弘农": LocationState(location_id="弘农", controller=ControlState.EMPTY),
         "洛阳": LocationState(location_id="洛阳", controller=ControlState.SIMA),
     }
     adjs = [

@@ -4,3 +4,4 @@ old_file/
 __pycache__/
 images/ai/
 **/assets/images/ai/
+logs/

@@ -107,10 +107,13 @@ class PlayerState:
         """Check if court action is still available this turn."""
         return not self.has_taken_court_action
 
-    def reset_turn_state(self):
-        """Reset per-turn tracking at start of action phase."""
-        self.military = 0
+    def reset_action_flags(self):
+        """Reset per-turn action tracking at start of player's turn."""
         self.has_taken_hand_action = False
         self.has_taken_court_action = False
         self.has_drawn_quick = False
         self.has_fortified_quick = False
+
+    def end_turn_cleanup(self):
+        """Reset military and check hand limit at end of player's turn."""
+        self.military = 0

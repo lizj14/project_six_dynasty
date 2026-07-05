@@ -1,4 +1,4 @@
-"""Special actions: convert, archive, spread_culture, search, draft, order changes."""
+"""Special actions: convert, archive, spread_culture, search, levy, order changes."""
 
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -277,17 +277,47 @@ class SpreadCultureAction(GameAction):
             player.vp += 3
             events.append({"type": "culture_max_contribution_bonus", "vp": 3})
 
-        # Place marker (locked)
-        # Find first location in region with a culture slot
+        # Place marker (locked) and award placement bonus
+        # Find a location in the target region with a culture slot
+        was_empty = False
         for loc in state.locations.values():
             if self.target_region in _get_location_regions(loc.location_id):
-                if loc.culture_marker is None:
-                    loc.culture_marker = culture
-                    loc.culture_locked = True
-                    events.append({"type": "culture_placed",
-                                   "location": loc.location_id,
-                                   "culture": self.culture_type})
-                    break
+                was_empty = (loc.culture_marker is None)
+                loc.culture_marker = culture
+                loc.culture_locked = True
+                events.append({"type": "culture_placed",
+                               "location": loc.location_id,
+                               "culture": self.culture_type,
+                               "was_empty": was_empty})
+                break
+
+        # Placement bonus (only if slot was empty)
+        if was_empty:
+            from rules.area_control import REGION_CONFIG
+            try:
+                region_enum = Region(self.target_region)
+                cfg = REGION_CONFIG.get(region_enum, {})
+                bonus = cfg.get("culture_bonus")
+                if bonus:
+                    btype = bonus["type"]
+                    amount = bonus["amount"]
+                    if btype == "vp":
+                        player.vp += amount
+                        events.append({"type": "culture_placement_bonus",
+                                       "bonus_type": "vp", "amount": amount})
+                    elif btype == "military":
+                        player.military += amount
+                        events.append({"type": "culture_placement_bonus",
+                                       "bonus_type": "military", "amount": amount})
+                    elif btype == "draw_card":
+                        for _ in range(amount):
+                            if state.main_deck:
+                                card = state.main_deck.pop(0)
+                                player.hand.append(card)
+                        events.append({"type": "culture_placement_bonus",
+                                       "bonus_type": "draw_card", "amount": amount})
+            except ValueError:
+                pass
 
         state.log_event("spread_culture", player=self.player_id,
                          culture=self.culture_type, region=self.target_region)
@@ -397,15 +427,15 @@ class SearchAction(GameAction):
         return "仅卡牌效果"
 
 # ============================================================
-# Draft / Levy (征收)
+# Levy (征发)
 # ============================================================
 
 @dataclass
-class DraftAction(GameAction):
-    """征收：从朝堂区选择候选策略牌，获得其资源效果，然后将牌放入出牌区。"""
-    action_type: str = "draft"
+class LevyAction(GameAction):
+    """征发：从朝堂区选择候选策略牌，获得其资源效果，然后将牌放入出牌区。（仅卡牌效果）"""
+    action_type: str = "levy"
     player_id: str = ""
-    card_id: str = ""             # Card to draft from court
+    card_id: str = ""             # Card to levy from court
 
     def validate(self, state: "GameState") -> ActionResult:
         court = state.get_court_cards(self.player_id)
@@ -442,12 +472,12 @@ class DraftAction(GameAction):
             state.jin_played_this_round.append(card)
 
         events = [{
-            "type": "draft", "player": self.player_id, "card": card.name,
+            "type": "levy", "player": self.player_id, "card": card.name,
             "army_gained": defn.resource_option_army,
             "vp_gained": defn.resource_option_vp,
         }]
 
-        state.log_event("draft", player=self.player_id, card=card.name)
+        state.log_event("levy", player=self.player_id, card=card.name)
         return ActionResult.ok(events)
 
     def cost_description(self, state: "GameState") -> str:
@@ -535,22 +565,34 @@ def _control_state_to_player_id(cs: "ControlState") -> Optional[str]:
     return mapping.get(cs)
 
 def _get_location_regions(location_id: str) -> list[str]:
-    """Get which regions a location belongs to. (Simplified mapping.)"""
+    """Get which regions a location belongs to. Source: board_info.md."""
     region_map = {
+        # 西凉
         "张掖": ["西凉"], "姑臧": ["西凉"], "金城": ["西凉"],
+        # 关中
         "安定": ["关中"], "天水": ["关中"], "长安": ["关中"],
+        # 巴蜀
         "汉中": ["巴蜀"], "巴郡": ["巴蜀"], "蜀郡": ["巴蜀"],
+        # 荆襄 (含上洛)
         "襄阳": ["荆襄"], "南郡": ["荆襄"], "巴东": ["荆襄"],
-        "武昌": ["荆襄"], "宛城": ["荆襄"],
-        "豫章": ["江南"], "建康": ["江南"], "京口": ["江南"],
+        "武昌": ["荆襄"], "宛城": ["荆襄"], "上洛": ["荆襄"],
+        # 江南 (浔阳替代豫章)
+        "浔阳": ["江南"], "建康": ["江南"], "京口": ["江南"],
         "吴": ["江南"], "会稽": ["江南"],
-        "弘农": ["关中", "中原"], "洛阳": ["中原"], "上洛": ["中原"],
+        # 中原 (上洛移出)
+        "弘农": ["关中", "中原"], "洛阳": ["中原"],
         "雍丘": ["中原"], "彭城": ["中原"], "谯": ["中原"], "东平": ["中原"],
+        # 山西
         "平阳": ["山西"], "太原": ["山西"], "上党": ["山西"],
+        # 山东
         "济南": ["山东"], "广固": ["山东"], "琅琊": ["山东"],
+        # 淮南
         "寿春": ["淮南"], "合肥": ["淮南"], "广陵": ["淮南"],
+        # 河北
         "中山": ["河北"], "襄国": ["河北"], "邺城": ["河北"], "信都": ["河北"],
+        # 幽燕
         "蓟城": ["幽燕"], "龙城": ["幽燕"],
+        # 关外
         "盛乐": ["关外"], "平城": ["关外"],
     }
     return region_map.get(location_id, [])

@@ -215,10 +215,21 @@ def load_card_design_csv(csv_path: str) -> CardLibrary:
 
             # For friend cards
             is_friend = "幕僚" in raw_category or category.name.startswith("FRIEND")
-
-            # For strategy cards — the resource text IS the resource option
+            # For strategy cards
             resource_option_army = resource_army
             resource_option_vp = resource_vp
+            # Hero initial stats
+            start_order = _parse_int(row.get("先动值", "0"))
+            init_contrib = _parse_int(row.get("初始功绩", "0"))
+            init_prestige = _parse_int(row.get("初始威望", "0"))
+            init_order = _parse_int(row.get("初始顺位", "1"))
+            # Staff limit: North=4, Jin=3(default), 刘裕=5
+            if "hero_north" in category.value:
+                staff_limit = 4
+            elif name == "刘裕":
+                staff_limit = 5
+            else:
+                staff_limit = 3
 
             card_def = CardDef(
                 card_id=card_id,
@@ -244,6 +255,11 @@ def load_card_design_csv(csv_path: str) -> CardLibrary:
                 is_friend=is_friend,
                 resource_option_army=resource_option_army,
                 resource_option_vp=resource_option_vp,
+                start_order=start_order,
+                initial_contribution=init_contrib,
+                initial_prestige=init_prestige,
+                initial_order=init_order,
+                staff_limit=staff_limit,
             )
             cards.append(card_def)
 
@@ -251,22 +267,47 @@ def load_card_design_csv(csv_path: str) -> CardLibrary:
 
 
 def load_goal_cards_csv(csv_path: str) -> list[CardDef]:
-    """Load goal cards from card_goal.csv."""
+    """Load goal cards from card_goal.csv.
+
+    Supports two CSV formats:
+      - new: 目标牌, 分数, 简单目标, 完整目标
+      - old: text_top, text_bottom
+    """
     goals: list[CardDef] = []
     name_counts: dict[str, int] = {}
 
     with open(csv_path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            name = row.get("text_top", "").strip()
-            if not name:
+            # Support both column name formats
+            name = row.get("目标牌", "") or row.get("text_top", "")
+            name = name.strip()
+            if not name or name == "目标牌":
                 continue
 
-            effect_text = row.get("text_bottom", "").strip()
+            # Build effect text from condition columns or use text_bottom
+            simple = row.get("简单目标", "").strip()
+            full = row.get("完整目标", "").strip()
+            score = row.get("分数", "").strip()
+
+            if simple or full:
+                effect_text = f"简单: {simple} ({score}); 完整: {full}"
+            else:
+                effect_text = row.get("text_bottom", "").strip()
 
             key = f"goal_{name}"
             name_counts[key] = name_counts.get(key, 0) + 1
             card_id = f"{key}_{name_counts[key]}"
+
+            # Parse score like "7/14"
+            simple_vp, full_vp = 0, 0
+            if score and "/" in score:
+                parts = score.split("/")
+                try:
+                    simple_vp = int(parts[0])
+                    full_vp = int(parts[1])
+                except ValueError:
+                    pass
 
             card_def = CardDef(
                 card_id=card_id,
@@ -276,35 +317,52 @@ def load_goal_cards_csv(csv_path: str) -> list[CardDef]:
                 card_type=CardType.GOAL,
                 card_category=CardCategory.GOAL,
                 effect_text=effect_text,
+                goal_simple_vp=simple_vp,
+                goal_full_vp=full_vp,
+                goal_simple_condition=simple,
+                goal_full_condition=full,
             )
             goals.append(card_def)
     return goals
 
 
 def load_emperor_cards_csv(csv_path: str) -> list[CardDef]:
-    """Load emperor cards from card_emperor.csv."""
+    """Load emperor cards from card_emperor.csv.
+
+    CSV format: 君主牌, 数量, 初始威望, 特效, 1, 2, 3, 4, 5, 6
+    Columns 1-6 map dice faces to task types.
+    """
+    import re
     emperors: list[CardDef] = []
     name_counts: dict[str, int] = {}
 
     with open(csv_path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            name = row.get("text_top", "").strip()
-            if not name:
+            # Support both new (君主牌) and old (text_top) column names
+            name = row.get("君主牌", "") or row.get("text_top", "")
+            name = name.strip()
+            if not name or name == "君主牌":
                 continue
 
-            effect_text = row.get("text_bottom", "").strip()
+            prestige_text = row.get("初始威望", "5").strip()
+            try:
+                prestige = int(prestige_text)
+            except ValueError:
+                prestige = 5
+
+            effect_text = row.get("特效", "") or row.get("text_bottom", "")
+
+            # Parse dice face → task mapping from columns 1-6
+            tasks = []
+            for face in range(1, 7):
+                task = row.get(str(face), "").strip()
+                if task and task != "-":
+                    tasks.append(task)
 
             key = f"emperor_{name}"
             name_counts[key] = name_counts.get(key, 0) + 1
             card_id = f"{key}_{name_counts[key]}"
-
-            # Parse initial prestige from effect_text: "初始威望：N"
-            import re
-            prestige = 5
-            match = re.search(r'初始威望[：:](\d+)', effect_text)
-            if match:
-                prestige = int(match.group(1))
 
             card_def = CardDef(
                 card_id=card_id,
@@ -313,8 +371,9 @@ def load_emperor_cards_csv(csv_path: str) -> list[CardDef]:
                 cost=-1,
                 card_type=CardType.EMPEROR,
                 card_category=CardCategory.EMPEROR,
-                effect_text=effect_text,
+                effect_text=effect_text.strip(),
                 initial_prestige=prestige,
+                emperor_tasks=tasks,
             )
             emperors.append(card_def)
     return emperors

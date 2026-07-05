@@ -182,10 +182,10 @@ class TestSearchAction:
 
 
 class TestDraftAction:
-    """Tests for draft (征收)."""
+    """Tests for levy (征发)."""
 
-    def test_draft_from_court(self):
-        from engine.actions.special_actions import DraftAction
+    def test_levy_from_court(self):
+        from engine.actions.special_actions import LevyAction
         state = make_state()
         card_def = CardDef(
             card_id="court_1", name="court_card", owner_faction="通用",
@@ -194,7 +194,7 @@ class TestDraftAction:
             effect_text="", resource_option_army=2, resource_option_vp=1,
         )
         state.north_court = [Card(definition=card_def)]
-        action = DraftAction(player_id="north", card_id="court_1")
+        action = LevyAction(player_id="north", card_id="court_1")
         result = action.execute(state)
         assert result.success
         assert state.north_player.military == 7  # 5 + 2

@@ -1,0 +1,33 @@
+[version]
+name = "v1.0"
+description = "六朝何事 核心规则"
+
+[parameters]
+max_rounds = 10
+vp_limit = 150
+hand_limit = 8
+friend_limit_jin = 3
+friend_limit_north = 4
+march_base_cost = 3
+march_min_cost = 1
+draw_quick_cost = 2
+occupy_quick_cost = 1
+fortify_quick_cost = 1
+north_initial_military = 5
+jin_initial_military = 1
+sima_initial_military = 2
+
+[features]
+area_control = true
+partial_control = true
+emperor_dice = true
+emperor_tasks = true
+usurp = true
+culture_spread = true
+culture_placement_bonus = true
+forced_events = true
+goals = true
+public_actions = false
+display_area = false
+expedition_marker = true
+sima_faction = true

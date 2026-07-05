@@ -52,7 +52,8 @@ class TestPlayerState:
             military=10, has_taken_hand_action=True, has_taken_court_action=True,
             has_drawn_quick=True, has_fortified_quick=True,
         )
-        p.reset_turn_state()
+        p.reset_action_flags()
+        p.end_turn_cleanup()
         assert p.military == 0
         assert not p.has_taken_hand_action
         assert not p.has_taken_court_action

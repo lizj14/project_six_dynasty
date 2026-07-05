@@ -158,6 +158,10 @@ class CourtAction(GameAction):
         if not target_card.definition.is_playable_by(player.faction):
             return ActionResult.fail(f"Cannot execute {target_card.name} — faction restricted")
 
+        # Card must have a court action effect in its AST
+        if not target_card.definition.has_strategy_action:
+            return ActionResult.fail(f"{target_card.name} has no court action effect")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
@@ -187,15 +191,65 @@ class CourtAction(GameAction):
         events = [{"type": "court_action", "player": self.player_id,
                     "card": card.name}]
 
-        # Strategy action effect: apply resource values
+        # Strategy action effect: use pre-parsed AST (no runtime parsing)
         defn = card.definition
-        if defn.resource_military > 0:
-            player.military += defn.resource_military
-            events.append({"type": "court_military", "amount": defn.resource_military})
+        parsed = defn.parsed_effect
 
-        if defn.resource_vp > 0:
-            player.vp += defn.resource_vp
-            events.append({"type": "court_vp", "amount": defn.resource_vp})
+        from cards.effect_ast import AbilityType, EffectType
+        strategy_block = None
+        if parsed:
+            for block in parsed.blocks:
+                if block.ability_type == AbilityType.STRATEGY_ACTION:
+                    strategy_block = block
+                    break
+
+        if strategy_block:
+            # Pay block-level costs first
+            for cost in strategy_block.costs:
+                if cost.cost_type == "discard_cards":
+                    count = cost.params.get("count", 1)
+                    for _ in range(count):
+                        if player.hand:
+                            state.main_discard.append(player.hand.pop())
+                elif cost.cost_type == "pay_military":
+                    player.military = max(0, player.military - cost.params.get("amount", 0))
+                elif cost.cost_type == "pay_vp":
+                    player.vp = max(0, player.vp - cost.params.get("amount", 0))
+
+            # Then execute steps
+            for step in strategy_block.steps:
+                if step.effect_type == EffectType.GAIN_MILITARY:
+                    amt = step.params.get("amount", 0)
+                    if isinstance(amt, int):
+                        player.military += amt
+                    events.append({"type": "court_military", "amount": amt,
+                                   "raw": step.source_text})
+                elif step.effect_type == EffectType.GAIN_VP:
+                    amt = step.params.get("amount", 0)
+                    if isinstance(amt, int):
+                        player.vp += amt
+                    events.append({"type": "court_vp", "amount": amt,
+                                   "raw": step.source_text})
+                elif step.effect_type == EffectType.DRAW_CARDS:
+                    count = step.params.get("count", 1)
+                    for _ in range(count):
+                        if state.main_deck:
+                            drawn = state.main_deck.pop(0)
+                            player.hand.append(drawn)
+                    events.append({"type": "court_draw", "count": count})
+                else:
+                    events.append({"type": "court_effect_unhandled",
+                                   "effect": step.effect_type,
+                                   "raw": step.source_text})
+        else:
+            # Fallback: no parsed action block — use resource values directly
+            if defn.resource_military > 0:
+                player.military += defn.resource_military
+                events.append({"type": "court_military",
+                               "amount": defn.resource_military})
+            if defn.resource_vp > 0:
+                player.vp += defn.resource_vp
+                events.append({"type": "court_vp", "amount": defn.resource_vp})
 
         # Check end condition: VP >= 150
         if player.vp >= 150:

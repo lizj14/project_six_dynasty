@@ -40,6 +40,7 @@ def make_march_state(north_military=5, target_controller=ControlState.NEUTRAL,
     )
     # Fix Sima army count: 洛阳 is Sima-controlled
     state.sima.army_placed_count = 1
+    state.sima.army_reserve_count = 0  # Override default 16 for test
     return state
 
 
@@ -68,11 +69,12 @@ class TestMarchValidation:
         assert not result.success
 
     def test_march_on_neutral(self):
+        """Neutral-occupied locations require march first (not occupy)."""
         from engine.actions.quick_actions import MarchAction
         state = make_march_state(target_controller=ControlState.NEUTRAL)
         action = MarchAction(player_id="north", target_location="弘农")
         result = action.validate(state)
-        assert not result.success  # Can't march on neutral — use occupy
+        assert result.success  # Can march on neutral — removes neutral forces
 
     def test_march_no_adjacent_friendly(self):
         from engine.actions.quick_actions import MarchAction

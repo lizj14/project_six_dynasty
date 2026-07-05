@@ -38,9 +38,9 @@ class OccupyAction(GameAction):
         if not loc:
             return ActionResult.fail(f"Location {self.target_location} not found")
 
-        # Target must be unoccupied
-        if loc.controller != ControlState.NEUTRAL:
-            return ActionResult.fail(f"Location {self.target_location} is already occupied")
+        # Target must be empty (not occupied by any forces)
+        if loc.controller != ControlState.EMPTY:
+            return ActionResult.fail(f"Location {self.target_location} is occupied — must march first")
 
         # Must be adjacent to a friendly location (or have expedition marker)
         friendly = state.get_friendly_locations(self.player_id)
@@ -158,9 +158,9 @@ class MarchAction(GameAction):
         if target_loc.is_friendly_to(cs):
             return ActionResult.fail(f"Cannot march on friendly location {self.target_location}")
 
-        # Cannot march on empty location (use occupy instead)
-        if target_loc.controller == ControlState.NEUTRAL:
-            return ActionResult.fail(f"Cannot march on neutral location — use occupy")
+        # Neutral locations are occupied by neutral forces — marching is valid
+        # (rulebook §3.2: locations can be 玩家占据/司马家占据/中立势力占据/未被占据)
+        # Only truly empty (unoccupied) locations should use occupy, not march
 
         # Must be adjacent to a friendly location
         friendly = state.get_friendly_locations(self.player_id)
@@ -184,7 +184,7 @@ class MarchAction(GameAction):
         # Pay cost
         player.military -= cost
 
-        # Remove existing unit (return to owner's reserve)
+        # Remove existing unit (return to owner's reserve, or remove neutral)
         old_controller = target_loc.controller
         old_owner_id = self._control_state_to_player_id(old_controller)
         if old_owner_id:
@@ -195,6 +195,7 @@ class MarchAction(GameAction):
             elif old_controller == ControlState.SIMA:
                 state.sima.army_placed_count -= 1
                 state.sima.army_reserve_count += 1
+        # Neutral troops are just removed — no reserve tracking needed
 
         # Remove fortification if present
         target_loc.is_fortified = False

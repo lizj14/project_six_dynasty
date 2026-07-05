@@ -122,7 +122,7 @@ class ActionType(Enum):
     ARCHIVE = "archive"        # 存档
     SPREAD_CULTURE = "spread_culture"  # 传播文化
     SEARCH = "search"          # 检索
-    DRAFT = "draft"            # 征收
+    LEVY = "levy"            # 征发
     RAISE_ORDER = "raise_order"  # 提高行动顺位
     LOWER_ORDER = "lower_order"  # 降低行动顺位
     DISCARD = "discard"        # 弃牌
@@ -156,7 +156,8 @@ class ControlState(Enum):
     JIN_P2 = "jin_p2"
     JIN_P3 = "jin_p3"
     SIMA = "sima"
-    NEUTRAL = "neutral"
+    NEUTRAL = "neutral"      # 中立势力占据 (has neutral troops)
+    EMPTY = "empty"          # 未被占据 (no troops, can be occupied directly)
 
 
 class EventTrigger(Enum):

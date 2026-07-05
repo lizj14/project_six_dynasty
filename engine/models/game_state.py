@@ -15,7 +15,7 @@ class SimaState:
     military: int = 2                   # 军力 (0-9)
     vp: int = 0                         # VP
     prestige: int = 5                   # 威望 (0-9), set by emperor card
-    army_reserve_count: int = 0         # 部队储备区
+    army_reserve_count: int = 16        # 部队储备区 (board_info.md)
     army_placed_count: int = 0          # Armies on map
     army_reserve_revealed_vp: int = 0
     army_reserve_revealed_military: int = 0
@@ -27,8 +27,8 @@ class EmperorState:
     """Current emperor (君主) state."""
     current_emperor: Optional[CardDef] = None  # Current emperor card
     emperor_deck: list[CardDef] = field(default_factory=list)
-    age: int = 2                        # 君主年龄轨 position
-    task_dice: list[str] = field(default_factory=list)  # 本回合任务标记
+    age: int = 1                        # 君主年龄轨 position
+    active_tasks: list = field(default_factory=list)  # EmperorTask list
     prestige_initial: int = 5           # 起始威望 (from current emperor)
 
 

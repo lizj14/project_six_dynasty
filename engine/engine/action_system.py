@@ -11,7 +11,7 @@ from .actions.quick_actions import (
 )
 from .actions.special_actions import (
     ConvertAction, ArchiveAction, SpreadCultureAction,
-    SearchAction, DraftAction, RaiseOrderAction, LowerOrderAction,
+    SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
 )
 from .actions.card_actions import PlayCardAction, CourtAction
 from models.enums import ControlState
@@ -21,7 +21,7 @@ from models.enums import ControlState
 AnyAction = Union[
     OccupyAction, MarchAction, DrawAction, RecruitAction, FortifyAction,
     ConvertAction, ArchiveAction, SpreadCultureAction,
-    SearchAction, DraftAction, RaiseOrderAction, LowerOrderAction,
+    SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
     PlayCardAction, CourtAction,
 ]
 

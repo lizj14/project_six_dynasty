@@ -35,6 +35,10 @@ class CardDef:
     culture_buddhism: int = 0              # 佛学 contribution
     # For hero cards
     start_order: int = 0                   # 先动值 (initial turn order, lower=earlier)
+    initial_contribution: int = 0          # 初始功绩
+    initial_prestige: int = 0              # 初始威望
+    initial_order: int = 1                 # 初始顺位 (default 1 if enter doesn't change)
+    staff_limit: int = 3                   # 幕僚区上限 (Jin=3, North=4, 刘裕=5)
     # For emperor cards
     initial_prestige: int = 0              # 初始威望
     emperor_tasks: list[str] = field(default_factory=list)  # 君主骰任务面
@@ -48,6 +52,52 @@ class CardDef:
     # For strategy cards — resource option when in court
     resource_option_army: int = 0          # 军力 from resource option
     resource_option_vp: int = 0            # VP from resource option
+    # Pre-parsed effect AST (populated at load time, never regex at runtime)
+    parsed_effect: Optional["CardEffect"] = None
+
+    # ======== AST-based queries (no regex at runtime) ========
+
+    @property
+    def has_strategy_action(self) -> bool:
+        """Does this card have a court action effect (行动：)?"""
+        if not self.parsed_effect:
+            return False
+        from cards.effect_ast import AbilityType
+        return any(b.ability_type == AbilityType.STRATEGY_ACTION
+                   for b in self.parsed_effect.blocks)
+
+    @property
+    def has_enter_effect(self) -> bool:
+        """Does this card have a hero enter effect (登场：)?"""
+        if not self.parsed_effect:
+            return False
+        from cards.effect_ast import AbilityType
+        return any(b.ability_type == AbilityType.ENTER
+                   for b in self.parsed_effect.blocks)
+
+    @property
+    def has_active_ability(self) -> bool:
+        if not self.parsed_effect:
+            return False
+        from cards.effect_ast import AbilityType
+        return any(b.ability_type == AbilityType.ACTIVE
+                   for b in self.parsed_effect.blocks)
+
+    @property
+    def has_passive_ability(self) -> bool:
+        if not self.parsed_effect:
+            return False
+        from cards.effect_ast import AbilityType
+        return any(b.ability_type == AbilityType.PASSIVE
+                   for b in self.parsed_effect.blocks)
+
+    @property
+    def has_forced_effect(self) -> bool:
+        if not self.parsed_effect:
+            return False
+        from cards.effect_ast import AbilityType
+        return any(b.ability_type == AbilityType.FORCED
+                   for b in self.parsed_effect.blocks)
 
     @property
     def markers(self) -> dict[MarkerType, int]:

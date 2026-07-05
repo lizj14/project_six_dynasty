@@ -199,12 +199,14 @@ class TestCourtAction:
 
     def test_court_action_valid(self):
         from engine.actions.card_actions import CourtAction
+        from cards.effect_parser import EffectParser
         state = make_state()
         card_def = CardDef(
             card_id="court_1", name="court_strategy", owner_faction="通用",
             cost=1, card_type=CardType.STRATEGY,
             card_category=CardCategory.STRATEGY_MILITARY,
-            effect_text="", resource_military=3,
+            effect_text="行动：3军力", resource_military=3,
+            parsed_effect=EffectParser().parse("court_strategy", "行动：3军力"),
         )
         state.north_court = [Card(definition=card_def)]
         action = CourtAction(player_id="north", card_id="court_1")
@@ -240,12 +242,14 @@ class TestCourtAction:
     def test_court_action_jin_deck(self):
         """Jin players use the shared jin_court."""
         from engine.actions.card_actions import CourtAction
+        from cards.effect_parser import EffectParser
         state = make_state()
         card_def = CardDef(
             card_id="jin_court_1", name="jin_strategy", owner_faction="通用",
             cost=1, card_type=CardType.STRATEGY,
             card_category=CardCategory.STRATEGY_SPECIAL,
-            effect_text="", resource_military=3,
+            effect_text="行动：3军力", resource_military=3,
+            parsed_effect=EffectParser().parse("jin_strategy", "行动：3军力"),
         )
         state.jin_court = [Card(definition=card_def)]
         action = CourtAction(player_id="jin_1", card_id="jin_court_1")
