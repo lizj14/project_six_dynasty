@@ -1787,8 +1787,7 @@ def _parse_play_card_tag_filter(text: str, orig: str) -> Optional[EffectStep]:
         marker_map = {'军事': 'military', '文化': 'culture', '内政': 'affair', '权谋': 'power'}
         return EffectStep(
             effect_type="play_card",
-            params={"count": int(m.group(1))},
-            filter={"exclude_marker": marker_map[m.group(2)]},
+            params={"count": int(m.group(1)), "filter": {"exclude_marker": marker_map[m.group(2)]}},
             source_text=orig,
         )
     return None

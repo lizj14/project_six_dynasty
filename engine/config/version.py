@@ -124,7 +124,6 @@ class Version:
                     faction_restriction=pe.get("faction_restriction"),
                     play_condition=play_cond,
                     restrictions=pe.get("restrictions", []),
-                    usurp_with_tie=pe.get("usurp_with_tie", False),
                 )
 
             all_cards.append(CardDef(
@@ -215,6 +214,7 @@ def _dict_to_block(bd: dict) -> "AbilityBlock":
         trigger_filter=bd.get("trigger_filter"),
         costs=costs, steps=steps, choice_options=choices,
         resource_option=bd.get("resource_option"),
+        modifier=bd.get("modifier"),
     )
 
 
@@ -223,6 +223,11 @@ def _dict_to_step(sd: dict) -> "EffectStep":
     params = dict(sd.get("params", {}))
     if sd.get("sub_effect"):
         params["sub_effect"] = sd["sub_effect"]
+    # Compatibility: step-level "filter" should be merged into params
+    if "filter" in sd and sd["filter"] is not None:
+        import warnings
+        warnings.warn(f"Step has top-level 'filter', merging into params: {sd.get('effect_type', '?')}")
+        params["filter"] = sd["filter"]
     return EffectStep(
         effect_type=sd["effect_type"], params=params,
         condition=_dict_to_condition(sd.get("condition")),

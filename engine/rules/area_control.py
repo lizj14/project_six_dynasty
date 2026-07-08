@@ -161,9 +161,7 @@ def award_region_vp(state: "GameState", results: dict[Region, ControlResult],
                             control_type="full")
 
         # Check 150 VP trigger
-        if player.vp >= 150:
-            state.game_end_marker = player_id
-            state.game_end_reason = "150vp"
+        state.check_vp_game_end(player_id)
 
 
 def on_location_change(state: "GameState", location_id: str):

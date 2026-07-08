@@ -362,6 +362,4 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
                     player.vp += vp
                     state.log_event("region_vp", phase="player_action",
                                     player=target, region=region.value, vp=vp)
-                    if player.vp >= 150:
-                        state.game_end_marker = target
-                        state.game_end_reason = "150vp"
+                    state.check_vp_game_end(target)

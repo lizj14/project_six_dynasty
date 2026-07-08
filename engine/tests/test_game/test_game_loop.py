@@ -125,3 +125,101 @@ def _run_game_with_seed(lib, seed):
     engine = GameEngine(library=lib, agents=agents, seed=seed)
     engine.run()
     return engine.get_scores()
+
+
+class TestGameEngineWithVersion:
+    """Tests using the new Version.load('v1.0') path."""
+
+    @pytest.fixture
+    def version_setup(self):
+        """Setup a game engine with Version.load('v1.0')."""
+        from config.version import Version
+        from ai.dummy_ai import DummyAI
+        from engine.game import GameEngine
+
+        v = Version.load('v1.0')
+        agents = [
+            DummyAI(player_id="north", seed=1),
+            DummyAI(player_id="jin_1", seed=2),
+            DummyAI(player_id="jin_2", seed=3),
+            DummyAI(player_id="jin_3", seed=4),
+        ]
+        engine = GameEngine(agents=agents, version=v, seed=42)
+        return engine
+
+    def test_version_load_smoke(self, version_setup):
+        """Version.load('v1.0') should produce a valid engine with cards."""
+        engine = version_setup
+        assert engine.library is not None
+        assert len(engine.library.all_cards) > 0
+        assert engine.version is not None
+        assert len(engine.version.map_adjacencies) > 0
+
+    def test_game_runs_without_crash(self, version_setup):
+        """A full game with Version loader should complete without exceptions."""
+        engine = version_setup
+        final_state = engine.run()
+        assert final_state.phase.value == "game_over"
+        assert final_state.round <= 10
+
+    def test_game_has_winner(self, version_setup):
+        """After a game, there should be a valid winner."""
+        engine = version_setup
+        engine.run()
+        scores = engine.get_scores()
+        assert len(scores) == 4
+        for pid, vp in scores.items():
+            assert vp >= 0, f"Player {pid} has negative VP: {vp}"
+        winner = engine.get_winner()
+        assert winner is not None
+
+    def test_multiple_games_deterministic(self, version_setup):
+        """Same seed should produce same result with Version loader."""
+        from config.version import Version
+        from ai.dummy_ai import DummyAI
+        from engine.game import GameEngine
+
+        v = Version.load('v1.0')
+
+        scores1 = _run_game_with_version(v, 42)
+        scores2 = _run_game_with_version(v, 42)
+        assert scores1 == scores2, "Same seed should produce identical results"
+
+    def test_ten_games_no_crash(self, version_setup):
+        """Run 10 games with different seeds — all should complete."""
+        from config.version import Version
+        from ai.dummy_ai import DummyAI
+        from engine.game import GameEngine
+
+        v = Version.load('v1.0')
+
+        for i in range(10):
+            seed = i * 100 + 1
+            agents = [
+                DummyAI(player_id="north", seed=seed),
+                DummyAI(player_id="jin_1", seed=seed + 1),
+                DummyAI(player_id="jin_2", seed=seed + 2),
+                DummyAI(player_id="jin_3", seed=seed + 3),
+            ]
+            engine = GameEngine(agents=agents, version=v, seed=seed)
+            try:
+                final_state = engine.run()
+                assert final_state.phase.value == "game_over"
+            except Exception as e:
+                pytest.fail(f"Game {i} (seed={seed}) crashed: {e}")
+
+
+def _run_game_with_version(version, seed):
+    """Helper: run a game with Version and return scores."""
+    from ai.dummy_ai import DummyAI
+    from engine.game import GameEngine
+
+    agents = [
+        DummyAI(player_id="north", seed=seed),
+        DummyAI(player_id="jin_1", seed=seed + 1),
+        DummyAI(player_id="jin_2", seed=seed + 2),
+        DummyAI(player_id="jin_3", seed=seed + 3),
+    ]
+    engine = GameEngine(agents=agents, version=version, seed=seed)
+    engine.run()
+    return engine.get_scores()

@@ -57,6 +57,10 @@ class GameEngine:
         )
         self.state.action_system = self.action_system
 
+        # Inject EffectResolver so card actions can use it
+        from cards.effect_resolver import EffectResolver
+        self.state.effect_resolver = EffectResolver(self.action_system)
+
         if self.logger:
             self.logger.log_game_start(self.state, self.state.seed)
             initial_hands = {}
@@ -271,11 +275,13 @@ class GameEngine:
                 self.logger.log_end_turn(player_id, discarded,
                                          player.military, player.vp)
 
-            # Rulebook §3.5: 任意玩家行动结束时，检查强制事件牌
+            # 任意玩家行动结束时，弃牌区全部洗入主牌库（重洗牌堆）
             if len(state.forced_event_pile) >= 3:
-                self.rng.shuffle(state.forced_event_pile)
-                state.main_deck = state.forced_event_pile + state.main_deck
+                state.main_discard.extend(state.forced_event_pile)
                 state.forced_event_pile = []
+                self.rng.shuffle(state.main_discard)
+                state.main_deck.extend(state.main_discard)
+                state.main_discard = []
 
         # === Settlement Phase ===
         run_settlement_phase(state, self.rng)
@@ -325,49 +331,18 @@ class GameEngine:
 
 
 def _check_event_condition(card, player, state) -> bool:
-    """Check if an event card's play condition is met using pre-parsed AST."""
+    """Check if an event card's play condition is met using pre-parsed AST.
+
+    Delegates to EffectResolver.check_condition() for all supported condition types.
+    """
     parsed = card.definition.parsed_effect
     if not parsed or not parsed.play_condition:
         return True  # No condition → always playable
 
-    from cards.effect_ast import Condition
     cond = parsed.play_condition
+    resolver = getattr(state, 'effect_resolver', None)
+    if resolver:
+        return resolver.check_condition(cond, state, player.player_id)
 
-    if cond.condition_type == "order_lowest":
-        # "顺位最低时可以打出"
-        jin_players = state.get_jin_players()
-        if player.player_id.startswith("jin"):
-            max_order = max(p.order for p in jin_players)
-            return player.order == max_order
-
-    if cond.condition_type == "control_region":
-        region_name = cond.params.get("region", "")
-        from rules.area_control import check_region_control, REGION_CONFIG
-        from models.enums import Region
-        for reg, cfg in REGION_CONFIG.items():
-            if region_name in cfg.get("locations", []):
-                result = check_region_control(state, reg)
-                return result.full_controller == player.player_id
-
-    if cond.condition_type == "occupy_location_in_region":
-        region_name = cond.params.get("region", "")
-        from rules.area_control import REGION_CONFIG
-        friendly = state.get_friendly_locations(player.player_id)
-        for reg, cfg in REGION_CONFIG.items():
-            if reg.value == region_name:
-                region_locs = cfg.get("locations", [])
-                return any(loc in region_locs for loc in friendly)
-        return False
-
-    if cond.condition_type == "has_expedition":
-        return player.has_expedition_marker
-
-    if cond.condition_type == "has_military":
-        needed = cond.params.get("amount", 0)
-        return player.military >= needed
-
-    if cond.condition_type == "staff_has_space":
-        return player.can_play_friend()
-
-    # Unknown condition — assume met
+    # Fallback: no resolver available
     return True

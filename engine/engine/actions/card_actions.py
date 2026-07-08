@@ -100,11 +100,10 @@ class PlayCardAction(GameAction):
             player.staff_area.append(card)
             events.append({"type": "friend_played", "card": card.name})
 
-            # Trigger enter effects (handled by effect resolver later)
+            # Note: enter effects handled by resolver below
 
         elif card.card_type == CardType.EVENT:
             # 事件牌 — resolve effect, then discard to main discard
-            # Effect resolution will be handled by the effect resolver
             state.main_discard.append(card)
             events.append({"type": "event_played", "card": card.name})
 
@@ -119,6 +118,21 @@ class PlayCardAction(GameAction):
             if player.faction == FactionType.JIN:
                 player.contribution = min(9, player.contribution + 1)
                 events.append({"type": "contribution_gained", "amount": 1})
+
+        # === Resolve card effects via EffectResolver ===
+        # Strategy cards go to deck; effects fire later via CourtAction.
+        # Friend and event cards fire effects immediately on play.
+        if card.card_type in (CardType.FRIEND, CardType.EVENT):
+            parsed = card.definition.parsed_effect
+            resolver = getattr(state, 'effect_resolver', None)
+            if resolver and parsed:
+                effect_result = resolver.resolve(
+                    parsed, state, self.player_id,
+                    context={"source": "play_card", "card_id": card.definition.card_id},
+                )
+                events.extend(effect_result.events)
+                if effect_result.errors:
+                    events.append({"type": "effect_errors", "errors": effect_result.errors})
 
         player.has_taken_hand_action = True
         state.log_event("play_card", player=self.player_id, card=card.name)
@@ -191,58 +205,20 @@ class CourtAction(GameAction):
         events = [{"type": "court_action", "player": self.player_id,
                     "card": card.name}]
 
-        # Strategy action effect: use pre-parsed AST (no runtime parsing)
+        # Resolve card effects via EffectResolver
         defn = card.definition
         parsed = defn.parsed_effect
-
-        from cards.effect_ast import AbilityType, EffectType
-        strategy_block = None
-        if parsed:
-            for block in parsed.blocks:
-                if block.ability_type == AbilityType.STRATEGY_ACTION:
-                    strategy_block = block
-                    break
-
-        if strategy_block:
-            # Pay block-level costs first
-            for cost in strategy_block.costs:
-                if cost.cost_type == "discard_cards":
-                    count = cost.params.get("count", 1)
-                    for _ in range(count):
-                        if player.hand:
-                            state.main_discard.append(player.hand.pop())
-                elif cost.cost_type == "pay_military":
-                    player.military = max(0, player.military - cost.params.get("amount", 0))
-                elif cost.cost_type == "pay_vp":
-                    player.vp = max(0, player.vp - cost.params.get("amount", 0))
-
-            # Then execute steps
-            for step in strategy_block.steps:
-                if step.effect_type == EffectType.GAIN_MILITARY:
-                    amt = step.params.get("amount", 0)
-                    if isinstance(amt, int):
-                        player.military += amt
-                    events.append({"type": "court_military", "amount": amt,
-                                   "raw": step.source_text})
-                elif step.effect_type == EffectType.GAIN_VP:
-                    amt = step.params.get("amount", 0)
-                    if isinstance(amt, int):
-                        player.vp += amt
-                    events.append({"type": "court_vp", "amount": amt,
-                                   "raw": step.source_text})
-                elif step.effect_type == EffectType.DRAW_CARDS:
-                    count = step.params.get("count", 1)
-                    for _ in range(count):
-                        if state.main_deck:
-                            drawn = state.main_deck.pop(0)
-                            player.hand.append(drawn)
-                    events.append({"type": "court_draw", "count": count})
-                else:
-                    events.append({"type": "court_effect_unhandled",
-                                   "effect": step.effect_type,
-                                   "raw": step.source_text})
+        resolver = getattr(state, 'effect_resolver', None)
+        if resolver and parsed:
+            effect_result = resolver.resolve(
+                parsed, state, self.player_id,
+                context={"source": "court_action", "card_id": defn.card_id},
+            )
+            events.extend(effect_result.events)
+            if effect_result.errors:
+                events.append({"type": "effect_errors", "errors": effect_result.errors})
         else:
-            # Fallback: no parsed action block — use resource values directly
+            # Fallback: no resolver or no parsed effect — use resource values directly
             if defn.resource_military > 0:
                 player.military += defn.resource_military
                 events.append({"type": "court_military",
@@ -252,9 +228,7 @@ class CourtAction(GameAction):
                 events.append({"type": "court_vp", "amount": defn.resource_vp})
 
         # Check end condition: VP >= 150
-        if player.vp >= 150:
-            state.game_end_marker = self.player_id
-            state.game_end_reason = "150vp"
+        if state.check_vp_game_end(self.player_id):
             events.append({"type": "game_end_trigger", "reason": "150vp",
                            "player": self.player_id})
 

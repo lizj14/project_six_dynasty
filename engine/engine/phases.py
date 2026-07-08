@@ -360,10 +360,6 @@ def run_preparation_phase(state: GameState, rng: random.Random):
     state.turn_order = ["north"] + [p.player_id for p in jin_sorted]
     state.active_player_index = 0
 
-    # Reset court cards (move unselected to discard, draw new 10)
-    _refresh_court(state, "north", rng)
-    _refresh_court(state, "jin", rng)
-
     state.phase = PhaseType.ACTION
 
 
@@ -424,12 +420,9 @@ def run_settlement_phase(state: GameState, rng: random.Random):
     state.jin_discard.extend(state.jin_played_this_round)
     state.jin_played_this_round = []
 
-    # Military gain from reserves (simplified: based on armies in reserve)
-    for player in state.get_all_players():
-        # Each army in reserve provides ~0.5 military, rounded up
-        base = max(1, player.army_reserve_count // 4)
-        faction_bonus = 2 if player.faction == FactionType.NORTH else 0
-        player.military = base + faction_bonus
+    # Refresh court cards (draw new 10)
+    _refresh_court(state, "north", rng)
+    _refresh_court(state, "jin", rng)
 
     # Unlock culture markers
     for loc in state.locations.values():

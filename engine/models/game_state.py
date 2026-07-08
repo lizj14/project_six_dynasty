@@ -1,7 +1,7 @@
 """Aggregate GameState model — the complete game snapshot."""
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Any
 
 from .enums import PhaseType, CultureType, Region, ControlState, FactionType
 from .card import Card, CardDef
@@ -99,6 +99,9 @@ class GameState:
 
     # === Random Seed ===
     seed: int = 0
+
+    # === Effect Resolver (injected by GameEngine) ===
+    effect_resolver: Optional[Any] = None
 
     # ======== Helper Methods ========
 
@@ -227,3 +230,20 @@ class GameState:
             "type": event_type,
             **kwargs,
         })
+
+    def check_vp_game_end(self, player_id: str, threshold: int = 150) -> bool:
+        """Check if a player's VP triggers the game end condition.
+
+        Call this after any VP gain. If the player's VP >= threshold,
+        sets game_end_marker and game_end_reason on the state.
+
+        Returns True if game end was triggered (newly or previously).
+        """
+        if self.game_end_marker:
+            return True  # Already triggered
+        player = self.get_player(player_id)
+        if player and player.vp >= threshold:
+            self.game_end_marker = player_id
+            self.game_end_reason = "150vp"
+            return True
+        return False
