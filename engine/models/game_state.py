@@ -156,10 +156,22 @@ class GameState:
 
             card = self.main_deck.pop(0)
 
-            # 强制性事件牌 → 放入强制事件牌区，不加入手牌
+            # 强制性事件牌 → 立刻结算效果，放入强制事件牌区，不加入手牌
             if card.card_type == _CardType.MECHANISM:
                 self.forced_event_pile.append(card)
                 events.append({"type": "forced_event_drawn", "card": card.name})
+
+                # 立刻结算强制事件牌效果
+                if self.effect_resolver and card.definition.parsed_effect:
+                    resolve_result = self.effect_resolver.resolve(
+                        card.definition.parsed_effect, self, player_id,
+                        context={"source": "forced_event",
+                                 "card_id": card.definition.card_id},
+                    )
+                    events.extend(resolve_result.events)
+                    if resolve_result.errors:
+                        events.append({"type": "effect_errors",
+                                      "errors": resolve_result.errors})
             else:
                 player.hand.append(card)
                 events.append({"type": "draw", "card": card.name})

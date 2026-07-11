@@ -13,6 +13,64 @@ import random
 from typing import Optional
 
 from .interface import GameAgent, SetupContext, SetupDecision
+from models.enums import ControlState, TerrainType
+
+
+# ── Recruit heuristic helper ──────────────────────────────────────
+
+def _can_march_after_recruit(state: "GameState", player_id: str,
+                             military: int) -> bool:
+    """Check whether the player could march after gaining +1 military.
+
+    Scans all potential march targets (enemy locations adjacent to
+    friendly) and checks if any have cost ≤ military + 1.
+    """
+    new_military = military + 1
+    friendly = state.get_friendly_locations(player_id)
+    player_cs = state._player_control_state(player_id)
+
+    for loc_id, loc in state.locations.items():
+        # Skip friendly or neutral locations (march targets must be enemy)
+        if loc.is_friendly_to(player_cs) or loc.controller == ControlState.NEUTRAL:
+            continue
+
+        # Must be adjacent to a friendly location
+        neighbors = state.get_adjacent_locations(loc_id)
+        if not any(n in friendly for n in neighbors):
+            continue
+
+        # Calculate march cost
+        cost = 3  # base
+
+        # Difficult terrain: +1
+        for nb in neighbors:
+            if nb in friendly:
+                terrain = state.get_terrain(nb, loc_id)
+                if terrain == TerrainType.DIFFICULT:
+                    cost += 1
+                break
+
+        # Fortified target: +1
+        if loc.is_fortified:
+            cost += 1
+
+        # Isolated location: -1
+        target_cs = loc.controller
+        isolated = True
+        for nb in neighbors:
+            nb_loc = state.locations.get(nb)
+            if nb_loc and nb_loc.is_friendly_to(target_cs):
+                isolated = False
+                break
+        if isolated:
+            cost -= 1
+
+        cost = max(1, cost)
+
+        if new_military >= cost:
+            return True
+
+    return False
 
 
 # ── Action category helper ────────────────────────────────────────
@@ -44,6 +102,8 @@ class DummyAI(GameAgent):
     def __init__(self, player_id: str = "", seed: int = 0):
         self.player_id = player_id
         self.rng = random.Random(seed)
+        self._recruit_count: int = 0
+        self._last_round: int = -1
 
     # === Setup ===
 
@@ -75,6 +135,11 @@ class DummyAI(GameAgent):
         Prefers map actions (march, occupy, spread_culture) when military
         is available, with fallback to court actions and quick actions.
 
+        Dummy AI heuristics (not game rules):
+          - Maximum 2 recruits per turn
+          - Only recruit if march actions are available (recruiting just
+            to discard cards with no follow-up march is wasteful)
+
         Returns None to pass (end turn) when:
           - No actions available, or
           - Randomly decides to stop (5-10% chance per call).
@@ -82,8 +147,30 @@ class DummyAI(GameAgent):
         if not available_actions:
             return None
 
+        # Reset per-turn tracking if round changed
+        if state.round != self._last_round:
+            self._last_round = state.round
+            self._recruit_count = 0
+
         player = state.get_player(self.player_id)
         military = player.military if player else 0
+
+        # ── Dummy AI recruit filtering ────────────────────
+        # Only consider recruit if: (a) < 2 this turn, and
+        # (b) marching is possible with military after recruiting
+        can_march = _can_march_after_recruit(state, self.player_id, military)
+        filtered_actions = []
+        for a in available_actions:
+            if getattr(a, 'action_type', '') == "recruit":
+                if self._recruit_count >= 2:
+                    continue          # Rule: max 2 per turn
+                if not can_march:
+                    continue          # Heuristic: won't recruit if still can't march
+            filtered_actions.append(a)
+
+        available_actions = filtered_actions
+        if not available_actions:
+            return None
 
         # 5-10% chance to stop early, simulating "pass"
         pass_chance = 0.05 if military > 0 else 0.15
@@ -145,7 +232,13 @@ class DummyAI(GameAgent):
         if not pool:
             return self.rng.choice(available_actions)
 
-        return self.rng.choice(pool)
+        chosen = self.rng.choice(pool)
+
+        # Track recruit count
+        if getattr(chosen, 'action_type', '') == "recruit":
+            self._recruit_count += 1
+
+        return chosen
 
     def take_turn(self, state: "GameState") -> list:
         """Legacy batch interface — returns empty, engine uses decide_action."""
@@ -160,3 +253,10 @@ class DummyAI(GameAgent):
     def select_target(self, state: "GameState", prompt: dict) -> Optional[str]:
         options = prompt.get("options", [])
         return self.rng.choice(options) if options else None
+
+    def choose_discards(self, state: "GameState", hand_cards: list[str],
+                        count: int) -> list[int]:
+        """Randomly pick cards to discard."""
+        indices = list(range(len(hand_cards)))
+        self.rng.shuffle(indices)
+        return indices[:count]

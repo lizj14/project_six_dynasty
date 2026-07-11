@@ -244,11 +244,17 @@ class GameEngine:
         # Rulebook §3.4: 军力行动结束时清0
         player.military = 0
 
-        # Enforce hand limit
+        # Enforce hand limit — agent chooses which cards to discard
         discarded = 0
-        while len(player.hand) > player.hand_limit:
-            state.main_discard.append(player.hand.pop())
-            discarded += 1
+        excess = len(player.hand) - player.hand_limit
+        if excess > 0:
+            hand_card_names = [c.name for c in player.hand]
+            discard_indices = agent.choose_discards(state, hand_card_names, excess)
+            # Discard in reverse index order to keep indices valid
+            for idx in sorted(discard_indices, reverse=True):
+                if 0 <= idx < len(player.hand):
+                    state.main_discard.append(player.hand.pop(idx))
+                    discarded += 1
 
         if self.logger:
             self.logger.log_end_turn(player_id, discarded,
@@ -279,7 +285,8 @@ class GameEngine:
         hand = self.action_system.get_available_hand_actions(state, player_id)
         court = self.action_system.get_available_court_actions(state, player_id)
         public = self.action_system.get_available_public_actions(state, player_id)
-        return quick + hand + court + public
+        activate = self.action_system.get_available_activate_actions(state, player_id)
+        return quick + hand + court + public + activate
 
     def _log_effect(self, player_id: str, effect_type: str,
                     params: dict = None, events: list = None,

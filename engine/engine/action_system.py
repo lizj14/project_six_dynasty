@@ -12,6 +12,7 @@ from .actions.quick_actions import (
 from .actions.special_actions import (
     ConvertAction, ArchiveAction, SpreadCultureAction,
     SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
+    ActivateEffectAction,
 )
 from .actions.card_actions import PlayCardAction, CourtAction, PublicCardAction
 from models.enums import ControlState
@@ -22,6 +23,7 @@ AnyAction = Union[
     OccupyAction, MarchAction, DrawAction, RecruitAction, FortifyAction,
     ConvertAction, ArchiveAction, SpreadCultureAction,
     SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
+    ActivateEffectAction,
     PlayCardAction, CourtAction, PublicCardAction,
 ]
 
@@ -206,5 +208,68 @@ class ActionSystem:
                         player_id=player_id, card_id=defn.card_id,
                         payment_indices=other_indices[:cost],
                     ))
+
+        return available
+
+    def get_available_activate_actions(self, state: "GameState", player_id: str) -> list[ActivateEffectAction]:
+        """Get all legal active ability activation actions.
+
+        Scans player's hero card and staff_area cards for active abilities
+        (ability_type == "active") that haven't been activated this turn.
+        """
+        player = state.get_player(player_id)
+        if not player:
+            return []
+
+        available = []
+
+        # Scan hero card
+        if player.hero:
+            available.extend(self._build_activate_actions(
+                player, player.hero, state))
+
+        # Scan staff area
+        for card in player.staff_area:
+            available.extend(self._build_activate_actions(
+                player, card, state))
+
+        return available
+
+    def _build_activate_actions(self, player: "PlayerState", card: "Card",
+                                state: "GameState") -> list[ActivateEffectAction]:
+        """Build ActivateEffectAction instances for a card's active abilities."""
+        available = []
+        card_id = card.definition.card_id
+
+        # Skip if already activated this turn
+        if card_id in player.activated_card_ids:
+            return available
+
+        parsed = card.definition.parsed_effect
+        if not parsed:
+            return available
+
+        active_blocks = [b for b in parsed.blocks if b.ability_type == "active"]
+        for bi, block in enumerate(active_blocks):
+            # If the block has choice_options, generate one action per choice
+            if block.choice_options:
+                for ci in range(len(block.choice_options)):
+                    action = ActivateEffectAction(
+                        player_id=player.player_id,
+                        card_id=card_id,
+                        block_index=bi,
+                        choice_index=ci,
+                    )
+                    if action.validate(state).success:
+                        available.append(action)
+            else:
+                action = ActivateEffectAction(
+                    player_id=player.player_id,
+                    card_id=card_id,
+                    block_index=bi,
+                    choice_index=0,
+                )
+                if action.validate(state).success:
+                    available.append(action)
 
         return available

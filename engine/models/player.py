@@ -52,6 +52,7 @@ class PlayerState:
     has_taken_court_action: bool = False    # 已执行牌组行动
     has_drawn_quick: bool = False           # 已执行快速摸牌（每回合限1次）
     has_fortified_quick: bool = False       # 已执行快速加固（每回合限1次）
+    activated_card_ids: set[str] = field(default_factory=set)  # 本回合已激活过主动效果的卡牌ID
 
     @property
     def staff_limit(self) -> int:
@@ -115,6 +116,7 @@ class PlayerState:
         self.has_taken_court_action = False
         self.has_drawn_quick = False
         self.has_fortified_quick = False
+        self.activated_card_ids.clear()
 
     def end_turn_cleanup(self):
         """Reset military and check hand limit at end of player's turn."""

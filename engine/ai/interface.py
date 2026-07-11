@@ -87,6 +87,16 @@ class GameAgent(ABC):
         """
         ...
 
+    def choose_discards(self, state: "GameState", hand_cards: list[str],
+                        count: int) -> list[int]:
+        """Choose which cards to discard for hand limit enforcement.
+
+        Called at end of turn when hand exceeds the limit. Returns a list
+        of indices (0-based) to discard. Default: discard from the end.
+        Override for smarter selection.
+        """
+        return list(range(len(hand_cards) - count, len(hand_cards)))
+
     @abstractmethod
     def select_target(self, state: "GameState", prompt: dict) -> Optional[str]:
         """Called when a player must select a target (location, player, card).

@@ -153,6 +153,8 @@ class PlayCardAction(GameAction):
         # === Resolve card effects via EffectResolver ===
         # Strategy cards go to deck; effects fire later via CourtAction.
         # Friend and event cards fire effects immediately on play.
+        # Active ability blocks are excluded — they must be activated
+        # explicitly via ActivateEffectAction during the player's turn.
         if card.card_type in (CardType.FRIEND, CardType.EVENT):
             parsed = card.definition.parsed_effect
             resolver = getattr(state, 'effect_resolver', None)
@@ -160,6 +162,7 @@ class PlayCardAction(GameAction):
                 effect_result = resolver.resolve(
                     parsed, state, self.player_id,
                     context={"source": "play_card", "card_id": card.definition.card_id},
+                    exclude_ability_types={"active"},
                 )
                 events.extend(effect_result.events)
                 if effect_result.errors:

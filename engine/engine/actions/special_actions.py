@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .base import GameAction, ActionResult
+from models.card import Card
 from models.enums import ControlState, FactionType, CardType, CardCategory, CultureType, Region
 
 # ============================================================
@@ -547,6 +548,172 @@ class LowerOrderAction(GameAction):
 
     def cost_description(self, state: "GameState") -> str:
         return "仅卡牌效果"
+
+
+# ============================================================
+# Activate Effect (激活主动效果)
+# ============================================================
+
+@dataclass
+class ActivateEffectAction(GameAction):
+    """激活行动：激活角色牌或幕僚牌的主动效果。
+
+    目标牌必须在玩家的 hero 槽或 staff_area 中。
+    每张牌每回合只能激活一次主动效果。
+    费用的支付在 EffectResolver 内部处理。
+    """
+    action_type: str = "activate_effect"
+    player_id: str = ""
+    card_id: str = ""                         # card_id of the card to activate
+    block_index: int = 0                      # Which active block to activate
+    choice_index: int = 0                     # For choice_options within the block
+
+    @property
+    def source_card(self) -> Optional["Card"]:
+        """Internal: return the Card object, resolved during validate/execute."""
+        return getattr(self, '_source_card', None)
+
+    def validate(self, state: "GameState") -> ActionResult:
+        player = state.get_player(self.player_id)
+        if not player:
+            return ActionResult.fail(f"Player {self.player_id} not found")
+
+        # Find the card — hero or staff_area
+        card = self._find_card(player)
+        if not card:
+            return ActionResult.fail(
+                f"Card {self.card_id} not found on player {self.player_id} "
+                f"(hero or staff_area)")
+
+        # Check if already activated this turn
+        if self.card_id in player.activated_card_ids:
+            return ActionResult.fail(
+                f"Card {card.name} already activated this turn")
+
+        # Get parsed effect and find active blocks
+        parsed = card.definition.parsed_effect
+        if not parsed:
+            return ActionResult.fail(f"Card {card.name} has no effects")
+
+        active_blocks = [b for b in parsed.blocks
+                        if b.ability_type == "active"]
+        if not active_blocks:
+            return ActionResult.fail(
+                f"Card {card.name} has no active abilities")
+
+        if self.block_index < 0 or self.block_index >= len(active_blocks):
+            return ActionResult.fail(
+                f"Invalid block_index {self.block_index} for card "
+                f"{card.name} (has {len(active_blocks)} active block(s))")
+
+        block = active_blocks[self.block_index]
+
+        # Validate block costs
+        for cost in block.costs:
+            if cost.cost_type == "discard_cards":
+                count = cost.params.get("count", 1)
+                if len(player.hand) < count:
+                    return ActionResult.fail(
+                        f"Need {count} card(s) in hand to pay cost, "
+                        f"have {len(player.hand)}")
+            elif cost.cost_type == "pay_military":
+                amount = cost.params.get("amount", 0)
+                if player.military < amount:
+                    return ActionResult.fail(
+                        f"Need {amount} military to pay cost, "
+                        f"have {player.military}")
+            elif cost.cost_type == "pay_vp":
+                amount = cost.params.get("amount", 0)
+                if player.vp < amount:
+                    return ActionResult.fail(
+                        f"Need {amount} VP to pay cost, have {player.vp}")
+
+        # Validate choice_index if block has choice_options
+        if block.choice_options:
+            if self.choice_index < 0 or self.choice_index >= len(block.choice_options):
+                return ActionResult.fail(
+                    f"Invalid choice_index {self.choice_index} for "
+                    f"{len(block.choice_options)} option(s)")
+
+        # Cache the card for execute
+        object.__setattr__(self, '_source_card', card)
+        return ActionResult.ok()
+
+    def execute(self, state: "GameState") -> ActionResult:
+        validation = self.validate(state)
+        if not validation.success:
+            return validation
+
+        player = state.get_player(self.player_id)
+        card = self.source_card
+
+        events = [{"type": "activate_effect", "player": self.player_id,
+                    "card": card.name, "card_id": self.card_id}]
+
+        # Resolve the active block(s) via EffectResolver
+        parsed = card.definition.parsed_effect
+        resolver = getattr(state, 'effect_resolver', None)
+        if resolver and parsed:
+            # Only resolve active blocks
+            active_blocks = [b for b in parsed.blocks
+                            if b.ability_type == "active"]
+            block = active_blocks[self.block_index]
+
+            effect_result = resolver._resolve_block(
+                block, state, self.player_id,
+                context={"source": "activate_effect",
+                         "card_id": self.card_id,
+                         "choice_index": self.choice_index},
+            )
+            events.extend(effect_result.events)
+            if effect_result.errors:
+                events.append({"type": "effect_errors",
+                              "errors": effect_result.errors})
+
+        # Mark card as activated this turn
+        player.activated_card_ids.add(self.card_id)
+
+        state.log_event("activate_effect", player=self.player_id,
+                        card=card.name)
+
+        # Check end condition: VP >= 150
+        if state.check_vp_game_end(self.player_id):
+            events.append({"type": "game_end_trigger", "reason": "150vp",
+                           "player": self.player_id})
+
+        return ActionResult.ok(events)
+
+    def _find_card(self, player: "PlayerState") -> Optional["Card"]:
+        """Find the target card in player's hero or staff_area."""
+        if player.hero and player.hero.definition.card_id == self.card_id:
+            return player.hero
+        for card in player.staff_area:
+            if card.definition.card_id == self.card_id:
+                return card
+        return None
+
+    def cost_description(self, state: "GameState") -> str:
+        player = state.get_player(self.player_id)
+        card = self._find_card(player) if player else None
+        if not card:
+            return "?"
+        parsed = card.definition.parsed_effect
+        if not parsed:
+            return "?"
+        active_blocks = [b for b in parsed.blocks if b.ability_type == "active"]
+        if not active_blocks:
+            return "?"
+        block = active_blocks[self.block_index]
+        parts = []
+        for cost in block.costs:
+            if cost.cost_type == "discard_cards":
+                parts.append(f"弃{cost.params.get('count', 1)}张手牌")
+            elif cost.cost_type == "pay_military":
+                parts.append(f"支付{cost.params.get('amount', 0)}军力")
+            elif cost.cost_type == "pay_vp":
+                parts.append(f"支付{cost.params.get('amount', 0)}VP")
+        return "，".join(parts) if parts else "激活主动效果"
+
 
 # ============================================================
 # Helpers

@@ -40,7 +40,8 @@ class EffectResolver:
     # ================================================================
 
     def resolve(self, effect: CardEffect, state: "GameState",
-                player_id: str, context: dict = None) -> ResolveResult:
+                player_id: str, context: dict = None,
+                exclude_ability_types: set[str] = None) -> ResolveResult:
         """Resolve a complete card effect for a given player.
 
         Args:
@@ -48,10 +49,16 @@ class EffectResolver:
             state: Current game state (mutated in place)
             player_id: The player executing the card
             context: Additional context (e.g. card index, target selections)
+            exclude_ability_types: Optional set of ability types to skip
+                (e.g. {"active"} when playing a friend card — active
+                abilities must be activated explicitly during the turn).
         """
         result = ResolveResult()
+        exclude = exclude_ability_types or set()
 
         for block in effect.blocks:
+            if block.ability_type in exclude:
+                continue
             block_result = self._resolve_block(block, state, player_id, context)
             result.events.extend(block_result.events)
             result.errors.extend(block_result.errors)
