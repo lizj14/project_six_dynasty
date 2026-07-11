@@ -602,6 +602,13 @@ def run_settlement_phase(state: GameState, rng: random.Random):
     state.jin_discard.extend(state.jin_court)
     state.jin_court = []
 
+    # Rulebook §4.2: 司马家基于部队储备区露出数字获得军力
+    from models.game_state import get_reserve_revealed
+    sima_vp, sima_mil = get_reserve_revealed(state.sima.army_placed_count, is_north=False)
+    state.sima.army_reserve_revealed_vp = sima_vp
+    state.sima.army_reserve_revealed_military = sima_mil
+    state.sima.military = min(9, state.sima.military + sima_mil)
+
     # Move played cards to discard
     state.north_discard.extend(state.north_played_this_round)
     state.north_played_this_round = []

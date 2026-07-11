@@ -88,3 +88,85 @@ class TestSimaState:
         assert sima.military == 2
         assert sima.vp == 0
         assert sima.prestige == 5
+
+
+class TestReserveRevealed:
+    """Tests for army reserve reveal computation (board_info.md:133-150).
+
+    Rule: VP and military each take the MAX value among all revealed slots.
+    """
+
+    def test_zero_placed_returns_zero(self):
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(0, is_north=False)
+        assert vp == 0
+        assert mil == 0
+
+    def test_negative_placed_returns_zero(self):
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(-5, is_north=False)
+        assert vp == 0
+        assert mil == 0
+
+    def test_jin_3_placed_no_military_yet(self):
+        """Slots 0-2 revealed: (2,0),(4,0),(6,0) → VP max=6, Mil max=0."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(3, is_north=False)
+        assert vp == 6
+        assert mil == 0
+
+    def test_jin_4_placed_first_military(self):
+        """Slots 0-3 revealed: VP max=6, Mil max=1 (slot 3 = 1军力)."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(4, is_north=False)
+        assert vp == 6
+        assert mil == 1
+
+    def test_jin_5_placed_vp_increases(self):
+        """Slots 0-4 revealed: slot 4 = 9vp → VP max=9, Mil max=1."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(5, is_north=False)
+        assert vp == 9
+        assert mil == 1
+
+    def test_jin_8_placed_two_military(self):
+        """Slots 0-7: slot 7 = 2军力 → VP max=13, Mil max=2."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(8, is_north=False)
+        assert vp == 13   # max(2,4,6,0,9,11,13,0)
+        assert mil == 2   # max(0,0,0,1,0,0,0,2)
+
+    def test_jin_12_placed_three_military(self):
+        """Slots 0-11: slot 11 = 3军力 → VP max=20, Mil max=3."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(12, is_north=False)
+        assert vp == 20  # max(2,4,6,0,9,11,13,0,16,18,20,0)
+        assert mil == 3  # max(0,0,0,1,0,0,0,2,0,0,0,3)
+
+    def test_jin_all_16_placed(self):
+        """All 16 slots revealed → VP max=30, Mil max=3."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(16, is_north=False)
+        assert vp == 30
+        assert mil == 3
+
+    def test_north_28_placed_max_military(self):
+        """Slots 0-27: Mil max=7 (slot 27 = 7军力), VP max=48."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(28, is_north=True)
+        assert vp == 48  # max VP among first 28 slots
+        assert mil == 7  # max military: 1,2,3,4,5,6,7
+
+    def test_north_all_32_placed(self):
+        """All 32 slots revealed → VP max=58, Mil max=7."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(32, is_north=True)
+        assert vp == 58
+        assert mil == 7
+
+    def test_placed_exceeds_track_clamped(self):
+        """Placed count beyond track length is clamped."""
+        from models.game_state import get_reserve_revealed
+        vp, mil = get_reserve_revealed(100, is_north=False)
+        assert vp == 30  # max VP of 16-slot track
+        assert mil == 3  # max military of 16-slot track

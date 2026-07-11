@@ -9,6 +9,50 @@ from .player import PlayerState
 from .location import LocationState, RegionState, LocationDef, RegionDef, AdjacencyDef
 
 
+# ================================================================
+# 部队储备区露出轨道常量 (board_info.md:133-150)
+# ================================================================
+# Each slot = (vp, military). Index 0 = first army placed (leftmost slot).
+# VP: 终局计分时，取最后一个露出格子的VP值
+# Military: 每回合获得军力 = 所有已露出军事格之和
+
+_RESERVE_TRACK_JIN: list[tuple[int, int]] = [
+    (2,0), (4,0), (6,0), (0,1), (9,0), (11,0), (13,0), (0,2),
+    (16,0), (18,0), (20,0), (0,3), (23,0), (25,0), (27,0), (30,0),
+]
+
+_RESERVE_TRACK_NORTH: list[tuple[int, int]] = [
+    (2,0), (4,0), (6,0), (0,1), (9,0), (11,0), (13,0), (0,2),
+    (16,0), (18,0), (20,0), (0,3), (23,0), (25,0), (27,0), (0,4),
+    (30,0), (32,0), (34,0), (0,5), (37,0), (39,0), (41,0), (0,6),
+    (44,0), (46,0), (48,0), (0,7), (51,0), (53,0), (55,0), (58,0),
+]
+
+
+def get_reserve_revealed(placed_count: int, is_north: bool = False) -> tuple[int, int]:
+    """Compute revealed VP and military from the army reserve track.
+
+    露出规则 (rulebook §3.4): VP和军力各自取当前已露出格子中的最大值。
+
+    Args:
+        placed_count: Number of armies placed on the map (taken from reserve).
+        is_north: True for North faction (32-slot track), False for Jin/Sima (16-slot).
+
+    Returns:
+        (revealed_vp, revealed_military) tuple.
+        - revealed_vp: Max VP value among all revealed slots (for end-game scoring).
+        - revealed_military: Max military value among all revealed slots (gained each turn).
+    """
+    track = _RESERVE_TRACK_NORTH if is_north else _RESERVE_TRACK_JIN
+    if placed_count <= 0:
+        return (0, 0)
+    placed = min(placed_count, len(track))
+    revealed = track[:placed]
+    vp = max((v for v, _ in revealed), default=0)
+    military = max((m for _, m in revealed), default=0)
+    return (vp, military)
+
+
 @dataclass
 class SimaState:
     """司马家 (Sima clan) NPC faction state."""

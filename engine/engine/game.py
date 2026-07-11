@@ -6,9 +6,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import random
 from typing import Optional
 
-from models.enums import PhaseType, CardType
+from models.enums import PhaseType, CardType, FactionType
 from models.card import CardLibrary
-from models.game_state import GameState
+from models.game_state import GameState, get_reserve_revealed
 from ai.interface import GameAgent
 from .action_system import ActionSystem
 from .phases import (
@@ -112,6 +112,7 @@ class GameEngine:
         # Wire trigger_callback — can only be done here (needs self._check_triggers)
         if self.state and self.state.effect_resolver:
             self.state.effect_resolver.trigger_callback = self._check_triggers
+            self.state.effect_resolver.select_target_callback = self._select_target_for_effect
             # Re-attach log_callback via engine (takes priority over wrapper)
             if self.logger:
                 self.state.effect_resolver.log_callback = self._log_effect
@@ -241,8 +242,13 @@ class GameEngine:
         # Fire turn_end triggers
         self._check_triggers("on_turn_end", {"player_id": player_id})
 
-        # Rulebook §3.4: 军力行动结束时清0
-        player.military = 0
+        # Rulebook §3.4: 基于部队储备区露出的数字获得军力，然后清零
+        is_north = (player.faction == FactionType.NORTH)
+        revealed_vp, revealed_mil = get_reserve_revealed(
+            player.army_placed_count, is_north)
+        player.army_reserve_revealed_vp = revealed_vp
+        player.army_reserve_revealed_military = revealed_mil
+        player.military = revealed_mil
 
         # Enforce hand limit — agent chooses which cards to discard
         discarded = 0
@@ -294,6 +300,17 @@ class GameEngine:
         """Callback from EffectResolver — log each effect step execution."""
         if self.logger:
             self.logger.log_effect(player_id, effect_type, params, events, source)
+
+    def _select_target_for_effect(self, player_id: str, prompt: dict) -> Optional[str]:
+        """Callback from EffectResolver — ask agent to select a target.
+
+        Bridges the resolver's target request to agent.select_target().
+        Returns the selected target identifier, or None if no agent/choice.
+        """
+        agent = self._get_agent(player_id)
+        if not agent:
+            return None
+        return agent.select_target(self.state, prompt)
 
     # ================================================================
     # Passive trigger system

@@ -8,9 +8,10 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
 from .effect_ast import EffectStep, EffectType
+from models.enums import ControlState
 
 if TYPE_CHECKING:
     from .effect_resolver import EffectResolver, ResolveResult
@@ -260,7 +261,7 @@ class PlayCardOperator(EffectOperator):
                             r = resolver.action_system.execute(state, action)
                             result.events.extend(r.events if r.success else [])
                             if not r.success:
-                                result.errors.extend(r.errors)
+                                if not r.success: result.errors.append(r.error or "action failed")
                         break
             else:
                 result.events.append({
@@ -310,7 +311,7 @@ class DraftOperator(EffectOperator):
                     r = resolver.action_system.execute(state, action)
                     result.events.extend(r.events if r.success else [])
                     if not r.success:
-                        result.errors.extend(r.errors)
+                        if not r.success: result.errors.append(r.error or "action failed")
                 else:
                     result.events.append({
                         "type": "draft_requested",
@@ -347,33 +348,52 @@ class _TargetedMapOperator(EffectOperator, ABC):
     event_type: str = ""        # e.g. "march_requested"
     context_key: str = ""       # e.g. "march_targets"
 
-    def execute(self, step, state, player_id, context, resolver):
+    @abstractmethod
+    def _get_valid_targets(self, state, player_id: str, step: EffectStep) -> list[str]:
+        """Enumerate valid target location IDs for this effect step.
+
+        Subclasses implement the specific filtering logic (march targets,
+        occupy targets, etc.).
+        """
+        ...
+
+    def _select_target(self, step, state, player_id, context, resolver,
+                       index: int, extra_info: dict = None) -> Optional[str]:
+        """Try to get a target: context → hardcoded → callback → None."""
         from .effect_resolver import ResolveResult
-        result = ResolveResult()
-        if not resolver.action_system:
-            return result
 
         p = step.params
-        count = p.get("count", 1)
-        free = p.get("free", False)
+        # 1. From context (pre-filled by caller)
+        targets = context.get(self.context_key, []) if context else []
+        if index < len(targets):
+            return targets[index]
 
-        for i in range(count):
-            targets = context.get(self.context_key, []) if context else []
-            target = targets[i] if i < len(targets) else p.get("target_location")
-            if target:
-                action = self.action_class(
-                    player_id=player_id,
-                    target_location=target,
-                )
-                r = resolver.action_system.execute(state, action)
-                result.events.extend(r.events if r.success else [])
-                if not r.success:
-                    result.errors.extend(r.errors)
-            else:
-                result.events.append({
-                    "type": self.event_type, "free": free, "index": i,
-                })
-        return result
+        # 2. Hardcoded in card data
+        if p.get("target_location"):
+            return p.get("target_location")
+
+        # 3. Ask agent via callback
+        valid = self._get_valid_targets(state, player_id, step)
+        if valid and resolver.select_target_callback:
+            prompt = {
+                "type": self.event_type,
+                "options": valid,
+            }
+            if extra_info:
+                prompt.update(extra_info)
+            return resolver.select_target_callback(player_id, prompt)
+
+        return None
+
+    def _execute_action(self, state, player_id, target, step, resolver,
+                        free=False):
+        """Create and execute the map action. Override for special handling."""
+        from .effect_resolver import ResolveResult
+        action = self.action_class(
+            player_id=player_id,
+            target_location=target,
+        )
+        return resolver.action_system.execute(state, action)
 
 
 @register
@@ -381,6 +401,19 @@ class MarchOperator(_TargetedMapOperator):
     effect_type = EffectType.MARCH
     event_type = "march_requested"
     context_key = "march_targets"
+
+    def _get_valid_targets(self, state, player_id, step):
+        """Enemy or neutral locations adjacent to friendly."""
+        friendly = state.get_friendly_locations(player_id)
+        player_cs = state._player_control_state(player_id)
+        valid = []
+        for loc_id, loc in state.locations.items():
+            if loc.is_friendly_to(player_cs):
+                continue
+            neighbors = state.get_adjacent_locations(loc_id)
+            if any(n in friendly for n in neighbors):
+                valid.append(loc_id)
+        return valid
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
@@ -395,22 +428,43 @@ class MarchOperator(_TargetedMapOperator):
         cost_reduction = p.get("cost_reduction", 0)
 
         for i in range(count):
-            targets = context.get("march_targets", []) if context else []
-            target = targets[i] if i < len(targets) else p.get("target_location")
+            target = self._select_target(step, state, player_id, context,
+                                         resolver, i,
+                                         extra_info={"free": free,
+                                                     "cost_reduction": cost_reduction})
             if target:
                 action = MarchAction(
                     player_id=player_id,
                     target_location=target,
                     source_location=p.get("source_location"),
                 )
+                # Handle free / cost_reduction — temporarily grant military
+                player = state.get_player(player_id)
+                if free or cost_reduction:
+                    cost = action._calculate_cost(state)
+                    reduction = cost if free else min(cost_reduction, cost - 1)
+                    if reduction > 0 and player:
+                        player.military += reduction
+                        r = resolver.action_system.execute(state, action)
+                        # action.execute() deducts full cost; refund unapplied reduction
+                        net_cost = cost - reduction
+                        actual_cost = cost  # action already deducted full cost
+                        refund = actual_cost - net_cost
+                        if refund > 0 and player:
+                            player.military += refund
+                        result.events.extend(r.events if r.success else [])
+                        if not r.success:
+                            if not r.success: result.errors.append(r.error or "action failed")
+                        continue
                 r = resolver.action_system.execute(state, action)
                 result.events.extend(r.events if r.success else [])
                 if not r.success:
-                    result.errors.extend(r.errors)
+                    if not r.success: result.errors.append(r.error or "action failed")
             else:
                 result.events.append({
                     "type": "march_requested", "free": free,
                     "cost_reduction": cost_reduction, "index": i,
+                    "skipped": True, "reason": "no_target",
                 })
         return result
 
@@ -421,11 +475,53 @@ class OccupyOperator(_TargetedMapOperator):
     event_type = "occupy_requested"
     context_key = "occupy_targets"
 
+    def _get_valid_targets(self, state, player_id, step):
+        """Empty/neutral locations adjacent to friendly."""
+        friendly = state.get_friendly_locations(player_id)
+        valid = []
+        for loc_id, loc in state.locations.items():
+            if loc.controller != ControlState.EMPTY:
+                continue
+            neighbors = state.get_adjacent_locations(loc_id)
+            if any(n in friendly for n in neighbors):
+                valid.append(loc_id)
+        return valid
+
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         from engine.actions.quick_actions import OccupyAction
-        self.action_class = OccupyAction  # set for _TargetedMapOperator base
-        return super().execute(step, state, player_id, context, resolver)
+        self.action_class = OccupyAction
+        result = ResolveResult()
+        if not resolver.action_system:
+            return result
+
+        p = step.params
+        count = p.get("count", 1)
+        free = p.get("free", False)
+
+        for i in range(count):
+            target = self._select_target(step, state, player_id, context,
+                                         resolver, i)
+            if target:
+                action = OccupyAction(player_id=player_id, target_location=target)
+                player = state.get_player(player_id)
+                if free and player:
+                    player.military += 1  # Grant 1 military temporarily
+                    r = resolver.action_system.execute(state, action)
+                    result.events.extend(r.events if r.success else [])
+                    if not r.success:
+                        if not r.success: result.errors.append(r.error or "action failed")
+                else:
+                    r = resolver.action_system.execute(state, action)
+                    result.events.extend(r.events if r.success else [])
+                    if not r.success:
+                        if not r.success: result.errors.append(r.error or "action failed")
+            else:
+                result.events.append({
+                    "type": "occupy_requested", "free": free, "index": i,
+                    "skipped": True, "reason": "no_target",
+                })
+        return result
 
 
 @register
@@ -434,11 +530,51 @@ class FortifyOperator(_TargetedMapOperator):
     event_type = "fortify_requested"
     context_key = "fortify_targets"
 
+    def _get_valid_targets(self, state, player_id, step):
+        """Friendly locations that are not fortified."""
+        friendly = state.get_friendly_locations(player_id)
+        valid = []
+        for loc_id in friendly:
+            loc = state.locations.get(loc_id)
+            if loc and not loc.is_fortified:
+                valid.append(loc_id)
+        return valid
+
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         from engine.actions.quick_actions import FortifyAction
         self.action_class = FortifyAction
-        return super().execute(step, state, player_id, context, resolver)
+        result = ResolveResult()
+        if not resolver.action_system:
+            return result
+
+        p = step.params
+        count = p.get("count", 1)
+        free = p.get("free", False)
+
+        for i in range(count):
+            target = self._select_target(step, state, player_id, context,
+                                         resolver, i)
+            if target:
+                action = FortifyAction(player_id=player_id, target_location=target)
+                player = state.get_player(player_id)
+                if free and player:
+                    player.military += 1  # Grant 1 military temporarily
+                    r = resolver.action_system.execute(state, action)
+                    result.events.extend(r.events if r.success else [])
+                    if not r.success:
+                        if not r.success: result.errors.append(r.error or "action failed")
+                else:
+                    r = resolver.action_system.execute(state, action)
+                    result.events.extend(r.events if r.success else [])
+                    if not r.success:
+                        if not r.success: result.errors.append(r.error or "action failed")
+            else:
+                result.events.append({
+                    "type": "fortify_requested", "free": free, "index": i,
+                    "skipped": True, "reason": "no_target",
+                })
+        return result
 
 
 @register
@@ -451,19 +587,162 @@ class ConvertOperator(EffectOperator):
         result = ResolveResult()
         if not resolver.action_system:
             return result
+
         p = step.params
         locs = p.get("specific_locations", [])
-        count = p.get("count", len(locs))
         restriction = p.get("restriction", [])
-        for loc_id in locs[:count]:
-            action = ConvertAction(
-                player_id=player_id,
-                target_location=loc_id,
-                neutral_only=('neutral' in restriction),
-            )
-            r = resolver.action_system.execute(state, action)
-            result.events.extend(r.events if r.success else [])
+        neutral_only = ('neutral' in restriction)
+        filter_spec = p.get("filter")
+
+        # 1. Hardcoded locations — execute directly
+        if locs:
+            count = p.get("count", len(locs))
+            for loc_id in locs[:count]:
+                action = ConvertAction(
+                    player_id=player_id,
+                    target_location=loc_id,
+                    neutral_only=neutral_only,
+                )
+                r = resolver.action_system.execute(state, action)
+                result.events.extend(r.events if r.success else [])
+                if not r.success:
+                    if not r.success: result.errors.append(r.error or "action failed")
+            return result
+
+        # 2. Filter-based — enumerate valid targets and ask agent
+        if filter_spec:
+            valid = self._get_filtered_locations(state, player_id, filter_spec,
+                                                  neutral_only)
+            if valid:
+                count = p.get("count", 1)
+                for i in range(count):
+                    target = self._pick_target(
+                        state, player_id, resolver, valid, "convert_requested",
+                        {"neutral_only": neutral_only})
+                    if target:
+                        action = ConvertAction(
+                            player_id=player_id,
+                            target_location=target,
+                            neutral_only=neutral_only,
+                        )
+                        r = resolver.action_system.execute(state, action)
+                        result.events.extend(r.events if r.success else [])
+                        if not r.success:
+                            if not r.success: result.errors.append(r.error or "action failed")
+                    else:
+                        result.events.append({
+                            "type": "convert_requested", "index": i,
+                            "skipped": True, "reason": "no_target",
+                        })
+            else:
+                result.events.append({
+                    "type": "convert_requested",
+                    "skipped": True, "reason": "no_valid_targets",
+                })
+            return result
+
+        # 3. Neither specific_locations nor filter — fallback
+        result.events.append({
+            "type": "convert_requested",
+            "skipped": True, "reason": "no_target_spec",
+        })
         return result
+
+    def _get_filtered_locations(self, state, player_id, filter_spec, neutral_only):
+        """Enumerate locations matching a filter dict.
+
+        Supported keys:
+          - adjacent: true → must be adjacent to friendly
+          - controller: "neutral" | "enemy" | "sima" | "north" | "jin"
+          - fortified: true/false
+          - region: str → in specified region
+          - not_controller: str → exclude a controller
+        """
+        valid = []
+        friendly = state.get_friendly_locations(player_id)
+        player_cs = state._player_control_state(player_id)
+
+        for loc_id, loc in state.locations.items():
+            # Adjacent filter
+            if filter_spec.get("adjacent"):
+                neighbors = state.get_adjacent_locations(loc_id)
+                if not any(n in friendly for n in neighbors):
+                    continue
+
+            # Controller filter
+            want_controller = filter_spec.get("controller")
+            if want_controller:
+                if want_controller == "neutral":
+                    if loc.controller not in (ControlState.NEUTRAL, ControlState.EMPTY):
+                        continue
+                elif want_controller == "enemy":
+                    if loc.is_friendly_to(player_cs):
+                        continue
+                elif want_controller == "sima":
+                    if loc.controller != ControlState.SIMA:
+                        continue
+                elif want_controller == "north":
+                    if loc.controller != ControlState.NORTH:
+                        continue
+                elif want_controller == "jin":
+                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2,
+                                  ControlState.JIN_P3}
+                    if loc.controller not in jin_states:
+                        continue
+
+            # Exclude controller
+            not_ctrl = filter_spec.get("not_controller")
+            if not_ctrl:
+                if not_ctrl == "neutral":
+                    if loc.controller in (ControlState.NEUTRAL, ControlState.EMPTY):
+                        continue
+
+            # Fortified filter
+            if "fortified" in filter_spec:
+                if filter_spec["fortified"] and not loc.is_fortified:
+                    continue
+                if not filter_spec["fortified"] and loc.is_fortified:
+                    continue
+
+            # Region filter
+            want_region = filter_spec.get("region")
+            if want_region:
+                from rules.area_control import REGION_CONFIG
+                from models.enums import Region
+                found = False
+                for reg, cfg in REGION_CONFIG.items():
+                    if reg.value == want_region and loc_id in cfg.get("locations", []):
+                        found = True
+                        break
+                if not found:
+                    continue
+
+            # Neutral-only from top-level (not filter)
+            if neutral_only and loc.controller not in (ControlState.NEUTRAL, ControlState.EMPTY):
+                continue
+
+            # Cannot convert own
+            if loc.controller == player_cs:
+                continue
+
+            # Jin cannot convert capital
+            player = state.get_player(player_id)
+            if player and player.faction.value == "jin" and loc_id == "建康":
+                continue
+
+            valid.append(loc_id)
+
+        return valid
+
+    @staticmethod
+    def _pick_target(state, player_id, resolver, valid, event_type, extra_info=None):
+        """Helper: ask agent to select from valid targets."""
+        if not valid or not resolver.select_target_callback:
+            return None
+        prompt = {"type": event_type, "options": valid}
+        if extra_info:
+            prompt.update(extra_info)
+        return resolver.select_target_callback(player_id, prompt)
 
 
 # ============================================================
@@ -480,16 +759,107 @@ class SpreadCultureOperator(EffectOperator):
         result = ResolveResult()
         if not resolver.action_system:
             return result
+
         culture = step.params.get("culture")
-        if culture:
+        if not culture:
+            result.events.append({
+                "type": "spread_culture_requested",
+                "skipped": True, "reason": "no_culture_specified",
+            })
+            return result
+
+        # 1. Hardcoded target_region in params
+        if step.params.get("target_region"):
             action = SpreadCultureAction(
                 player_id=player_id,
                 culture_type=culture,
-                target_region="",
+                target_region=step.params["target_region"],
             )
             r = resolver.action_system.execute(state, action)
             result.events.extend(r.events if r.success else [])
+            if not r.success:
+                if not r.success: result.errors.append(r.error or "action failed")
+            return result
+
+        # 2. Agent selects region
+        valid_regions = self._get_valid_regions(state, player_id, culture)
+        if valid_regions and resolver.select_target_callback:
+            prompt = {
+                "type": "spread_culture_requested",
+                "options": valid_regions,
+                "culture": culture,
+            }
+            chosen = resolver.select_target_callback(player_id, prompt)
+            if chosen:
+                action = SpreadCultureAction(
+                    player_id=player_id,
+                    culture_type=culture,
+                    target_region=chosen,
+                )
+                r = resolver.action_system.execute(state, action)
+                result.events.extend(r.events if r.success else [])
+                if not r.success:
+                    if not r.success: result.errors.append(r.error or "action failed")
+            else:
+                result.events.append({
+                    "type": "spread_culture_requested",
+                    "culture": culture, "skipped": True, "reason": "no_choice",
+                })
+        elif valid_regions:
+            # No callback — just pick first valid region (deterministic fallback)
+            action = SpreadCultureAction(
+                player_id=player_id,
+                culture_type=culture,
+                target_region=valid_regions[0],
+            )
+            r = resolver.action_system.execute(state, action)
+            result.events.extend(r.events if r.success else [])
+            if not r.success:
+                if not r.success: result.errors.append(r.error or "action failed")
+        else:
+            result.events.append({
+                "type": "spread_culture_requested",
+                "culture": culture, "skipped": True, "reason": "no_valid_regions",
+            })
+
         return result
+
+    @staticmethod
+    def _get_valid_regions(state, player_id, culture) -> list[str]:
+        """Enumerate regions where the player can spread this culture.
+
+        Valid if: player controls at least one location in the region, OR
+        region is adjacent to a region that already has this culture marker.
+        """
+        from rules.area_control import REGION_CONFIG
+        from models.enums import CultureType
+
+        friendly = state.get_friendly_locations(player_id)
+        culture_ct = CultureType(culture) if culture else None
+
+        # Regions that already have culture markers on map
+        regions_with_culture = set()
+        for loc_id, loc in state.locations.items():
+            if loc.culture_marker and loc.culture_marker == culture_ct:
+                for reg, cfg in REGION_CONFIG.items():
+                    if loc_id in cfg.get("locations", []):
+                        regions_with_culture.add(reg)
+
+        valid = []
+        for reg, cfg in REGION_CONFIG.items():
+            reg_locs = cfg.get("locations", [])
+            # Player controls at least one location in this region
+            controls = any(loc in friendly for loc in reg_locs)
+            # Adjacent to a region that has this culture
+            adjacent = reg in regions_with_culture
+            # Initial culture match
+            initial_culture = cfg.get("initial_culture", "")
+            has_initial = (initial_culture == culture)
+
+            if controls or adjacent or has_initial:
+                valid.append(reg.value)
+
+        return valid
 
 
 @register
