@@ -606,6 +606,31 @@ def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict
         else:
             desc = "打出 (手牌)"
 
+    elif atype == "play_public_card":
+        cid = getattr(action, 'card_id', '')
+        payment_indices = getattr(action, 'payment_indices', [])
+        payment_names = []
+        if player:
+            for pi in sorted(payment_indices, reverse=True):
+                if 0 <= pi < len(player.hand):
+                    payment_names.append(player.hand[pi].name)
+        costs["payment_cards"] = payment_names if payment_names else None
+
+        # Find card name from public pool
+        card_name = cid
+        card_cost = 0
+        for c in state.public_action_pool:
+            if c.definition.card_id == cid:
+                card_name = c.name
+                card_cost = c.cost
+                break
+        params["card"] = card_name
+        params["card_id"] = cid
+        params["cost"] = card_cost
+        desc = f"公共行动: {card_name}"
+        if payment_names:
+            desc += f"（支付: {' '.join(payment_names)}）"
+
     elif atype == "court_action":
         cid = getattr(action, 'card_id', '')
         params["card_id"] = cid

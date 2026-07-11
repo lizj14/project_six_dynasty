@@ -13,7 +13,7 @@ from .actions.special_actions import (
     ConvertAction, ArchiveAction, SpreadCultureAction,
     SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
 )
-from .actions.card_actions import PlayCardAction, CourtAction
+from .actions.card_actions import PlayCardAction, CourtAction, PublicCardAction
 from models.enums import ControlState
 
 
@@ -22,7 +22,7 @@ AnyAction = Union[
     OccupyAction, MarchAction, DrawAction, RecruitAction, FortifyAction,
     ConvertAction, ArchiveAction, SpreadCultureAction,
     SearchAction, LevyAction, RaiseOrderAction, LowerOrderAction,
-    PlayCardAction, CourtAction,
+    PlayCardAction, CourtAction, PublicCardAction,
 ]
 
 
@@ -168,5 +168,43 @@ class ActionSystem:
                 action = CourtAction(player_id=player_id, card_id=card.definition.card_id)
                 if action.validate(state).success:
                     available.append(action)
+
+        return available
+
+    def get_available_public_actions(self, state: "GameState", player_id: str) -> list[PublicCardAction]:
+        """Get all legal public action card plays."""
+        player = state.get_player(player_id)
+        if not player or player.has_taken_hand_action:
+            return []
+
+        available = []
+        for card in state.public_action_pool:
+            defn = card.definition
+            if defn.card_id in state.public_exhausted:
+                continue
+            if not defn.is_playable_by(player.faction):
+                continue
+
+            # Check play_condition from card's parsed effect
+            parsed = defn.parsed_effect
+            if parsed and parsed.play_condition:
+                resolver = getattr(state, 'effect_resolver', None)
+                if resolver and not resolver.check_condition(
+                    parsed.play_condition, state, player_id):
+                    continue
+
+            # Generate payment combinations
+            cost = card.cost
+            if cost == 0:
+                available.append(PublicCardAction(
+                    player_id=player_id, card_id=defn.card_id, payment_indices=[]
+                ))
+            else:
+                other_indices = [j for j in range(len(player.hand))]
+                if len(other_indices) >= cost:
+                    available.append(PublicCardAction(
+                        player_id=player_id, card_id=defn.card_id,
+                        payment_indices=other_indices[:cost],
+                    ))
 
         return available

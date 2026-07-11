@@ -20,7 +20,8 @@ class PlayerState:
     vp: int = 0                             # 胜利点数
     prestige: int = 0                       # 威望 (0-9, Jin only)
     contribution: int = 0                   # 功绩 (0-9, Jin only)
-    order: int = 0                          # 行动顺位 position (lower = earlier)
+    order: int = 0                          # 行动顺位 position (higher = earlier in turn)
+    start_order: int = 0                    # 先动值 (from hero card, immutable during gameplay)
     # Army
     army_reserve_count: int = 0             # 部队储备区 remaining armies
     army_placed_count: int = 0              # Armies currently on the map

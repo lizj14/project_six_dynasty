@@ -139,7 +139,7 @@ class GameEngine:
             self.logger.log_round_start(state.round)
 
         # === Preparation Phase ===
-        run_preparation_phase(state, self.rng)
+        emperor_events = run_preparation_phase(state, self.rng)
 
         # Rulebook §4.2: 准备阶段结算区控奖励
         from rules.scoring import award_region_control_phase
@@ -147,7 +147,7 @@ class GameEngine:
 
         if self.logger:
             self.logger.log_preparation(
-                emperor_events=[], sima_dist=[], region_vp=[],
+                emperor_events=emperor_events, sima_dist=[], region_vp=[],
             )
 
         # === Action Phase ===
@@ -271,7 +271,8 @@ class GameEngine:
         quick = self.action_system.get_available_quick_actions(state, player_id)
         hand = self.action_system.get_available_hand_actions(state, player_id)
         court = self.action_system.get_available_court_actions(state, player_id)
-        return quick + hand + court
+        public = self.action_system.get_available_public_actions(state, player_id)
+        return quick + hand + court + public
 
     def _log_effect(self, player_id: str, effect_type: str,
                     params: dict = None, events: list = None,
@@ -291,6 +292,7 @@ class GameEngine:
         "fortify": "on_fortify",
         "convert": "on_convert",
         "play_card": "on_play_card",
+        "play_public_card": "on_play_card",
         "court_action": "on_court_action",
         "spread_culture": "on_spread_culture",
         "archive": "on_archive",

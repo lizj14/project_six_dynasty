@@ -489,7 +489,7 @@ class LevyAction(GameAction):
 
 @dataclass
 class RaiseOrderAction(GameAction):
-    """提高行动顺位：将自己的标记在行动顺位轨上前进1格。仅东晋。"""
+    """提高行动顺位：将自己的顺位值+1（顺位值越大越先行动）。仅东晋。"""
     action_type: str = "raise_order"
     player_id: str = ""
     amount: int = 1
@@ -508,7 +508,7 @@ class RaiseOrderAction(GameAction):
             return validation
 
         player = state.get_player(self.player_id)
-        player.order = max(0, player.order - self.amount)  # Lower = earlier
+        player.order = min(10, player.order + self.amount)  # Higher = earlier
         # Note: order change doesn't affect current round's turn order
 
         state.log_event("raise_order", player=self.player_id, new_order=player.order)
@@ -520,7 +520,7 @@ class RaiseOrderAction(GameAction):
 
 @dataclass
 class LowerOrderAction(GameAction):
-    """降低行动顺位。"""
+    """降低行动顺位：将目标顺位值-1（顺位值越小越晚行动）。"""
     action_type: str = "lower_order"
     player_id: str = ""           # Who is using this
     target_player_id: str = ""    # Whose order to lower
@@ -540,7 +540,7 @@ class LowerOrderAction(GameAction):
             return validation
 
         target = state.get_player(self.target_player_id)
-        target.order = min(10, target.order + self.amount)  # Higher = later
+        target.order = max(0, target.order - self.amount)  # Lower = later
 
         state.log_event("lower_order", target=self.target_player_id,
                          new_order=target.order)

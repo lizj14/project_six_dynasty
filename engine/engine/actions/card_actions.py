@@ -175,6 +175,133 @@ class PlayCardAction(GameAction):
         card = state.get_player(self.player_id).hand[self.card_index]
         return f"支付{card.cost}张手牌"
 
+
+@dataclass
+class PublicCardAction(GameAction):
+    """公共行动牌：使用共享公共行动牌池中的一张牌，消耗手牌行动次数。
+
+    Similar to PlayCardAction + CourtAction combined:
+    - Counts as the player's hand action for the turn
+    - Pays the card's cost from hand (like PlayCardAction)
+    - Resolves strategy_action effect (like CourtAction)
+    - Card flips face-down (exhausted) instead of being discarded
+    - All 5 cards recover at the start of each round
+    """
+    action_type: str = "play_public_card"
+    player_id: str = ""
+    card_id: str = ""                         # card_id of the public card
+    payment_indices: list[int] = None         # Indices of hand cards to discard as payment
+
+    def __post_init__(self):
+        if self.payment_indices is None:
+            self.payment_indices = []
+
+    def validate(self, state: "GameState") -> ActionResult:
+        player = state.get_player(self.player_id)
+        if not player:
+            return ActionResult.fail(f"Player {self.player_id} not found")
+
+        if player.has_taken_hand_action:
+            return ActionResult.fail("Already used hand action this turn")
+
+        # Find card in public pool
+        pool_card = None
+        for c in state.public_action_pool:
+            if c.definition.card_id == self.card_id:
+                pool_card = c
+                break
+        if not pool_card:
+            return ActionResult.fail(f"Public card {self.card_id} not in pool")
+
+        if self.card_id in state.public_exhausted:
+            return ActionResult.fail(f"Public card {pool_card.name} is exhausted this round")
+
+        # Check faction restriction
+        if not pool_card.definition.is_playable_by(player.faction):
+            return ActionResult.fail(
+                f"Cannot use {pool_card.name} — faction restricted")
+
+        # Check payment
+        cost = pool_card.cost
+        if len(self.payment_indices) != cost:
+            return ActionResult.fail(f"Need to pay {cost} cards as cost, "
+                                     f"provided {len(self.payment_indices)}")
+
+        # Validate payment indices
+        used_indices = set()
+        for pi in self.payment_indices:
+            if pi < 0 or pi >= len(player.hand):
+                return ActionResult.fail(f"Invalid payment index {pi}")
+            if pi in used_indices:
+                return ActionResult.fail(f"Duplicate index {pi} in payment")
+            used_indices.add(pi)
+
+        return ActionResult.ok()
+
+    def execute(self, state: "GameState") -> ActionResult:
+        validation = self.validate(state)
+        if not validation.success:
+            return validation
+
+        player = state.get_player(self.player_id)
+
+        # Find card in public pool
+        pool_card = None
+        for c in state.public_action_pool:
+            if c.definition.card_id == self.card_id:
+                pool_card = c
+                break
+        if not pool_card:
+            return ActionResult.fail("Public card not found in pool")
+
+        # Pay cost from hand
+        payment_cards = []
+        for pi in sorted(self.payment_indices, reverse=True):
+            payment_cards.append(player.hand.pop(pi))
+        state.main_discard.extend(payment_cards)
+
+        events = [{"type": "play_public_card", "player": self.player_id,
+                    "card": pool_card.name, "cost_paid": len(payment_cards),
+                    "payment_cards": [c.name for c in payment_cards]}]
+
+        # Mark card as exhausted (flip face-down for this round)
+        state.public_exhausted.add(self.card_id)
+        events.append({"type": "public_card_exhausted", "card": pool_card.name})
+
+        # Resolve the card's strategy_action effect via EffectResolver
+        defn = pool_card.definition
+        parsed = defn.parsed_effect
+        resolver = getattr(state, 'effect_resolver', None)
+        if resolver and parsed:
+            effect_result = resolver.resolve(
+                parsed, state, self.player_id,
+                context={"source": "play_public_card", "card_id": defn.card_id},
+            )
+            events.extend(effect_result.events)
+            if effect_result.errors:
+                events.append({"type": "effect_errors", "errors": effect_result.errors})
+
+        # Check end condition: VP >= 150
+        if state.check_vp_game_end(self.player_id):
+            events.append({"type": "game_end_trigger", "reason": "150vp",
+                           "player": self.player_id})
+
+        player.has_taken_hand_action = True
+        state.log_event("play_public_card", player=self.player_id,
+                        card=pool_card.name)
+        return ActionResult.ok(events)
+
+    def cost_description(self, state: "GameState") -> str:
+        pool_card = None
+        for c in state.public_action_pool:
+            if c.definition.card_id == self.card_id:
+                pool_card = c
+                break
+        if not pool_card:
+            return "?"
+        return f"支付{pool_card.cost}张手牌"
+
+
 @dataclass
 class CourtAction(GameAction):
     """牌组行动：从朝堂区选择一张候选策略牌，结算行动效果。

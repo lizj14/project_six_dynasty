@@ -204,7 +204,11 @@ class TestDraftAction:
 
 
 class TestOrderActions:
-    """Tests for raise/lower order."""
+    """Tests for raise/lower order.
+
+    Order is sorted descending (higher = earlier in turn).
+    RaiseOrder: order+1 (go earlier). LowerOrder: order-1 (go later).
+    """
 
     def test_raise_order(self):
         from engine.actions.special_actions import RaiseOrderAction
@@ -213,7 +217,7 @@ class TestOrderActions:
         action = RaiseOrderAction(player_id="jin_1", amount=1)
         result = action.execute(state)
         assert result.success
-        assert state.jin_players[0].order == 2  # Lower = earlier
+        assert state.jin_players[0].order == 4  # Higher = earlier
 
     def test_raise_order_not_jin(self):
         from engine.actions.special_actions import RaiseOrderAction
@@ -229,4 +233,4 @@ class TestOrderActions:
         action = LowerOrderAction(player_id="jin_1", target_player_id="jin_1", amount=1)
         result = action.execute(state)
         assert result.success
-        assert state.jin_players[0].order == 3  # Higher = later
+        assert state.jin_players[0].order == 1  # Lower = later

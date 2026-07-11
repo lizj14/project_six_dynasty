@@ -85,6 +85,8 @@ class GameState:
 
     # === Public Actions ===
     public_actions: list[CardDef] = field(default_factory=list)
+    public_action_pool: list["Card"] = field(default_factory=list)    # 5 shared public action cards
+    public_exhausted: set[str] = field(default_factory=set)           # card_ids exhausted this round
 
     # === Culture Tracks ===
     culture_tracks: dict[CultureType, CultureTrackState] = field(default_factory=dict)

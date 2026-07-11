@@ -15,6 +15,32 @@ from .actions.card_actions import PlayCardAction
 from cards.effect_resolver import EffectResolver
 
 
+# ================================================================
+# Jin player ordering utilities
+# ================================================================
+
+def _get_jin_setup_order(state: GameState) -> list[PlayerState]:
+    """Jin players sorted by 先动值 (start_order), ascending (smaller = earlier).
+
+    Used during setup phase (hero enter + face-down cards).
+    start_order is set from the hero card and never modified during gameplay.
+    """
+    return sorted(state.jin_players, key=lambda p: p.start_order)
+
+
+def _get_jin_turn_order(state: GameState) -> list[PlayerState]:
+    """Jin players sorted by 顺位 (order), descending (larger = earlier in turn).
+
+    Used during game rounds (preparation phase) to build turn_order.
+    Tiebreaker: 先动值 (start_order) ascending (smaller = earlier).
+    """
+    return sorted(state.jin_players, key=lambda p: (-p.order, p.start_order))
+
+
+# ================================================================
+# Setup game — orchestrator
+# ================================================================
+
 def setup_game(library: CardLibrary, agents: list,
                seed: int = 0, version=None,
                map_adjacencies: list = None,
@@ -30,7 +56,36 @@ def setup_game(library: CardLibrary, agents: list,
     """
     rng = random.Random(seed)
 
-    # === Create players ===
+    # Phase 1: Create players
+    north, jin1, jin2, jin3 = _create_setup_players()
+    players = [north, jin1, jin2, jin3]
+
+    # Phase 2+3: Deal cards + agent setup decisions
+    public_pool_cards, main_deck_cards, setup_discard_pile = _deal_and_select_cards(
+        library, players, agents, rng)
+
+    # Phase 4+5: Build national decks + assemble GameState
+    state = _build_game_state(
+        library, north, jin1, jin2, jin3,
+        seed, version, map_adjacencies,
+        action_system, logger,
+        public_pool_cards, main_deck_cards, setup_discard_pile,
+    )
+
+    # Phase 6+7: Execute hero enter, face-down cards, count armies
+    _execute_setup_effects(state, agents, action_system, logger)
+
+    state.phase = PhaseType.PREPARATION
+    state.round = 1
+    return state
+
+
+# ================================================================
+# Setup sub-functions
+# ================================================================
+
+def _create_setup_players() -> tuple[PlayerState, PlayerState, PlayerState, PlayerState]:
+    """Create the four initial PlayerState objects with faction defaults."""
     north = PlayerState(
         player_id="north", faction=FactionType.NORTH,
         military=5, army_reserve_count=32, army_placed_count=0,
@@ -50,38 +105,44 @@ def setup_game(library: CardLibrary, agents: list,
         military=1, prestige=0, contribution=0, order=2,
         army_reserve_count=16, army_placed_count=0,
     )
+    return north, jin1, jin2, jin3
 
-    # === Setup: unified decision per player ===
+
+def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
+                           agents: list, rng: random.Random
+                           ) -> tuple[list[Card], list[Card], list[Card]]:
+    """Shuffle pools, deal hero/goal candidates, build hands + main deck,
+    then run agent setup_decision() to select hero/goal/face-down card.
+
+    Returns:
+        (public_pool_cards, main_deck_cards, setup_discard_pile)
+    """
     from ai.interface import SetupContext, SetupDecision
 
-    # Collect hero pools
+    north, jin1, jin2, jin3 = players
+
+    # === Collect hero/goal pools ===
     all_heroes = library.by_type(CardType.HERO)
     north_heroes = [c for c in all_heroes
                     if c.card_category.value.startswith("hero_north")]
     jin_heroes = [c for c in all_heroes
                   if c.card_category.value.startswith("hero_jin")]
 
-    # Collect goal pool (Jin only)
     all_goals = library.by_type(CardType.GOAL)
     goal_pool = list(all_goals)
     rng.shuffle(goal_pool)
 
-    # Track per-player info for later decision
     _hero_choices_by_player: dict[str, list] = {}
     _goal_choices_by_player: dict[str, list] = {}
 
-    # Shuffle pools
     rng.shuffle(jin_heroes)
     rng.shuffle(north_heroes)
     _jin_deal_index = 0
 
-    # ============================================================
-    # Step 1: Assign candidates + Build full hands FIRST
-    # ============================================================
+    # === Step 1: Assign candidates + build faction hands ===
     allocated_card_ids: set[str] = set()
 
-    for player, agent in [(north, agents[0]), (jin1, agents[1]),
-                           (jin2, agents[2]), (jin3, agents[3])]:
+    for player in [north, jin1, jin2, jin3]:
         # --- Hero candidates (non-overlapping) ---
         if player.faction == FactionType.NORTH:
             hero_choices = north_heroes[:2]
@@ -97,7 +158,7 @@ def setup_game(library: CardLibrary, agents: list,
             goal_choices = rng.sample(goal_pool, min(3, len(goal_pool)))
         _goal_choices_by_player[player.player_id] = goal_choices
 
-        # --- Build hand: hero candidate cards ---
+        # --- Build hand: hero candidate faction cards ---
         for hero_def in hero_choices:
             for cdef in library.by_faction(hero_def.owner_faction):
                 if cdef.card_type != CardType.HERO and cdef.card_id not in allocated_card_ids:
@@ -105,13 +166,14 @@ def setup_game(library: CardLibrary, agents: list,
                     allocated_card_ids.add(cdef.card_id)
 
     # --- Build main deck ---
-    # Rulebook §2.1: 公共行动牌 (public action cards) are shared, not in main deck.
-    # Initial cards are pseudo-cards used during setup only.
-    # Cards with faction_restriction should only go to matching faction.
     main_deck_cards = []
+    public_pool_cards = []
     for cdef in library.all_cards:
+        if cdef.card_type == CardType.PUBLIC:
+            public_pool_cards.append(Card(definition=cdef))
+            continue
         if cdef.card_type in (CardType.HERO, CardType.GOAL, CardType.EMPEROR,
-                              CardType.REFUGEE, CardType.PUBLIC, CardType.INITIAL):
+                              CardType.REFUGEE, CardType.INITIAL):
             continue
         if cdef.owner_faction == "初始":
             continue
@@ -131,7 +193,6 @@ def setup_game(library: CardLibrary, agents: list,
         allocated_card_ids.add(cdef.card_id)
 
     # --- Draw from main deck: North→10, Jin→8 ---
-    # Forced events: discard and redraw (rulebook §4.1 step 5)
     _setup_discard_pile: list = []
     target_hand = {"north": 10, "jin_1": 8, "jin_2": 8, "jin_3": 8}
     for player in [north, jin1, jin2, jin3]:
@@ -143,7 +204,6 @@ def setup_game(library: CardLibrary, agents: list,
                 break
             card = main_deck_cards.pop(0)
             if card.card_type == CardType.MECHANISM:
-                # Forced event — discard and redraw (rulebook §4.1 step 5)
                 _setup_discard_pile.append(card)
                 attempts += 1
                 continue
@@ -152,9 +212,7 @@ def setup_game(library: CardLibrary, agents: list,
             drawn += 1
             attempts += 1
 
-    # ============================================================
-    # Step 2: Now make decisions with the COMPLETE hand
-    # ============================================================
+    # === Step 2: Agent setup decisions ===
     for player, agent in [(north, agents[0]), (jin1, agents[1]),
                            (jin2, agents[2]), (jin3, agents[3])]:
         hero_choices = _hero_choices_by_player.get(player.player_id, [])
@@ -173,7 +231,7 @@ def setup_game(library: CardLibrary, agents: list,
                            "simple_condition": g.goal_simple_condition,
                            "full_condition": g.goal_full_condition}
                           for g in goal_choices],
-            hand_cards=[c.name for c in player.hand],  # Complete hand now!
+            hand_cards=[c.name for c in player.hand],
             other_jin_heroes=[],
         )
 
@@ -181,7 +239,9 @@ def setup_game(library: CardLibrary, agents: list,
 
         # --- Apply hero ---
         if 0 <= decision.hero_index < len(hero_choices):
-            player.hero = Card(definition=hero_choices[decision.hero_index])
+            hero_def = hero_choices[decision.hero_index]
+            player.hero = Card(definition=hero_def)
+            player.start_order = hero_def.start_order
 
         # --- Apply goals ---
         if player.faction == FactionType.JIN and goal_choices:
@@ -197,7 +257,19 @@ def setup_game(library: CardLibrary, agents: list,
         player._setup_face_down_index = decision.face_down_card_index
         player._setup_payment_indices = decision.payment_indices
 
-    # === National starting decks ===
+    return public_pool_cards, main_deck_cards, _setup_discard_pile
+
+
+def _build_game_state(library: CardLibrary,
+                      north: PlayerState, jin1: PlayerState,
+                      jin2: PlayerState, jin3: PlayerState,
+                      seed: int, version, map_adjacencies,
+                      action_system, logger,
+                      public_pool_cards: list[Card],
+                      main_deck_cards: list[Card],
+                      setup_discard_pile: list[Card]) -> GameState:
+    """Build national decks, create and populate the GameState object."""
+
     # Helper: get a CardDef by name, or None
     def _get_def(name: str):
         return library.by_name_exact(name)
@@ -210,12 +282,7 @@ def setup_game(library: CardLibrary, agents: list,
     jia_guan_def = _get_def("加官进爵")
     qingtan_def = _get_def("清谈")
 
-    state = GameState(round=0, phase=PhaseType.SETUP, seed=seed)
-    state.north_player = north
-    state.jin_players = [jin1, jin2, jin3]
-    state.turn_order = ["north", "jin_1", "jin_2", "jin_3"]
-
-    # Jin national deck (10 cards)
+    # --- Jin national deck (10 cards) ---
     jin_national = []
     if jin_start:
         for _ in range(3):
@@ -226,12 +293,11 @@ def setup_game(library: CardLibrary, agents: list,
     for _def in [court_def, jia_guan_def, beifa_def, zhengpi_def, qingtan_def]:
         if _def:
             jin_national.append(Card(definition=_def))
-    # Fill to 10 with soldiers
     while len(jin_national) < 10 and jin_start:
         jin_national.append(Card(definition=jin_start))
-    state.jin_court = jin_national[:10]
+    jin_national = jin_national[:10]
 
-    # North national deck (10 cards)
+    # --- North national deck (10 cards) ---
     north_national = []
     if jin_start:
         for _ in range(5):
@@ -242,29 +308,40 @@ def setup_game(library: CardLibrary, agents: list,
     for _def in [court_def, zhengpi_def]:
         if _def:
             north_national.append(Card(definition=_def))
-    # 轻骑兵
     qing_qi = library.by_name_exact("轻骑兵")
     if qing_qi:
         north_national.append(Card(definition=qing_qi))
     while len(north_national) < 10 and jin_start:
         north_national.append(Card(definition=jin_start))
-    state.north_court = north_national[:10]
+    north_national = north_national[:10]
 
-    # === Main deck ===
+    # --- Create GameState ---
+    state = GameState(round=0, phase=PhaseType.SETUP, seed=seed)
+    state.north_player = north
+    state.jin_players = [jin1, jin2, jin3]
+    state.turn_order = ["north", "jin_1", "jin_2", "jin_3"]
+
+    # Public action card pool (5 shared cards, rulebook §2.1)
+    state.public_action_pool = public_pool_cards
+
+    # National decks
+    state.jin_court = jin_national
+    state.north_court = north_national
+
+    # Main deck
     state.main_deck = main_deck_cards
 
-    # === Map setup (simplified) ===
+    # Map setup
     state.locations = _create_initial_locations()
-    # Add setup-discarded forced events to main discard
-    state.main_discard.extend(_setup_discard_pile)
+    state.main_discard.extend(setup_discard_pile)
 
-    # Load map adjacencies from version config or YAML
+    # Load map adjacencies
     if map_adjacencies:
         state.map_adjacencies = list(map_adjacencies)
     else:
         state.map_adjacencies = _load_adjacencies()
 
-    # === Emperor ===
+    # Emperor
     emperor_cards = library.by_type(CardType.EMPEROR)
     if emperor_cards:
         state.emperor = EmperorState(
@@ -274,27 +351,34 @@ def setup_game(library: CardLibrary, agents: list,
             prestige_initial=emperor_cards[0].initial_prestige,
         )
 
-    # === Inject EffectResolver (created once, with log callback if logger available) ===
+    # EffectResolver (created once, with log callback if logger available)
     state.effect_resolver = EffectResolver(action_system)
     if logger:
         state.effect_resolver.log_callback = _log_effect_wrapper(logger)
     state.action_system = action_system
 
-    # === Execute hero enter effects (登场), sorted by 先动值 ===
-    # North always first, Jin players sorted by order attribute (rulebook §2.2)
+    return state
+
+
+def _execute_setup_effects(state: GameState, agents: list,
+                           action_system, logger):
+    """Execute hero enter effects, face-down cards, and count initial armies.
+
+    Hero enter: North always first, then Jin sorted by 先动值 (start_order) ascending.
+    """
+    # --- Hero enter effects (登场), sorted by 先动值 ---
+    # North always first, Jin players sorted by start_order ascending (rulebook §2.2)
     _execute_hero_enter(state, state.north_player, agents[0])
-    # Build agent lookup by player_id
     agent_map = {a.player_id: a for a in agents}
-    jin_sorted = sorted(state.jin_players, key=lambda p: p.order)
-    for jin_player in jin_sorted:
+    for jin_player in _get_jin_setup_order(state):
         _execute_hero_enter(state, jin_player, agent_map.get(jin_player.player_id))
 
-    # === Execute initial face-down cards (rulebook §4.1 step 7) ===
+    # --- Execute initial face-down cards (rulebook §4.1 step 7) ---
     state._setup_cards_played = _execute_setup_face_down_cards(
         state, action_system, logger,
     )
 
-    # Count initial army placements from map
+    # --- Count initial army placements from map ---
     state.north_player.army_placed_count = sum(
         1 for loc in state.locations.values()
         if loc.controller == ControlState.NORTH
@@ -306,18 +390,17 @@ def setup_game(library: CardLibrary, agents: list,
     )
     state.sima.army_reserve_count = 16 - state.sima.army_placed_count
 
-    # Count Jin player armies from map
-    for i, jin_player in enumerate([jin1, jin2, jin3]):
+    for jin_player in state.jin_players:
         cs = state._player_control_state(jin_player.player_id)
         jin_player.army_placed_count = sum(
             1 for loc in state.locations.values() if loc.controller == cs
         )
         jin_player.army_reserve_count = 16 - jin_player.army_placed_count
 
-    state.phase = PhaseType.PREPARATION
-    state.round = 1
-    return state
 
+# ================================================================
+# Existing phase functions
+# ================================================================
 
 def _log_effect_wrapper(logger):
     """Create a log_callback closure for EffectResolver (phases.py cannot reference self._log_effect)."""
@@ -327,12 +410,11 @@ def _log_effect_wrapper(logger):
     return callback
 
 
-
 def _execute_setup_face_down_cards(state: GameState, action_system,
                                     logger=None) -> dict:
     """Execute initial face-down cards (rulebook §4.1 step 7).
 
-    North first, then Jin players sorted by 先动值 (order attribute).
+    North first, then Jin players sorted by 先动值 (start_order, ascending).
     Delegates to PlayCardAction via action_system.execute() — same code path
     as normal card play.  Faction restriction and event condition checks are
     handled inside PlayCardAction.execute() (cards discarded on failure).
@@ -348,7 +430,7 @@ def _execute_setup_face_down_cards(state: GameState, action_system,
     if action_system is None:
         return {}
 
-    jin_sorted = sorted(state.jin_players, key=lambda p: p.order)
+    jin_sorted = _get_jin_setup_order(state)
     setup_order = [state.north_player] + jin_sorted
     setup_cards_played = {}
 
@@ -442,8 +524,6 @@ def _create_initial_locations() -> dict[str, LocationState]:
         "幽燕": ["蓟城", "龙城"],
         "关外": ["盛乐", "平城"],
     }
-    # Initial control (source: board_info.md)
-    # North: starts with no locations
     north_starts = []
     sima_starts = [
         "建康", "京口", "吴", "会稽", "浔阳",
@@ -466,27 +546,33 @@ def _create_initial_locations() -> dict[str, LocationState]:
     return locations
 
 
-def run_preparation_phase(state: GameState, rng: random.Random):
-    """Execute the preparation phase for the current round."""
+def run_preparation_phase(state: GameState, rng: random.Random) -> list[dict]:
+    """Execute the preparation phase for the current round.
+
+    Returns emperor dice events for logging.
+    """
     state.phase = PhaseType.PREPARATION
 
-    # Reset public actions
-    state.public_actions = []  # Will be populated from card library
+    # Refresh public action cards: all exhausted cards recover, then populate
+    state.public_exhausted.clear()
+    state.public_actions = [card.definition for card in state.public_action_pool]
 
     # Emperor dice — use real emperor module
     from rules.emperor import roll_emperor_dice
-    roll_emperor_dice(state, rng)
+    emperor_events = roll_emperor_dice(state, rng)
 
     # Sima military distribution (after emperor dice)
     from rules.sima import distribute_sima_military
     distribute_sima_military(state)
 
-    # Set action order: north first, then Jin by order track
-    jin_sorted = sorted(state.jin_players, key=lambda p: p.order)
+    # Set action order: north first, then Jin by order track (higher = earlier)
+    jin_sorted = _get_jin_turn_order(state)
     state.turn_order = ["north"] + [p.player_id for p in jin_sorted]
     state.active_player_index = 0
 
     state.phase = PhaseType.ACTION
+
+    return emperor_events
 
 
 def run_player_draw(state: GameState, player_id: str):
