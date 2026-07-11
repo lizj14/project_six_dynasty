@@ -54,155 +54,10 @@ class GameEngine:
             self.rng.randint(0, 999999),
             version=self.version,
             map_adjacencies=self.map_adjacencies,
+            action_system=self.action_system,
+            logger=self.logger,
         )
-        self.state.action_system = self.action_system
-
-        # Inject EffectResolver so card actions can use it
-        from cards.effect_resolver import EffectResolver
-        self.state.effect_resolver = EffectResolver(self.action_system)
-        self.state.effect_resolver.trigger_callback = self._check_triggers
-        # Hook logger for effect-level state modification tracking
-        if self.logger:
-            self.state.effect_resolver.log_callback = self._log_effect
-
-        if self.logger:
-            self.logger.log_game_start(self.state, self.state.seed)
-            initial_hands = {}
-            for p in self.state.get_all_players():
-                initial_hands[p.player_id] = [c.name for c in p.hand]
-            self.logger.log_setup_cards(self.state, {}, initial_hands)
-            self.logger.log_initial_court(self.state)
-
-        # === Execute initial face-down cards (rulebook §4.1 step 7) ===
-        # North first, then Jin by start order
-        from .actions.card_actions import PlayCardAction
-        jin_sorted = sorted(self.state.jin_players, key=lambda p: p.order)
-        setup_order = [self.state.north_player] + jin_sorted
-        setup_cards_played = {}
-
-        # Start a setup round in the logger so effect resolution is captured
-        if self.logger:
-            self.logger.log_round_start(0)
-
-        for player in setup_order:
-            if player.hand:
-                idx = getattr(player, '_setup_face_down_index', 0)
-                payment = getattr(player, '_setup_payment_indices', [])
-                if idx >= len(player.hand):
-                    idx = 0
-                card = player.hand[idx]
-                cost = card.cost
-
-                # Check faction restriction — card in hand doesn't mean playable
-                if not card.definition.is_playable_by(player.faction):
-                    # Discard without effect
-                    self.state.main_discard.append(player.hand.pop(idx))
-                    setup_cards_played[player.player_id] = {
-                        "card": card.name, "cost": cost,
-                        "payment": [],
-                        "success": False,
-                        "error": f"faction_restriction: {card.definition.faction_restriction}",
-                    }
-                    if self.logger:
-                        self.logger.log_action(
-                            player_id=player.player_id,
-                            action_type="play_card",
-                            description=f"打出 {card.name} (事件) — 派系不符，弃置",
-                            params={"card": card.name, "cost": cost},
-                            costs={},
-                            results={"error": "faction_restriction"},
-                        )
-                    continue
-                # Use agent-chosen payment, or find from other cards
-                other_indices = [i for i in payment if i != idx and 0 <= i < len(player.hand)]
-                if len(other_indices) < cost:
-                    remaining = [i for i in range(len(player.hand)) if i != idx and i not in other_indices]
-                    other_indices = other_indices + remaining[:cost - len(other_indices)]
-
-                # Capture payment card names BEFORE execution
-                payment_names = []
-                for pi in sorted(other_indices[:cost], reverse=True):
-                    if 0 <= pi < len(player.hand) and pi != idx:
-                        payment_names.append(player.hand[pi].name)
-
-                if len(other_indices) >= cost:
-                    # Describe action for logging
-                    from .game_logger import describe_action
-                    desc, params, costs, _ = describe_action(
-                        PlayCardAction(player_id=player.player_id, card_index=idx,
-                                       payment_indices=other_indices[:cost]),
-                        self.state,
-                    )
-
-                    # Check if event card condition is met
-                    condition_met = True
-                    from models.enums import CardType as CT
-                    if card.card_type == CT.EVENT:
-                        condition_met = _check_event_condition(card, player, self.state)
-
-                    action = PlayCardAction(
-                        player_id=player.player_id,
-                        card_index=idx,
-                        payment_indices=other_indices[:cost],
-                    )
-                    if condition_met:
-                        result = self.action_system.execute(self.state, action)
-                    else:
-                        # Pay cost but no effect — discard manually
-                        discarding = sorted(other_indices[:cost] + [idx], reverse=True)
-                        for di in discarding:
-                            if 0 <= di < len(player.hand):
-                                self.state.main_discard.append(player.hand.pop(di))
-                        result = None
-                        desc += " (条件不满足)"
-
-                    # Log the setup card play with results
-                    if self.logger:
-                        results_log = {}
-                        if result and result.success:
-                            for evt in (result.events or []):
-                                if evt.get("type") == "court_action" and "card" in evt:
-                                    params["card"] = evt["card"]
-                                if "vp_gained" in evt:
-                                    results_log["vp"] = evt.get("vp_gained", 0)
-                                if "military_gained" in evt:
-                                    results_log["military"] = evt.get("military_gained", 0)
-                        if not condition_met:
-                            results_log["condition_met"] = False
-                        self.logger.log_action(
-                            player_id=player.player_id,
-                            action_type="play_card",
-                            description=desc,
-                            params=params,
-                            costs=costs,
-                            results=results_log,
-                        )
-
-                    setup_cards_played[player.player_id] = {
-                        "card": card.name, "cost": cost,
-                        "payment": payment_names,
-                        "success": condition_met,
-                        "condition_met": condition_met,
-                    }
-                else:
-                    self.state.main_discard.append(player.hand.pop(idx))
-                    setup_cards_played[player.player_id] = {
-                        "card": card.name, "cost": cost,
-                        "payment": [],
-                        "success": False, "error": "insufficient payment",
-                    }
-
-        # Finalize the setup round so effects are captured
-        if self.logger:
-            self.logger.log_round_end()
-
-        if self.logger:
-            setup_cards_simple = {
-                pid: f"{v['card']}（支付: {' '.join(v.get('payment', []))}）"
-                      if v.get('payment') else v['card']
-                for pid, v in setup_cards_played.items()
-            }
-            self.logger.log_setup_cards(self.state, setup_cards_simple, initial_hands)
+        self._post_setup_init()
 
         # Main game loop
         while self.state.phase != PhaseType.GAME_OVER:
@@ -229,19 +84,52 @@ class GameEngine:
         return self.state
 
     def run_until_round(self, target_round: int) -> GameState:
-        """Run until a specific round (for testing)."""
+        """Run until a specific round (for testing).
+
+        Has identical initialization to run(), including:
+        - EffectResolver with callbacks
+        - Face-down card execution via setup_game()
+        - Logging (if logger is set)
+        """
         self.state = setup_game(
             self.library, self.agents,
             self.rng.randint(0, 999999),
             version=self.version,
             map_adjacencies=self.map_adjacencies,
+            action_system=self.action_system,
+            logger=self.logger,
         )
+        self._post_setup_init()
 
         while (self.state.phase != PhaseType.GAME_OVER and
                self.state.round <= target_round):
             self._run_round()
 
         return self.state
+
+    def _post_setup_init(self):
+        """Wire callbacks and log setup summary after setup_game() returns."""
+        # Wire trigger_callback — can only be done here (needs self._check_triggers)
+        if self.state and self.state.effect_resolver:
+            self.state.effect_resolver.trigger_callback = self._check_triggers
+            # Re-attach log_callback via engine (takes priority over wrapper)
+            if self.logger:
+                self.state.effect_resolver.log_callback = self._log_effect
+
+        if self.logger:
+            self.logger.log_game_start(self.state, self.state.seed)
+            initial_hands = {}
+            for p in self.state.get_all_players():
+                initial_hands[p.player_id] = [c.name for c in p.hand]
+
+            setup_cards_played = getattr(self.state, '_setup_cards_played', {})
+            setup_cards_simple = {
+                pid: f"{v['card']}（支付: {' '.join(v.get('payment', []))}）"
+                      if v.get('payment') else v['card']
+                for pid, v in setup_cards_played.items()
+            }
+            self.logger.log_setup_cards(self.state, setup_cards_simple, initial_hands)
+            self.logger.log_initial_court(self.state)
 
     def _run_round(self):
         """Execute one full round."""
@@ -313,11 +201,6 @@ class GameEngine:
                 if action is None:
                     break
 
-                # Capture description BEFORE execution
-                if self.logger:
-                    from .game_logger import describe_action, snapshot_player_state
-                    desc, params, costs, _ = describe_action(action, state)
-
                 result = self.action_system.execute(state, action)
 
                 # Fire passive triggers based on action type
@@ -332,25 +215,8 @@ class GameEngine:
                         })
 
                 if self.logger:
-                    results = {}
-                    for evt in (result.events or []):
-                        if evt.get("type") == "court_action":
-                            if "card" in evt:
-                                params["card"] = evt["card"]
-                        if "vp_gained" in evt:
-                            results["vp"] = evt.get("vp_gained", 0)
-                        if "military_gained" in evt:
-                            results["military"] = evt.get("military_gained", 0)
-                    snap = snapshot_player_state(state, player_id)
-                    self.logger.log_action(
-                        player_id=player_id,
-                        action_type=getattr(action, 'action_type', '?'),
-                        description=desc,
-                        params=params,
-                        costs=costs,
-                        results=results,
-                        state_snapshot=snap,
-                    )
+                    from .game_logger import log_action_result
+                    log_action_result(self.logger, action, result, state)
 
                 if not result.success:
                     pass
@@ -554,21 +420,3 @@ class GameEngine:
         if not self.state:
             return {}
         return {p.player_id: p.vp for p in self.state.get_all_players()}
-
-
-def _check_event_condition(card, player, state) -> bool:
-    """Check if an event card's play condition is met using pre-parsed AST.
-
-    Delegates to EffectResolver.check_condition() for all supported condition types.
-    """
-    parsed = card.definition.parsed_effect
-    if not parsed or not parsed.play_condition:
-        return True  # No condition → always playable
-
-    cond = parsed.play_condition
-    resolver = getattr(state, 'effect_resolver', None)
-    if resolver:
-        return resolver.check_condition(cond, state, player.player_id)
-
-    # Fallback: no resolver available
-    return True

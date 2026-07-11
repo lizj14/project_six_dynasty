@@ -11,17 +11,22 @@ from models.card import Card, CardDef, CardLibrary
 from models.player import PlayerState
 from models.location import LocationState, AdjacencyDef
 from models.game_state import GameState, SimaState, EmperorState
+from .actions.card_actions import PlayCardAction
+from cards.effect_resolver import EffectResolver
 
 
 def setup_game(library: CardLibrary, agents: list,
                seed: int = 0, version=None,
-               map_adjacencies: list = None) -> GameState:
+               map_adjacencies: list = None,
+               action_system=None, logger=None) -> GameState:
     """Initialize a complete game state from scratch.
 
     Args:
         library: CardLibrary with all card definitions
         agents: 4 GameAgents [north, jin_1, jin_2, jin_3]
         seed: Random seed for reproducibility
+        action_system: ActionSystem for executing card actions (optional)
+        logger: GameLogger for recording setup actions (optional)
     """
     rng = random.Random(seed)
 
@@ -269,15 +274,25 @@ def setup_game(library: CardLibrary, agents: list,
             prestige_initial=emperor_cards[0].initial_prestige,
         )
 
-    # Inject temporary EffectResolver for hero enter effects
-    from engine.action_system import ActionSystem
-    from cards.effect_resolver import EffectResolver
-    state.effect_resolver = EffectResolver(ActionSystem())
+    # === Inject EffectResolver (created once, with log callback if logger available) ===
+    state.effect_resolver = EffectResolver(action_system)
+    if logger:
+        state.effect_resolver.log_callback = _log_effect_wrapper(logger)
+    state.action_system = action_system
 
-    # === Execute hero enter effects (登场) ===
+    # === Execute hero enter effects (登场), sorted by 先动值 ===
+    # North always first, Jin players sorted by order attribute (rulebook §2.2)
     _execute_hero_enter(state, state.north_player, agents[0])
-    for i, (jin_player, agent) in enumerate(zip([jin1, jin2, jin3], agents[1:])):
-        _execute_hero_enter(state, jin_player, agent)
+    # Build agent lookup by player_id
+    agent_map = {a.player_id: a for a in agents}
+    jin_sorted = sorted(state.jin_players, key=lambda p: p.order)
+    for jin_player in jin_sorted:
+        _execute_hero_enter(state, jin_player, agent_map.get(jin_player.player_id))
+
+    # === Execute initial face-down cards (rulebook §4.1 step 7) ===
+    state._setup_cards_played = _execute_setup_face_down_cards(
+        state, action_system, logger,
+    )
 
     # Count initial army placements from map
     state.north_player.army_placed_count = sum(
@@ -302,6 +317,108 @@ def setup_game(library: CardLibrary, agents: list,
     state.phase = PhaseType.PREPARATION
     state.round = 1
     return state
+
+
+def _log_effect_wrapper(logger):
+    """Create a log_callback closure for EffectResolver (phases.py cannot reference self._log_effect)."""
+    def callback(player_id, effect_type, params=None, events=None, source="card"):
+        if logger:
+            logger.log_effect(player_id, effect_type, params, events, source)
+    return callback
+
+
+
+def _execute_setup_face_down_cards(state: GameState, action_system,
+                                    logger=None) -> dict:
+    """Execute initial face-down cards (rulebook §4.1 step 7).
+
+    North first, then Jin players sorted by 先动值 (order attribute).
+    Delegates to PlayCardAction via action_system.execute() — same code path
+    as normal card play.  Faction restriction and event condition checks are
+    handled inside PlayCardAction.execute() (cards discarded on failure).
+
+    Args:
+        state: GameState with populated hands and _setup_face_down_index
+        action_system: ActionSystem for executing PlayCardAction
+        logger: Optional GameLogger for recording setup actions
+
+    Returns:
+        dict of {player_id: {card, cost, payment, success}}
+    """
+    if action_system is None:
+        return {}
+
+    jin_sorted = sorted(state.jin_players, key=lambda p: p.order)
+    setup_order = [state.north_player] + jin_sorted
+    setup_cards_played = {}
+
+    if logger:
+        logger.log_round_start(0)
+
+    for player in setup_order:
+        if not player.hand:
+            continue
+
+        idx = getattr(player, '_setup_face_down_index', 0)
+        payment = getattr(player, '_setup_payment_indices', [])
+        if idx >= len(player.hand):
+            idx = 0
+        card = player.hand[idx]
+        cost = card.cost
+
+        # Auto-fill payment indices from remaining hand cards
+        other_indices = [i for i in payment if i != idx and 0 <= i < len(player.hand)]
+        if len(other_indices) < cost:
+            remaining = [i for i in range(len(player.hand))
+                        if i != idx and i not in other_indices]
+            other_indices = other_indices + remaining[:cost - len(other_indices)]
+
+        # Capture payment card names before execution
+        payment_names = []
+        for pi in sorted(other_indices[:cost], reverse=True):
+            if 0 <= pi < len(player.hand) and pi != idx:
+                payment_names.append(player.hand[pi].name)
+
+        if len(other_indices) >= cost:
+            action = PlayCardAction(
+                player_id=player.player_id,
+                card_index=idx,
+                payment_indices=other_indices[:cost],
+            )
+
+            # Execute via normal PlayCardAction flow
+            result = action_system.execute(state, action)
+
+            # Log (shared helper, same format as _run_round)
+            if logger:
+                from .game_logger import log_action_result
+                log_action_result(logger, action, result, state)
+
+            # Determine success: card was not discarded due to restriction/condition
+            success = result.success
+            for evt in (result.events or []):
+                if evt.get("type") == "card_discarded":
+                    success = False
+                    break
+
+            setup_cards_played[player.player_id] = {
+                "card": card.name, "cost": cost,
+                "payment": payment_names,
+                "success": success,
+            }
+        else:
+            # Insufficient cards for payment — discard directly
+            state.main_discard.append(player.hand.pop(idx))
+            setup_cards_played[player.player_id] = {
+                "card": card.name, "cost": cost,
+                "payment": [],
+                "success": False, "error": "insufficient payment",
+            }
+
+    if logger:
+        logger.log_round_end()
+
+    return setup_cards_played
 
 
 def _create_initial_locations() -> dict[str, LocationState]:

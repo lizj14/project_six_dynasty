@@ -24,6 +24,7 @@ class PlayCardAction(GameAction):
     player_id: str = ""
     card_index: int = -1                      # Index in hand
     payment_indices: list[int] = None         # Indices of cards to discard as payment
+    replace_staff_index: int = 0              # Which staff card to replace if staff full
 
     def __post_init__(self):
         if self.payment_indices is None:
@@ -41,14 +42,6 @@ class PlayCardAction(GameAction):
             return ActionResult.fail(f"Invalid card index {self.card_index}")
 
         card = player.hand[self.card_index]
-
-        # Check faction restriction
-        if not card.definition.is_playable_by(player.faction):
-            return ActionResult.fail(f"Cannot play {card.name} — faction restricted")
-
-        # Check friend limit
-        if card.is_friend and not player.can_play_friend():
-            return ActionResult.fail(f"Staff area full (limit: {player.staff_limit})")
 
         # Check payment
         cost = card.cost
@@ -91,12 +84,50 @@ class PlayCardAction(GameAction):
         state.main_discard.extend(payment_cards)
 
         events = [{"type": "play_card", "player": self.player_id,
-                    "card": card.name, "cost_paid": len(payment_cards)}]
+                    "card": card.name, "cost_paid": len(payment_cards),
+                    "payment_cards": [c.name for c in payment_cards]}]
+
+        # === Faction restriction check ===
+        # Card cannot be played by this faction → discard (no effect, cost already paid).
+        # This is the unified path for both normal play (safety net — agents never
+        # select restricted cards) and setup (cards pre-assigned may not match faction).
+        if not card.definition.is_playable_by(player.faction):
+            state.main_discard.append(card)
+            events.append({"type": "card_discarded", "card": card.name,
+                           "reason": "faction_restriction"})
+            player.has_taken_hand_action = True
+            state.log_event("play_card_failed", player=self.player_id,
+                           card=card.name, reason="faction_restriction")
+            return ActionResult.ok(events)
+
+        # === Event condition check ===
+        # Event card's play_condition not met → discard (no effect, cost already paid)
+        if card.card_type == CardType.EVENT:
+            parsed = card.definition.parsed_effect
+            if parsed and parsed.play_condition:
+                resolver = getattr(state, 'effect_resolver', None)
+                if resolver and not resolver.check_condition(
+                    parsed.play_condition, state, self.player_id):
+                    state.main_discard.append(card)
+                    events.append({"type": "card_discarded", "card": card.name,
+                                   "reason": "condition_not_met"})
+                    player.has_taken_hand_action = True
+                    state.log_event("play_card_failed", player=self.player_id,
+                                   card=card.name, reason="condition_not_met")
+                    return ActionResult.ok(events)
 
         # Handle card by type
         if card.is_friend:
             # 幕僚牌 — place in staff area
-            # If staff area full, must replace (handled in validate)
+            # If staff area is full, replace the staff member at replace_staff_index
+            if not player.can_play_friend():
+                if 0 <= self.replace_staff_index < len(player.staff_area):
+                    replaced = player.staff_area.pop(self.replace_staff_index)
+                    state.main_discard.append(replaced)
+                    events.append({"type": "staff_replaced",
+                                   "card": replaced.name,
+                                   "replaced_by": card.name,
+                                   "index": self.replace_staff_index})
             player.staff_area.append(card)
             events.append({"type": "friend_played", "card": card.name})
 

@@ -691,3 +691,40 @@ def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict
         desc = str(atype)
 
     return desc, params, costs, results
+
+
+def log_action_result(logger, action, result, state):
+    """Shared logging helper: describe → execute result → log action.
+
+    Used by both _run_round() (normal play) and _execute_setup_face_down_cards()
+    (setup phase) so the logging format is identical.
+
+    Args:
+        logger: GameLogger instance
+        action: GameAction that was executed
+        result: ActionResult from action_system.execute()
+        state: GameState snapshot
+    """
+    desc, params, costs, _ = describe_action(action, state)
+
+    results = {}
+    for evt in (result.events or []):
+        if evt.get("type") == "court_action" and "card" in evt:
+            params["card"] = evt["card"]
+        if "vp_gained" in evt:
+            results["vp"] = evt.get("vp_gained", 0)
+        if "military_gained" in evt:
+            results["military"] = evt.get("military_gained", 0)
+        if evt.get("type") == "card_discarded":
+            results["discard_reason"] = evt.get("reason", "")
+
+    snap = snapshot_player_state(state, action.player_id)
+    logger.log_action(
+        player_id=action.player_id,
+        action_type=getattr(action, 'action_type', '?'),
+        description=desc,
+        params=params,
+        costs=costs,
+        results=results,
+        state_snapshot=snap,
+    )

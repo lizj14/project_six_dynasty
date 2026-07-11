@@ -108,8 +108,6 @@ class ActionSystem:
         for i, card in enumerate(player.hand):
             if not card.definition.is_playable_by(player.faction):
                 continue
-            if card.is_friend and not player.can_play_friend():
-                continue
 
             # Check play_condition from card's parsed effect
             parsed = card.definition.parsed_effect
@@ -121,18 +119,31 @@ class ActionSystem:
 
             # For each card, generate possible payment combinations
             cost = card.cost
+            base_actions = []
             if cost == 0:
-                available.append(PlayCardAction(
+                base_actions.append(PlayCardAction(
                     player_id=player_id, card_index=i, payment_indices=[]
                 ))
             else:
                 # Generate all combinations of payment cards
                 other_indices = [j for j in range(len(player.hand)) if j != i]
                 if len(other_indices) >= cost:
-                    available.append(PlayCardAction(
+                    base_actions.append(PlayCardAction(
                         player_id=player_id, card_index=i,
                         payment_indices=other_indices[:cost]
                     ))
+
+            # Friend cards when staff is full: generate one action per replacement slot
+            if card.is_friend and not player.can_play_friend():
+                for action in base_actions:
+                    for si in range(len(player.staff_area)):
+                        available.append(PlayCardAction(
+                            player_id=player_id, card_index=action.card_index,
+                            payment_indices=list(action.payment_indices),
+                            replace_staff_index=si,
+                        ))
+            else:
+                available.extend(base_actions)
 
         return available
 

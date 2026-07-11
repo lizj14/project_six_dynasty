@@ -127,9 +127,11 @@ class TestPlayCardAction:
         assert len(state.north_player.staff_area) == 1
 
     def test_play_friend_staff_full(self):
+        """When staff area is full, friend cards can still be played by
+        replacing an existing staff member (default: replace_staff_index=0).
+        """
         from engine.actions.card_actions import PlayCardAction
         state = make_state()
-        # Fill staff area
         existing = CardDef(
             card_id="exist", name="existing", owner_faction="通用",
             cost=0, card_type=CardType.FRIEND,
@@ -145,8 +147,16 @@ class TestPlayCardAction:
         state.north_player.staff_area = [Card(definition=existing)] * 4  # North limit = 4
         state.north_player.hand = [Card(definition=new_friend)]
         action = PlayCardAction(player_id="north", card_index=0, payment_indices=[])
-        result = action.validate(state)
-        assert not result.success  # Staff area full
+        # Validation passes — staff full no longer blocks
+        assert action.validate(state).success
+        # Execute replaces staff[0] with the new friend
+        result = action.execute(state)
+        assert result.success
+        assert len(state.north_player.staff_area) == 4  # Still at limit
+        assert state.north_player.staff_area[-1].name == "new_friend"  # New card added
+        replaced = [e for e in result.events if e.get("type") == "staff_replaced"]
+        assert len(replaced) == 1
+        assert replaced[0]["replaced_by"] == "new_friend"
 
     def test_play_jin_strategy_gains_contribution(self):
         from engine.actions.card_actions import PlayCardAction
@@ -164,6 +174,10 @@ class TestPlayCardAction:
         assert state.jin_players[0].contribution == 1
 
     def test_play_card_faction_restricted(self):
+        """Faction restriction handled in execute(): card discarded with reason.
+
+        This is the unified path for both normal play (safety net) and setup.
+        """
         from engine.actions.card_actions import PlayCardAction
         state = make_state()
         card_def = CardDef(
@@ -174,8 +188,15 @@ class TestPlayCardAction:
         )
         state.north_player.hand = [Card(definition=card_def)]
         action = PlayCardAction(player_id="north", card_index=0, payment_indices=[])
-        result = action.validate(state)
-        assert not result.success
+        # Validation passes (faction check is in execute, not validate)
+        assert action.validate(state).success
+        # Execute discards the card with faction_restriction reason
+        result = action.execute(state)
+        assert result.success  # Action completed, just with no effect
+        assert len(state.north_player.hand) == 0  # Card discarded
+        discarded = [e for e in result.events if e.get("type") == "card_discarded"]
+        assert len(discarded) == 1
+        assert discarded[0]["reason"] == "faction_restriction"
 
     def test_duplicate_payment_index(self):
         from engine.actions.card_actions import PlayCardAction

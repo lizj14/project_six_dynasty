@@ -100,8 +100,9 @@ class GameState:
     # === Random Seed ===
     seed: int = 0
 
-    # === Effect Resolver (injected by GameEngine) ===
+    # === Engine-injected dependencies ===
     effect_resolver: Optional[Any] = None
+    action_system: Optional[Any] = None
 
     # ======== Helper Methods ========
 
