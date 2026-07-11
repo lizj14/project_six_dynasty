@@ -26,6 +26,41 @@ class GameLog:
     end_reason: str = ""
 
 
+def _format_effect(e: dict) -> str:
+    """Format a single effect entry for human-readable display."""
+    et = e.get("effect", "?")
+    pid = e.get("player", "?")
+    src = e.get("source", "?")
+    p = e.get("params", {})
+
+    # Build detail parts from params
+    parts = []
+    if p.get("amount") is not None:
+        parts.append(f"+{p['amount']}")
+    if p.get("count") is not None:
+        parts.append(f"x{p['count']}")
+    if p.get("target"):
+        parts.append(f"target={p['target']}")
+    if p.get("marker"):
+        parts.append(f"marker={p['marker']}")
+    if p.get("culture_type"):
+        parts.append(f"culture={p['culture_type']}")
+    if p.get("region"):
+        parts.append(f"region={p['region']}")
+    if p.get("operate"):
+        parts.append(f"op={p['operate']}")
+    # Catch remaining params
+    for k, v in p.items():
+        if k not in ("amount", "count", "target", "marker",
+                      "culture_type", "region", "operate"):
+            parts.append(f"{k}={v}")
+
+    detail = ", ".join(parts) if parts else ""
+    if detail:
+        return f"{pid} [{src}] {et}: {detail}"
+    return f"{pid} [{src}] {et}"
+
+
 class GameLogger:
     """Captures structured game events during play."""
 
@@ -177,6 +212,74 @@ class GameLogger:
             "vp": final_vp,
         }
 
+    # ======== Passive Triggers ========
+
+    def log_trigger(self, trigger_type: str, source_player_id: str,
+                    source_card: str, context: dict = None):
+        """Record a passive trigger firing.
+
+        Args:
+            trigger_type: e.g. "on_march", "on_gain_vp", "on_turn_end"
+            source_player_id: Who owns the passive card
+            source_card: Card name that has the passive ability
+            context: What triggered it (action type, target player, etc.)
+        """
+        if not self._current_round:
+            return
+        # Store triggers in the current round for later serialization
+        triggers = self._current_round.setdefault("triggers_fired", [])
+        entry = {
+            "trigger": trigger_type,
+            "source_player": source_player_id,
+            "source_card": source_card,
+        }
+        if context:
+            entry["context"] = context
+        triggers.append(entry)
+
+    def log_effect(self, player_id: str, effect_type: str,
+                   params: dict = None, events: list[dict] = None,
+                   source: str = "card"):
+        """Record an individual effect being resolved (state modification).
+
+        Called from EffectResolver after each step executes, for both
+        active card plays and passive trigger resolutions.
+
+        Args:
+            player_id: Who the effect applies to
+            effect_type: e.g. "gain_military", "gain_vp", "draw_cards"
+            params: Effect parameters (amount, target, etc.)
+            events: Resolution events produced
+            source: "card" for active play, "passive" for trigger, "enter" for hero enter
+        """
+        if not self._current_round:
+            return
+        effects = self._current_round.setdefault("effects_resolved", [])
+        entry = {
+            "player": player_id,
+            "effect": effect_type,
+            "source": source,
+        }
+        if params:
+            entry["params"] = params
+        if events:
+            entry["events"] = events
+        effects.append(entry)
+
+    # ======== State Snapshots (periodic) ========
+
+    def log_state_snapshot(self, label: str, state_data: dict):
+        """Record a named point-in-time snapshot of game state.
+
+        Args:
+            label: e.g. "round_start", "after_action_phase"
+            state_data: dict of relevant state values
+        """
+        if not self._current_round:
+            return
+        snapshots = self._current_round.setdefault("state_snapshots", [])
+        snapshots.append({"label": label, "data": state_data})
+
     # ======== Final Scoring ========
 
     def log_final_scoring(self, scoring_result: dict, winner: str,
@@ -255,6 +358,49 @@ class GameLogger:
                 lines.append(f"  {pid}: {card_name} {hand_str}")
             lines.append("")
 
+        # ── Setup round (round 0) — show full effect resolution ──
+        setup_rounds = [r for r in self.log.rounds if r["round"] == 0]
+        if setup_rounds:
+            r = setup_rounds[0]
+            lines.append("┌─ 初始暗置牌结算 ─────────────────────────────")
+            for turn in r.get("player_turns", []):
+                pid = turn["player"]
+                for act in turn.get("actions", []):
+                    desc = act.get("description", act.get("type", "?"))
+                    lines.append(f"│ {pid}: {desc}")
+                    costs = act.get("costs", {})
+                    if costs:
+                        cost_str = ", ".join(f"{k}:{v}" for k, v in costs.items())
+                        lines.append(f"│   费用: {cost_str}")
+                    results = act.get("results", {})
+                    if results:
+                        res_str = ", ".join(f"{k}:{v}" for k, v in results.items())
+                        lines.append(f"│   结果: {res_str}")
+            effects = r.get("effects_resolved", [])
+            if effects:
+                lines.append(f"│")
+                lines.append(f"│ 效果结算 ({len(effects)} 步):")
+                for e in effects:
+                    lines.append(f"│   {_format_effect(e)}")
+                    evts = e.get("events", []) or []
+                    for evt in evts:
+                        t = evt.get("type", "")
+                        if t and t not in ("effect_resolved",):
+                            detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
+                            if detail:
+                                lines.append(f"│     ↳ {t}: {detail}")
+            triggers = r.get("triggers_fired", [])
+            if triggers:
+                for t in triggers:
+                    src = t.get("source_card", "?")
+                    tt = t.get("trigger", "?")
+                    sp = t.get("source_player", "?")
+                    lines.append(f"│ 触发: {tt} — {sp}的[{src}]")
+            lines.append("└──────────────────────────────────────────────")
+            lines.append("")
+            # Remove round 0 from the rounds list so it's not rendered again below
+            self.log.rounds = [r for r in self.log.rounds if r["round"] != 0]
+
         # Initial court
         nc = getattr(self.log, 'north_initial_court', [])
         jc = getattr(self.log, 'jin_initial_court', [])
@@ -320,6 +466,36 @@ class GameLogger:
                 end = turn.get("end_state", {})
                 if end:
                     lines.append(f"    结束 — VP:{end.get('vp', '?')} 军力:{end.get('military', '?')}")
+
+            # Triggers fired
+            triggers = r.get("triggers_fired", [])
+            if triggers:
+                lines.append(f"")
+                lines.append(f"  ⚡ 被动触发 ({len(triggers)} 次):")
+                for t in triggers:
+                    src = t.get("source_card", "?")
+                    tt = t.get("trigger", "?")
+                    sp = t.get("source_player", "?")
+                    ctx = t.get("context", {})
+                    ctx_str = ""
+                    if ctx.get("action_type"):
+                        ctx_str = f" → {ctx['action_type']}"
+                    lines.append(f"    {tt}: {sp} 的 [{src}]{ctx_str}")
+
+            # Effects resolved
+            effects = r.get("effects_resolved", [])
+            if effects:
+                lines.append(f"")
+                lines.append(f"  📋 效果结算 ({len(effects)} 次):")
+                for e in effects:
+                    lines.append(f"    {_format_effect(e)}")
+                    evts = e.get("events", []) or []
+                    for evt in evts:
+                        t = evt.get("type", "")
+                        if t and t not in ("effect_resolved",):
+                            detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
+                            if detail:
+                                lines.append(f"      ↳ {t}: {detail}")
 
             # Settlement
             settle = r.get("settlement", {})

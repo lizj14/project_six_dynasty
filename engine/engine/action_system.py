@@ -111,6 +111,14 @@ class ActionSystem:
             if card.is_friend and not player.can_play_friend():
                 continue
 
+            # Check play_condition from card's parsed effect
+            parsed = card.definition.parsed_effect
+            if parsed and parsed.play_condition:
+                resolver = getattr(state, 'effect_resolver', None)
+                if resolver and not resolver.check_condition(
+                    parsed.play_condition, state, player_id):
+                    continue
+
             # For each card, generate possible payment combinations
             cost = card.cost
             if cost == 0:
@@ -138,6 +146,14 @@ class ActionSystem:
         court = state.get_court_cards(player_id)
         for card in court:
             if card.definition.is_playable_by(player.faction):
+                # Check play_condition from card's parsed effect
+                parsed = card.definition.parsed_effect
+                if parsed and parsed.play_condition:
+                    resolver = getattr(state, 'effect_resolver', None)
+                    if resolver and not resolver.check_condition(
+                        parsed.play_condition, state, player_id):
+                        continue
+
                 action = CourtAction(player_id=player_id, card_id=card.definition.card_id)
                 if action.validate(state).success:
                     available.append(action)

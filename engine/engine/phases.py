@@ -100,9 +100,13 @@ def setup_game(library: CardLibrary, agents: list,
                     allocated_card_ids.add(cdef.card_id)
 
     # --- Build main deck ---
+    # Rulebook §2.1: 公共行动牌 (public action cards) are shared, not in main deck.
+    # Initial cards are pseudo-cards used during setup only.
+    # Cards with faction_restriction should only go to matching faction.
     main_deck_cards = []
     for cdef in library.all_cards:
-        if cdef.card_type in (CardType.HERO, CardType.GOAL, CardType.EMPEROR, CardType.REFUGEE):
+        if cdef.card_type in (CardType.HERO, CardType.GOAL, CardType.EMPEROR,
+                              CardType.REFUGEE, CardType.PUBLIC, CardType.INITIAL):
             continue
         if cdef.owner_faction == "初始":
             continue
@@ -264,6 +268,11 @@ def setup_game(library: CardLibrary, agents: list,
             age=1,
             prestige_initial=emperor_cards[0].initial_prestige,
         )
+
+    # Inject temporary EffectResolver for hero enter effects
+    from engine.action_system import ActionSystem
+    from cards.effect_resolver import EffectResolver
+    state.effect_resolver = EffectResolver(ActionSystem())
 
     # === Execute hero enter effects (登场) ===
     _execute_hero_enter(state, state.north_player, agents[0])
@@ -478,42 +487,27 @@ def _execute_hero_enter(state: GameState, player: PlayerState, agent):
         return
 
     defn = player.hero.definition
-    from models.enums import ControlState
-    from cards.effect_ast import AbilityType, EffectType
+    from cards.effect_ast import AbilityType
 
-    cs = state._player_control_state(player.player_id)
-
-    # Apply initial stats from hero card
+    # Apply initial stats from hero card (not part of effect AST)
     player.contribution = min(9, defn.initial_contribution)
     player.prestige = min(9, defn.initial_prestige)
     player.order = defn.initial_order
 
-    # Execute parsed enter effects (conversions, military, etc.)
+    # Delegate enter effects to EffectResolver
     parsed = defn.parsed_effect
     if not parsed:
         return
 
+    resolver = getattr(state, 'effect_resolver', None)
+    if resolver is None:
+        from cards.effect_resolver import EffectResolver
+        resolver = EffectResolver()
+
     for block in parsed.blocks:
         if block.ability_type != AbilityType.ENTER:
             continue
-
-        for step in block.steps:
-            et = step.effect_type
-            p = step.params
-
-            if et == EffectType.CONVERT:
-                locs = p.get("specific_locations", [])
-                for loc_id in locs:
-                    if loc_id in state.locations:
-                        old_ctrl = state.locations[loc_id].controller
-                        _return_army_to_reserve(state, old_ctrl)
-                        state.locations[loc_id].controller = cs
-                        state.locations[loc_id].is_fortified = False
-
-            elif et == EffectType.GAIN_MILITARY:
-                amt = p.get("amount", 0)
-                if isinstance(amt, int):
-                    player.military += amt
+        resolver._resolve_block(block, state, player.player_id, context={})
 
 
 def _return_army_to_reserve(state: GameState, cs: "ControlState"):

@@ -44,9 +44,10 @@ class EffectOperator(ABC):
         """Execute this effect step against the game state."""
         ...
 
-    def _resolve(self, value: Any, state, player_id: str, resolver: "EffectResolver") -> int:
-        """Delegate to resolver's value resolution."""
-        return resolver._resolve_value(value, state, player_id)
+    def _resolve(self, value: Any, state, player_id: str, resolver: "EffectResolver",
+                 step_params: dict = None) -> int:
+        """Delegate to resolver's value resolution, passing step params for X/sum."""
+        return resolver._resolve_value(value, state, player_id, step_params)
 
 
 # ============================================================
@@ -61,7 +62,7 @@ class GainMilitaryOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         player = state.get_player(player_id)
-        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver)
+        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver, step.params)
         if player:
             player.military += amount
             result.events.append({"type": "gain_military", "amount": amount})
@@ -76,11 +77,13 @@ class GainVPOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         player = state.get_player(player_id)
-        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver)
+        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver, step.params)
         if player:
             player.vp += amount
             result.events.append({"type": "gain_vp", "amount": amount})
             state.check_vp_game_end(player_id)
+            resolver._fire_trigger("on_gain_vp", player_id,
+                                   {"amount": amount})
         return result
 
 
@@ -92,7 +95,7 @@ class LoseVPOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         player = state.get_player(player_id)
-        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver)
+        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver, step.params)
         if player:
             player.vp = max(0, player.vp - amount)
             result.events.append({"type": "lose_vp", "amount": amount})
@@ -107,12 +110,11 @@ class LoseMilitaryOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         player = state.get_player(player_id)
-        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver)
+        amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver, step.params)
         if player:
             lost = min(player.military, amount)
             player.military -= lost
             result.events.append({"type": "lose_military", "amount": lost})
-            # TODO: Phase 2a gap #3 — route to sima military pool
         return result
 
 
@@ -181,6 +183,7 @@ class DiscardCardsOperator(EffectOperator):
             if player and player.hand:
                 state.main_discard.append(player.hand.pop())
                 result.events.append({"type": "discard"})
+                resolver._fire_trigger("on_discard", player_id)
         return result
 
 
@@ -211,6 +214,8 @@ class ArchiveCardOperator(EffectOperator):
                 player.history_area.append(card)
                 player.vp += card.definition.history_vp
                 result.events.append({"type": "archive_card", "card": card.name})
+                resolver._fire_trigger("on_archive", player_id,
+                                       {"card": card})
                 from models.enums import FactionType
                 if player.faction == FactionType.JIN:
                     player.contribution = min(9, player.contribution + 1)
@@ -541,6 +546,8 @@ class RaisePrestigeOperator(EffectOperator):
         if player:
             player.prestige = min(10, player.prestige + amount)
             result.events.append({"type": "raise_prestige", "amount": amount})
+            resolver._fire_trigger("on_gain_prestige", player_id,
+                                   {"amount": amount})
         return result
 
 
@@ -571,6 +578,8 @@ class RaiseContributionOperator(EffectOperator):
         if player:
             player.contribution = min(9, player.contribution + amount)
             result.events.append({"type": "raise_contribution", "amount": amount})
+            resolver._fire_trigger("on_gain_contribution", player_id,
+                                   {"amount": amount})
         return result
 
 

@@ -55,12 +55,29 @@ class GameAgent(ABC):
         """
         ...
 
-    # ======== Turn (once per round) ========
+    # ======== Turn (iterative — one action at a time) ========
 
     @abstractmethod
-    def take_turn(self, state: "GameState") -> list["GameAction"]:
-        """Given current game state, produce the sequence of actions."""
+    def decide_action(self, state: "GameState",
+                      available_actions: list) -> Optional["GameAction"]:
+        """Pick ONE action from the available list, or return None to pass/end turn.
+
+        Called repeatedly by the engine in a loop. After each action is executed,
+        the engine re-queries available actions (reflecting the updated state) and
+        calls this method again. The agent sees the freshest state before each
+        decision.
+
+        Returns None to indicate "no more actions this turn."
+        """
         ...
+
+    def take_turn(self, state: "GameState") -> list["GameAction"]:
+        """Legacy batch interface — kept for backward compatibility.
+
+        New agents should override decide_action() instead.
+        The engine primaritly uses the iterative decide_action() loop.
+        """
+        return []
 
     @abstractmethod
     def make_choice(self, state: "GameState", prompt: dict) -> int:
