@@ -152,99 +152,7 @@ class GameEngine:
 
         # === Action Phase ===
         for player_id in state.turn_order:
-            player = state.get_player(player_id)
-            if not player:
-                continue
-
-            agent = self._get_agent(player_id)
-            if not agent:
-                continue
-
-            # Reset action flags (but keep military from settlement)
-            player.reset_action_flags()
-
-            # Rulebook §4.2: 玩家行动开始时结算区控奖励
-            award_region_control_phase(state, player_id=player_id)
-            self._check_triggers("on_region_reward",
-                                 {"player_id": player_id, "phase": "player_action"})
-
-            # Fire turn_start triggers
-            self._check_triggers("on_turn_start", {"player_id": player_id})
-
-            # Draw 2 cards
-            draw_events = run_player_draw(state, player_id)
-
-            if self.logger:
-                cards_drawn = [e.get("card", "?") for e in draw_events
-                               if e.get("type") == "draw"]
-                forced = [e.get("card", "?") for e in draw_events
-                          if e.get("type") == "forced_event_drawn"]
-                self.logger.log_draw(player_id, cards_drawn, forced)
-                # Log current status (VP, prestige, contribution, order)
-                status = {
-                    "vp": player.vp,
-                    "military": player.military,
-                }
-                if player.faction.value == "jin":
-                    status["prestige"] = player.prestige
-                    status["contribution"] = player.contribution
-                    status["order"] = player.order
-                self.logger.log_action(player_id, "turn_start", "回合开始",
-                                       state_snapshot=status)
-
-            # Iterative action loop: re-query available actions after each action
-            # so the agent always sees the latest state
-            max_actions = 50  # Safety limit
-            for _ in range(max_actions):
-                available = self._get_available_actions(state, player_id)
-                action = agent.decide_action(state, available)
-                if action is None:
-                    break
-
-                result = self.action_system.execute(state, action)
-
-                # Fire passive triggers based on action type
-                if result.success:
-                    trigger_type = self._ACTION_TRIGGER_MAP.get(
-                        getattr(action, 'action_type', ''))
-                    if trigger_type:
-                        self._check_triggers(trigger_type, {
-                            "player_id": player_id,
-                            "action": action,
-                            "result": result,
-                        })
-
-                if self.logger:
-                    from .game_logger import log_action_result
-                    log_action_result(self.logger, action, result, state)
-
-                if not result.success:
-                    pass
-
-            # Fire turn_end triggers
-            self._check_triggers("on_turn_end", {"player_id": player_id})
-
-            # Rulebook §3.4: 军力行动结束时清0
-            # Remaining military is lost — prevents hoarding between turns.
-            player.military = 0
-
-            # Enforce hand limit
-            discarded = 0
-            while len(player.hand) > player.hand_limit:
-                state.main_discard.append(player.hand.pop())
-                discarded += 1
-
-            if self.logger:
-                self.logger.log_end_turn(player_id, discarded,
-                                         player.military, player.vp)
-
-            # 任意玩家行动结束时，弃牌区全部洗入主牌库（重洗牌堆）
-            if len(state.forced_event_pile) >= 3:
-                state.main_discard.extend(state.forced_event_pile)
-                state.forced_event_pile = []
-                self.rng.shuffle(state.main_discard)
-                state.main_deck.extend(state.main_discard)
-                state.main_discard = []
+            self._run_player_turn(state, player_id)
 
         # === Settlement Phase ===
         run_settlement_phase(state, self.rng)
@@ -254,6 +162,105 @@ class GameEngine:
                 court_vp={}, military_gain={}, emperor_age=[],
             )
             self.logger.log_round_end()
+
+    def _run_player_turn(self, state: GameState, player_id: str):
+        """Execute one player's complete turn within the action phase.
+
+        Includes: guard checks, region reward, turn-start triggers, draw,
+        iterative action loop (decide → execute → triggers), turn-end
+        triggers, military reset, hand-limit enforcement, and forced-event
+        pile reshuffle.
+        """
+        from rules.scoring import award_region_control_phase
+
+        player = state.get_player(player_id)
+        if not player:
+            return
+
+        agent = self._get_agent(player_id)
+        if not agent:
+            return
+
+        # Reset action flags (but keep military from settlement)
+        player.reset_action_flags()
+
+        # Rulebook §4.2: 玩家行动开始时结算区控奖励
+        award_region_control_phase(state, player_id=player_id)
+        self._check_triggers("on_region_reward",
+                             {"player_id": player_id, "phase": "player_action"})
+
+        # Fire turn_start triggers
+        self._check_triggers("on_turn_start", {"player_id": player_id})
+
+        # Draw 2 cards
+        draw_events = run_player_draw(state, player_id)
+
+        if self.logger:
+            cards_drawn = [e.get("card", "?") for e in draw_events
+                           if e.get("type") == "draw"]
+            forced = [e.get("card", "?") for e in draw_events
+                      if e.get("type") == "forced_event_drawn"]
+            self.logger.log_draw(player_id, cards_drawn, forced)
+            status = {
+                "vp": player.vp,
+                "military": player.military,
+            }
+            if player.faction.value == "jin":
+                status["prestige"] = player.prestige
+                status["contribution"] = player.contribution
+                status["order"] = player.order
+            self.logger.log_action(player_id, "turn_start", "回合开始",
+                                   state_snapshot=status)
+
+        # Iterative action loop: re-query available actions after each action
+        # so the agent always sees the latest state
+        max_actions = 50  # Safety limit
+        for _ in range(max_actions):
+            available = self._get_available_actions(state, player_id)
+            action = agent.decide_action(state, available)
+            if action is None:
+                break
+
+            result = self.action_system.execute(state, action)
+
+            # Fire passive triggers based on action type
+            if result.success:
+                trigger_type = self._ACTION_TRIGGER_MAP.get(
+                    getattr(action, 'action_type', ''))
+                if trigger_type:
+                    self._check_triggers(trigger_type, {
+                        "player_id": player_id,
+                        "action": action,
+                        "result": result,
+                    })
+
+            if self.logger:
+                from .game_logger import log_action_result
+                log_action_result(self.logger, action, result, state)
+
+        # Fire turn_end triggers
+        self._check_triggers("on_turn_end", {"player_id": player_id})
+
+        # Rulebook §3.4: 军力行动结束时清0
+        player.military = 0
+
+        # Enforce hand limit
+        discarded = 0
+        while len(player.hand) > player.hand_limit:
+            state.main_discard.append(player.hand.pop())
+            discarded += 1
+
+        if self.logger:
+            self.logger.log_end_turn(player_id, discarded,
+                                     player.military, player.vp)
+
+        # 任意玩家行动结束时，弃牌区全部洗入主牌库（重洗牌堆）
+        if len(state.forced_event_pile) >= 3:
+            state.main_discard.extend(state.forced_event_pile)
+            state.forced_event_pile = []
+            self.rng.shuffle(state.main_discard)
+            state.main_deck.extend(state.main_discard)
+            state.main_discard = []
 
     def _get_agent(self, player_id: str) -> Optional[GameAgent]:
         for agent in self.agents:

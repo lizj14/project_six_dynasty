@@ -29,12 +29,17 @@ def _get_jin_setup_order(state: GameState) -> list[PlayerState]:
 
 
 def _get_jin_turn_order(state: GameState) -> list[PlayerState]:
-    """Jin players sorted by 顺位 (order), descending (larger = earlier in turn).
+    """Jin players sorted by 顺位 (order) descending, then 到达顺序 (order_seq) descending.
 
-    Used during game rounds (preparation phase) to build turn_order.
-    Tiebreaker: 先动值 (start_order) ascending (smaller = earlier).
+    Primary: higher order = earlier in turn.
+    Tiebreaker: higher order_seq = arrived at this order later = 后到者优先.
+
+    At game start, order_seq is initialized from start_order (higher 先动值
+    = piece placed on top of the order track = later arrival = priority).
+    During gameplay, order_seq is updated from the global counter on each
+    RaiseOrderAction/LowerOrderAction.
     """
-    return sorted(state.jin_players, key=lambda p: (-p.order, p.start_order))
+    return sorted(state.jin_players, key=lambda p: (-p.order, -p.order_seq))
 
 
 # ================================================================
@@ -576,37 +581,8 @@ def run_preparation_phase(state: GameState, rng: random.Random) -> list[dict]:
 
 
 def run_player_draw(state: GameState, player_id: str):
-    """Execute the draw phase for a player (draw 2 cards, handle forced events)."""
-    player = state.get_player(player_id)
-    if not player:
-        return []
-
-    events = []
-    for _ in range(2):
-        if state.main_deck:
-            card = state.main_deck.pop(0)
-            # Handle forced event cards
-            if card.card_type == CardType.MECHANISM:
-                state.forced_event_pile.append(card)
-                events.append({"type": "forced_event_drawn", "card": card.name})
-                # Don't add to hand — will be resolved separately
-            else:
-                player.hand.append(card)
-                events.append({"type": "draw", "card": card.name})
-        else:
-            # Reshuffle discard into deck
-            if state.main_discard:
-                rng = random.Random(state.seed + state.round)
-                rng.shuffle(state.main_discard)
-                state.main_deck = state.main_discard
-                state.main_discard = []
-                # Try drawing again
-                if state.main_deck:
-                    card = state.main_deck.pop(0)
-                    player.hand.append(card)
-                    events.append({"type": "draw", "card": card.name})
-
-    return events
+    """回合开始时摸2张牌。调用通用摸牌功能。"""
+    return state.draw_cards(player_id, count=2)
 
 
 def run_settlement_phase(state: GameState, rng: random.Random):
@@ -639,6 +615,10 @@ def run_settlement_phase(state: GameState, rng: random.Random):
     # Unlock culture markers
     for loc in state.locations.values():
         loc.culture_locked = False
+
+    # Reset region control markers to face-up for new round
+    from rules.scoring import reset_region_control_markers
+    reset_region_control_markers(state)
 
     # Emperor age check — use real emperor module
     from rules.emperor import check_emperor_age
@@ -696,6 +676,7 @@ def _execute_hero_enter(state: GameState, player: PlayerState, agent):
     player.contribution = min(9, defn.initial_contribution)
     player.prestige = min(9, defn.initial_prestige)
     player.order = defn.initial_order
+    player.order_seq = defn.start_order  # 初始到达顺序=先动值（越高=棋子越在上面=后到者优先）
 
     # Delegate enter effects to EffectResolver
     parsed = defn.parsed_effect

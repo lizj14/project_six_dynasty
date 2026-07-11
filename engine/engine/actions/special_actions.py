@@ -310,12 +310,8 @@ class SpreadCultureAction(GameAction):
                         events.append({"type": "culture_placement_bonus",
                                        "bonus_type": "military", "amount": amount})
                     elif btype == "draw_card":
-                        for _ in range(amount):
-                            if state.main_deck:
-                                card = state.main_deck.pop(0)
-                                player.hand.append(card)
-                        events.append({"type": "culture_placement_bonus",
-                                       "bonus_type": "draw_card", "amount": amount})
+                        draw_events = state.draw_cards(self.player_id, amount)
+                        events.extend(draw_events)
             except ValueError:
                 pass
 
@@ -509,6 +505,7 @@ class RaiseOrderAction(GameAction):
 
         player = state.get_player(self.player_id)
         player.order = min(10, player.order + self.amount)  # Higher = earlier
+        player.order_seq = state.allocate_order_seq()  # 后到者优先
         # Note: order change doesn't affect current round's turn order
 
         state.log_event("raise_order", player=self.player_id, new_order=player.order)
@@ -541,6 +538,7 @@ class LowerOrderAction(GameAction):
 
         target = state.get_player(self.target_player_id)
         target.order = max(0, target.order - self.amount)  # Lower = later
+        target.order_seq = state.allocate_order_seq()  # 后到者优先
 
         state.log_event("lower_order", target=self.target_player_id,
                          new_order=target.order)

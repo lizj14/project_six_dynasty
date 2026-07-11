@@ -106,6 +106,68 @@ class GameState:
     effect_resolver: Optional[Any] = None
     action_system: Optional[Any] = None
 
+    # === Order tiebreaking (后到者优先) ===
+    _order_seq_counter: int = 0             # Global counter for order-change sequencing
+
+    def allocate_order_seq(self) -> int:
+        """Return the next order sequence number (for 后到者优先 tiebreaking).
+
+        Called whenever a player's order changes. Later arrivals get higher
+        sequence numbers and thus go earlier among players with the same order.
+        """
+        self._order_seq_counter += 1
+        return self._order_seq_counter
+
+    # ======== Card Drawing ========
+
+    def draw_cards(self, player_id: str, count: int = 1) -> list[dict]:
+        """通用的摸牌功能。
+
+        处理：
+        - 牌库为空时重洗弃牌堆进牌库
+        - 摸到强制性事件牌时放入强制事件牌区（不加入手牌）
+        - 日志记录
+
+        可在回合开始、行动效果、响应效果等各处复用。
+        返回事件列表，每项含 type ("draw" / "forced_event_drawn") 和 card。
+        """
+        import random as _random
+        from .enums import CardType as _CardType
+
+        player = self.get_player(player_id)
+        if not player:
+            return []
+
+        rng = _random.Random(self.seed + self.round)
+        events = []
+
+        for _ in range(count):
+            # 牌库空 → 重洗弃牌堆进牌库
+            if not self.main_deck:
+                if self.main_discard:
+                    rng.shuffle(self.main_discard)
+                    self.main_deck = self.main_discard
+                    self.main_discard = []
+                else:
+                    break  # 无牌可摸
+
+            if not self.main_deck:
+                break
+
+            card = self.main_deck.pop(0)
+
+            # 强制性事件牌 → 放入强制事件牌区，不加入手牌
+            if card.card_type == _CardType.MECHANISM:
+                self.forced_event_pile.append(card)
+                events.append({"type": "forced_event_drawn", "card": card.name})
+            else:
+                player.hand.append(card)
+                events.append({"type": "draw", "card": card.name})
+
+            self.log_event("draw", player=player_id, card=card.name)
+
+        return events
+
     # ======== Helper Methods ========
 
     def get_player(self, player_id: str) -> Optional[PlayerState]:

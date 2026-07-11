@@ -331,11 +331,24 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
       - Preparation phase: Sima's regions (face-up markers only)
       - Player action start: that player's regions (face-up markers only)
 
-    After awarding, markers are flipped face-down for the rest of the round.
+    Each region can only award VP ONCE per round. After awarding, the
+    region's control marker is flipped face-down (control_face_up=False)
+    for the rest of the round. Reset happens in settlement phase.
     """
     results = check_all_regions(state)
 
     for region, cr in results.items():
+        # Ensure RegionState exists (lazy init)
+        if region not in state.regions:
+            from models.location import RegionState
+            state.regions[region] = RegionState(region=region)
+
+        region_state = state.regions[region]
+
+        # Skip if already scored this round (marker face-down)
+        if not region_state.control_face_up:
+            continue
+
         # Determine who to award
         target = None
         if player_id is None:
@@ -363,3 +376,15 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
                     state.log_event("region_vp", phase="player_action",
                                     player=target, region=region.value, vp=vp)
                     state.check_vp_game_end(target)
+
+            # Flip control marker face-down — this region can't score again this round
+            region_state.control_face_up = False
+
+
+def reset_region_control_markers(state: "GameState"):
+    """Flip all region control markers face-up for the new round.
+
+    Called during settlement phase (rulebook §4.3).
+    """
+    for region_state in state.regions.values():
+        region_state.control_face_up = True

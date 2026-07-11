@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .base import GameAction, ActionResult
-from models.enums import ControlState, TerrainType, FactionType, CardType
+from models.enums import ControlState, TerrainType, FactionType
 
 # ============================================================
 # Occupy (占据)
@@ -265,8 +265,8 @@ class DrawAction(GameAction):
         if player.military < 2:
             return ActionResult.fail(f"Need 2 military, have {player.military}")
 
-        if not state.main_deck:
-            return ActionResult.fail("Main deck is empty")
+        if not state.main_deck and not state.main_discard:
+            return ActionResult.fail("No cards available to draw")
 
         return ActionResult.ok()
 
@@ -279,19 +279,7 @@ class DrawAction(GameAction):
         player.military -= 2
         player.has_drawn_quick = True
 
-        # Draw from main deck
-        card = state.main_deck.pop(0)
-        player.hand.append(card)
-
-        events = [{"type": "draw", "player": self.player_id, "card": card.name}]
-
-        # Check for forced event (强制事件牌)
-        if card.card_type == CardType.MECHANISM:
-            events.append({"type": "forced_event_drawn", "card": card.name})
-            # Forced events must be resolved immediately
-            # This will be handled by the game loop
-
-        state.log_event("draw", player=self.player_id, card=card.name)
+        events = state.draw_cards(self.player_id, count=1)
         return ActionResult.ok(events)
 
     def cost_description(self, state: "GameState") -> str:

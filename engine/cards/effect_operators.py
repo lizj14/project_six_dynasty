@@ -159,14 +159,9 @@ class DrawCardsOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        player = state.get_player(player_id)
         count = step.params.get("count", 1)
-        for _ in range(count):
-            if state.main_deck:
-                card = state.main_deck.pop(0)
-                if player:
-                    player.hand.append(card)
-                result.events.append({"type": "draw", "card": card.name})
+        draw_events = state.draw_cards(player_id, count)
+        result.events.extend(draw_events)
         return result
 
 
