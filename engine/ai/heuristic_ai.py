@@ -32,6 +32,8 @@ class HeuristicAI(GameAgent):
     def __init__(self, player_id: str = "", seed: int = 0):
         self.player_id = player_id
         self.rng = random.Random(seed)
+        self._chain_occupy: bool = False       # Chain occupy after successful march
+        self._last_march_target: str = ""
 
     # === Setup ===
 
@@ -84,7 +86,21 @@ class HeuristicAI(GameAgent):
                       available_actions: list) -> Optional["GameAction"]:
         """Score each available action and pick the best. Pass if score too low."""
         if not available_actions:
+            self._chain_occupy = False
             return None
+
+        # ── Chain march → occupy ─────────────────────
+        # After a successful march, immediately try to occupy the same location
+        # if military remains.
+        if self._chain_occupy:
+            self._chain_occupy = False
+            occupy_actions = [a for a in available_actions
+                            if getattr(a, 'action_type', '') == "occupy"]
+            if occupy_actions:
+                for a in occupy_actions:
+                    if getattr(a, 'target_location', '') == self._last_march_target:
+                        return a
+                return self.rng.choice(occupy_actions)
 
         scored = []
         for action in available_actions:
@@ -97,7 +113,16 @@ class HeuristicAI(GameAgent):
 
         # Sort by score descending, add small random jitter to break ties
         scored.sort(key=lambda x: x[0] + self.rng.uniform(-0.2, 0.2), reverse=True)
-        return scored[0][1]
+        chosen = scored[0][1]
+
+        # Chain march → occupy: set flag so next decide_action picks occupy
+        if getattr(chosen, 'action_type', '') == "march":
+            self._chain_occupy = True
+            self._last_march_target = getattr(chosen, 'target_location', '')
+        else:
+            self._chain_occupy = False
+
+        return chosen
 
     def _score_action(self, action, state: "GameState") -> float:
         """Score a single action from 0-10.
@@ -135,18 +160,21 @@ class HeuristicAI(GameAgent):
             return 2.0  # Conditional value
         elif atype == "levy":
             return 2.0  # Draft new court cards
+        elif atype == "activate_effect":
+            return self._score_activate_effect(action, state)
+        elif atype == "play_public_card":
+            return self._score_play_public_card(action, state)
         else:
             return 1.0  # Unknown — worth trying
 
     # ── Action-specific scorers ──────────────────────────────
 
     def _score_court_action(self, action, state) -> float:
-        """Score court (牌组) actions based on resource gain."""
+        """Score court (牌组) actions based on resource gain and affordability."""
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
 
-        # Check if we can afford it (court actions typically cost military)
         card_id = getattr(action, 'card_id', '')
         court = state.get_court_cards(self.player_id)
         for card in court:
@@ -154,8 +182,17 @@ class HeuristicAI(GameAgent):
                 defn = card.definition
                 score = 0.0
 
-                # Parse expected resource gain from parsed AST
+                # ── Check block-level costs first ──────────────
                 parsed = defn.parsed_effect
+                if parsed:
+                    for block in parsed.blocks:
+                        if block.ability_type != AbilityType.STRATEGY_ACTION:
+                            continue
+                        for bc in block.costs:
+                            if not self._can_afford_cost(bc, player, state):
+                                return 0.0  # Can't afford → skip
+
+                # Parse expected resource gain from parsed AST
                 if parsed:
                     for block in parsed.blocks:
                         if block.ability_type != AbilityType.STRATEGY_ACTION:
@@ -198,7 +235,7 @@ class HeuristicAI(GameAgent):
         return 2.0  # Default: worth trying
 
     def _score_play_card(self, action, state) -> float:
-        """Score playing a card from hand based on its effects."""
+        """Score playing a card from hand based on its effects and affordability."""
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
@@ -211,6 +248,21 @@ class HeuristicAI(GameAgent):
         defn = card.definition
         cost = defn.cost or 0
         score = 0.0
+
+        # ── Check play_condition first ─────────────────────
+        parsed = defn.parsed_effect
+        if parsed and parsed.play_condition:
+            resolver = getattr(state, 'effect_resolver', None)
+            if resolver and not resolver.check_condition(
+                parsed.play_condition, state, self.player_id):
+                return 0.0  # Condition not met → can't play
+
+        # ── Check block-level costs ────────────────────────
+        if parsed:
+            for block in parsed.blocks:
+                for bc in block.costs:
+                    if not self._can_afford_cost(bc, player, state):
+                        return 0.0  # Can't afford → skip
 
         # Friend cards (幕僚): provide ongoing passive/enter effects
         if card.is_friend:
@@ -348,7 +400,11 @@ class HeuristicAI(GameAgent):
         return max(0.0, min(score, 10.0))
 
     def _score_occupy(self, action, state) -> float:
-        """Score occupying a neutral location."""
+        """Score occupying a neutral/empty location.
+
+        High priority for adjacent empty locations — these are free real estate
+        that give VP from region control without combat.
+        """
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
@@ -357,12 +413,18 @@ class HeuristicAI(GameAgent):
             return 0.0
 
         target = getattr(action, 'target_location', '')
-        score = 1.5  # Base value
+        score = 3.0  # Base: high priority — occupying is a key action
+
+        # Adjacent empty location: extra value (closer to our territory)
+        friendly = state.get_friendly_locations(self.player_id)
+        neighbors = state.get_adjacent_locations(target)
+        if any(nb in friendly for nb in neighbors):
+            score += 2.0  # Adjacent to our territory — even better
 
         # Region VP value
         for reg, cfg in REGION_CONFIG.items():
             if target in cfg.get("locations", []):
-                score += cfg.get("vp_per_location", 1) * 1.0
+                score += cfg.get("vp_per_location", 1) * 1.5
                 break
 
         return max(0.0, min(score, 10.0))
@@ -412,16 +474,37 @@ class HeuristicAI(GameAgent):
         return score
 
     def _score_recruit(self, action, state) -> float:
-        """Score recruiting (discard 1 card → 1 military)."""
+        """Score recruiting (discard 1 card → 1 military).
+
+        High priority when empty occupiable locations exist but no military.
+        """
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
+
+        # Check: are there empty occupiable adjacent locations?
+        friendly = state.get_friendly_locations(self.player_id)
+        has_occupy_targets = False
+        for loc_id, loc in state.locations.items():
+            if loc.controller == ControlState.EMPTY:
+                neighbors = state.get_adjacent_locations(loc_id)
+                if any(nb in friendly for nb in neighbors):
+                    has_occupy_targets = True
+                    break
+
+        # If empty occupiable locations exist AND no military, recruit is top priority
+        if has_occupy_targets and player.military == 0:
+            return 8.0  # High priority: need military to occupy
 
         # Only recruit if hand has expendable cards and military is low
         if len(player.hand) <= 2:
             return 0.0  # Keep cards
         if player.military >= 5:
             return 0.5  # Don't need it
+
+        # If occupy targets exist with low military, higher priority
+        if has_occupy_targets and player.military < 2:
+            return 4.0
 
         return 1.5  # Worth considering
 
@@ -467,6 +550,120 @@ class HeuristicAI(GameAgent):
             return 2.0
         else:
             return 1.0
+
+    def _score_activate_effect(self, action, state) -> float:
+        """Score activating a hero or staff card's active ability."""
+        player = state.get_player(self.player_id)
+        if not player:
+            return 0.0
+
+        card_id = getattr(action, 'card_id', '')
+        block_index = getattr(action, 'block_index', 0)
+
+        # Find the card
+        card = None
+        if player.hero and player.hero.definition.card_id == card_id:
+            card = player.hero
+        else:
+            for c in player.staff_area:
+                if c.definition.card_id == card_id:
+                    card = c
+                    break
+        if not card:
+            return 0.0
+
+        parsed = card.definition.parsed_effect
+        if not parsed:
+            return 0.0
+
+        active_blocks = [b for b in parsed.blocks if b.ability_type == AbilityType.ACTIVE]
+        if block_index >= len(active_blocks):
+            return 0.0
+
+        block = active_blocks[block_index]
+
+        # ── Check affordability ──────────────────────────
+        for cost in block.costs:
+            if not self._can_afford_cost(cost, player, state):
+                return 0.0  # Can't afford
+
+        score = 2.0  # Base value for active abilities
+
+        # Score the expected gains
+        for step in block.steps:
+            score += self._step_value(step)
+
+        # If choice_options, score the best option
+        if block.choice_options:
+            best_choice = 0.0
+            for option_steps in block.choice_options:
+                opt_score = sum(self._step_value(s) for s in option_steps)
+                best_choice = max(best_choice, opt_score)
+            score += best_choice
+
+        return max(0.0, min(score, 10.0))
+
+    def _score_play_public_card(self, action, state) -> float:
+        """Score using a public action card."""
+        player = state.get_player(self.player_id)
+        if not player:
+            return 0.0
+
+        card_id = getattr(action, 'card_id', '')
+
+        # Find the card in public pool
+        pool_card = None
+        for c in state.public_action_pool:
+            if c.definition.card_id == card_id:
+                pool_card = c
+                break
+        if not pool_card:
+            return 0.0
+
+        defn = pool_card.definition
+        score = 1.0
+        cost = defn.cost or 0
+
+        # ── Check play_condition ─────────────────────────
+        parsed = defn.parsed_effect
+        if parsed and parsed.play_condition:
+            resolver = getattr(state, 'effect_resolver', None)
+            if resolver and not resolver.check_condition(
+                parsed.play_condition, state, self.player_id):
+                return 0.0  # Condition not met
+
+        # ── Check block-level costs ──────────────────────
+        if parsed:
+            for block in parsed.blocks:
+                for cost_item in block.costs:
+                    if not self._can_afford_cost(cost_item, player, state):
+                        return 0.0  # Can't afford
+
+                # Score resource gains
+                for step in block.steps:
+                    score += self._step_value(step)
+
+        # Payment cost: discard hand cards
+        score -= cost * 0.5
+
+        return max(0.0, min(score, 10.0))
+
+    def _can_afford_cost(self, cost, player, state) -> bool:
+        """Check whether the player can afford a block-level cost."""
+        ct = cost.cost_type if hasattr(cost, 'cost_type') else cost.get('cost_type', '')
+        params = cost.params if hasattr(cost, 'params') else cost
+
+        if ct == "pay_military":
+            amount = params.get("amount", 0) if isinstance(params, dict) else getattr(cost, 'amount', 0)
+            return player.military >= amount
+        elif ct == "pay_vp":
+            amount = params.get("amount", 0) if isinstance(params, dict) else getattr(cost, 'amount', 0)
+            return player.vp >= amount
+        elif ct == "discard_cards":
+            count = params.get("count", 1) if isinstance(params, dict) else getattr(cost, 'count', 1)
+            return len(player.hand) >= count
+        # Unknown cost type — assume affordable
+        return True
 
     # === Legacy ===
 

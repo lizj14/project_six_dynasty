@@ -218,7 +218,7 @@ class MarkerCountGtCondition(ConditionOperator):
             return False
         mt = self._parse_marker(condition.params.get("marker", ""))
         threshold = condition.params.get("threshold", 0)
-        return player.get_marker(mt) > threshold if mt else False
+        return player.get_marker_total(mt, state) > threshold if mt else False
 
 
 @register_condition
@@ -232,7 +232,7 @@ class MarkerCountCondition(ConditionOperator):
             return False
         mt = self._parse_marker(condition.params.get("marker", ""))
         min_val = condition.params.get("min", 0)
-        return player.get_marker(mt) >= min_val if mt else False
+        return player.get_marker_total(mt, state) >= min_val if mt else False
 
 
 @register_condition

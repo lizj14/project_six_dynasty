@@ -120,7 +120,7 @@
 ```
 
 **角色牌特有字段：**
-- `start_order`: 先动值（越小越先行动）
+- `start_order`: 先动值（越大越先行动，与顺位方向一致）
 - `initial_contribution`: 初始功绩
 - `initial_prestige`: 初始威望
 - `initial_order`: 初始顺位

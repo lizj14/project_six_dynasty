@@ -12,25 +12,19 @@ class TestGameEngine:
 
     @pytest.fixture
     def engine_setup(self):
-        """Setup a game engine with 4 DummyAIs."""
-        from cards.loader import load_card_design_csv
+        """Setup a game engine with 4 DummyAIs using Version.load('v1.0')."""
+        from config.version import Version
         from ai.dummy_ai import DummyAI
         from engine.game import GameEngine
 
-        csv_path = os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "card_design.csv"
-        )
-        if not os.path.exists(csv_path):
-            pytest.skip("card_design.csv not found")
-
-        lib = load_card_design_csv(csv_path)
+        v = Version.load('v1.0')
         agents = [
             DummyAI(player_id="north", seed=1),
             DummyAI(player_id="jin_1", seed=2),
             DummyAI(player_id="jin_2", seed=3),
             DummyAI(player_id="jin_3", seed=4),
         ]
-        engine = GameEngine(library=lib, agents=agents, seed=42)
+        engine = GameEngine(agents=agents, version=v, seed=42)
         return engine
 
     def test_game_runs_without_crash(self, engine_setup):
@@ -57,21 +51,15 @@ class TestGameEngine:
 
     def test_multiple_games_deterministic(self, engine_setup):
         """Same seed should produce same result."""
-        from cards.loader import load_card_design_csv
+        from config.version import Version
         from ai.dummy_ai import DummyAI
         from engine.game import GameEngine
 
-        csv_path = os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "card_design.csv"
-        )
-        if not os.path.exists(csv_path):
-            pytest.skip("card_design.csv not found")
-
-        lib = load_card_design_csv(csv_path)
+        v = Version.load('v1.0')
 
         # Run two games with same seed
-        scores1 = _run_game_with_seed(lib, 42)
-        scores2 = _run_game_with_seed(lib, 42)
+        scores1 = _run_game_with_version(v, 42)
+        scores2 = _run_game_with_version(v, 42)
         assert scores1 == scores2, "Same seed should produce identical results"
 
     def test_game_ends_by_round_10(self, engine_setup):
@@ -82,18 +70,11 @@ class TestGameEngine:
 
     def test_ten_games_no_crash(self, engine_setup):
         """Run 10 games with different seeds — all should complete."""
-        import random
-        from cards.loader import load_card_design_csv
+        from config.version import Version
         from ai.dummy_ai import DummyAI
         from engine.game import GameEngine
 
-        csv_path = os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "card_design.csv"
-        )
-        if not os.path.exists(csv_path):
-            pytest.skip("card_design.csv not found")
-
-        lib = load_card_design_csv(csv_path)
+        v = Version.load('v1.0')
 
         for i in range(10):
             seed = i * 100 + 1
@@ -103,7 +84,7 @@ class TestGameEngine:
                 DummyAI(player_id="jin_2", seed=seed + 2),
                 DummyAI(player_id="jin_3", seed=seed + 3),
             ]
-            engine = GameEngine(library=lib, agents=agents, seed=seed)
+            engine = GameEngine(agents=agents, version=v, seed=seed)
             try:
                 final_state = engine.run()
                 assert final_state.phase.value == "game_over"

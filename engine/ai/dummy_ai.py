@@ -30,8 +30,8 @@ def _can_march_after_recruit(state: "GameState", player_id: str,
     player_cs = state._player_control_state(player_id)
 
     for loc_id, loc in state.locations.items():
-        # Skip friendly or neutral locations (march targets must be enemy)
-        if loc.is_friendly_to(player_cs) or loc.controller == ControlState.NEUTRAL:
+        # Skip friendly or empty locations (march targets must be enemy/neutral)
+        if loc.is_friendly_to(player_cs) or loc.controller == ControlState.EMPTY:
             continue
 
         # Must be adjacent to a friendly location
@@ -54,16 +54,17 @@ def _can_march_after_recruit(state: "GameState", player_id: str,
         if loc.is_fortified:
             cost += 1
 
-        # Isolated location: -1
+        # Isolated location: -1 (only for player/Sima-controlled targets)
         target_cs = loc.controller
-        isolated = True
-        for nb in neighbors:
-            nb_loc = state.locations.get(nb)
-            if nb_loc and nb_loc.is_friendly_to(target_cs):
-                isolated = False
-                break
-        if isolated:
-            cost -= 1
+        if target_cs and target_cs not in (ControlState.NEUTRAL, ControlState.EMPTY):
+            isolated = True
+            for nb in neighbors:
+                nb_loc = state.locations.get(nb)
+                if nb_loc and nb_loc.is_friendly_to(target_cs):
+                    isolated = False
+                    break
+            if isolated:
+                cost -= 1
 
         cost = max(1, cost)
 
@@ -104,6 +105,8 @@ class DummyAI(GameAgent):
         self.rng = random.Random(seed)
         self._recruit_count: int = 0
         self._last_round: int = -1
+        self._chain_occupy: bool = False       # Chain occupy after successful march
+        self._last_march_target: str = ""      # Track march target for chaining
 
     # === Setup ===
 
@@ -145,7 +148,22 @@ class DummyAI(GameAgent):
           - Randomly decides to stop (5-10% chance per call).
         """
         if not available_actions:
+            self._chain_occupy = False
             return None
+
+        # ── Chain march → occupy ─────────────────────
+        # After a successful march, immediately try to occupy the same location
+        # if military remains (rulebook: march captures, occupy fortifies)
+        if self._chain_occupy:
+            self._chain_occupy = False
+            occupy_actions = [a for a in available_actions
+                            if getattr(a, 'action_type', '') == "occupy"]
+            if occupy_actions:
+                # Prefer the marched target if available, otherwise any occupy
+                for a in occupy_actions:
+                    if getattr(a, 'target_location', '') == self._last_march_target:
+                        return a
+                return self.rng.choice(occupy_actions)
 
         # Reset per-turn tracking if round changed
         if state.round != self._last_round:
@@ -157,23 +175,33 @@ class DummyAI(GameAgent):
 
         # ── Dummy AI recruit filtering ────────────────────
         # Only consider recruit if: (a) < 2 this turn, and
-        # (b) marching is possible with military after recruiting
+        # (b) marching is possible with military after recruiting, OR
+        #     military is 0 and no better actions exist
         can_march = _can_march_after_recruit(state, self.player_id, military)
+        has_useful_actions = any(
+            getattr(a, 'action_type', '') not in ("recruit",)
+            for a in available_actions
+        )
         filtered_actions = []
         for a in available_actions:
             if getattr(a, 'action_type', '') == "recruit":
                 if self._recruit_count >= 2:
                     continue          # Rule: max 2 per turn
-                if not can_march:
-                    continue          # Heuristic: won't recruit if still can't march
+                if not can_march and has_useful_actions:
+                    continue          # Only skip recruit when better options exist
             filtered_actions.append(a)
 
         available_actions = filtered_actions
         if not available_actions:
             return None
 
-        # 5-10% chance to stop early, simulating "pass"
-        pass_chance = 0.05 if military > 0 else 0.15
+        # Pass chance: military>0 → 5%, military=0+useful → 0%, military=0+only_recruit → 50%
+        if military > 0:
+            pass_chance = 0.05
+        elif has_useful_actions:
+            pass_chance = 0.0     # Never pass when there are real actions available
+        else:
+            pass_chance = 0.5     # Only recruit is available — 50% pass
         if self.rng.random() < pass_chance:
             return None
 
@@ -237,6 +265,13 @@ class DummyAI(GameAgent):
         # Track recruit count
         if getattr(chosen, 'action_type', '') == "recruit":
             self._recruit_count += 1
+
+        # Chain march → occupy: set flag so next decide_action picks occupy
+        if getattr(chosen, 'action_type', '') == "march":
+            self._chain_occupy = True
+            self._last_march_target = getattr(chosen, 'target_location', '')
+        else:
+            self._chain_occupy = False
 
         return chosen
 

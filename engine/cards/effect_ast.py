@@ -131,6 +131,15 @@ class EffectType:
     NOOP = "noop"
     RAW = "raw"  # Unparsed effect, stored as text
 
+    # Meta-effects
+    EXTRA_ACTION = "extra_action"
+    TARGETED_EFFECT = "targeted_effect"
+
+    # Map actions (variants)
+    CONVERT_OWN_TO_NEUTRAL = "convert_own_to_neutral"
+    CONVERT_TO_NEUTRAL = "convert_to_neutral"
+    CONVERT_TO_SIMA = "convert_to_sima"
+
 
 class AbilityType:
     """Constants for ability_type values."""

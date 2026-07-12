@@ -20,25 +20,32 @@ from cards.effect_resolver import EffectResolver
 # ================================================================
 
 def _get_jin_setup_order(state: GameState) -> list[PlayerState]:
-    """Jin players sorted by 先动值 (start_order), ascending (smaller = earlier).
+    """Jin players sorted by 先动值 (start_order), descending (higher = earlier).
 
     Used during setup phase (hero enter + face-down cards).
     start_order is set from the hero card and never modified during gameplay.
+    Direction is consistent with order (higher = earlier in turn).
     """
-    return sorted(state.jin_players, key=lambda p: p.start_order)
+    return sorted(state.jin_players, key=lambda p: -p.start_order)
 
 
 def _get_jin_turn_order(state: GameState) -> list[PlayerState]:
-    """Jin players sorted by 顺位 (order) descending, then 到达顺序 (order_seq) descending.
+    """Jin players sorted for the action phase.
 
-    Primary: higher order = earlier in turn.
-    Tiebreaker: higher order_seq = arrived at this order later = 后到者优先.
+    Round 1 (初设后的第一回合): sorted by 先动値 (start_order) descending.
+      start_order is the only criterion — higher = earlier in turn.
 
-    At game start, order_seq is initialized from start_order (higher 先动值
-    = piece placed on top of the order track = later arrival = priority).
+    Round 2+: sorted by 顺位 (order) descending, then 到达顺序 (order_seq) descending.
+      Primary: higher order = earlier in turn.
+      Tiebreaker: higher order_seq = arrived at this order later = 后到者优先.
+
     During gameplay, order_seq is updated from the global counter on each
     RaiseOrderAction/LowerOrderAction.
     """
+    if state.round <= 1:
+        # Round 1: 先动值决定行动顺序（越大越先，与顺位方向一致）
+        return sorted(state.jin_players, key=lambda p: -p.start_order)
+    # Round 2+: 顺位决定行动顺序（越高越先，同顺位则后到者优先）
     return sorted(state.jin_players, key=lambda p: (-p.order, -p.order_seq))
 
 
@@ -369,12 +376,20 @@ def _execute_setup_effects(state: GameState, agents: list,
                            action_system, logger):
     """Execute hero enter effects, face-down cards, and count initial armies.
 
-    Hero enter: North always first, then Jin sorted by 先动值 (start_order) ascending.
+    Hero enter: North always first, then Jin sorted by 先动值 (start_order) descending (higher = earlier).
     """
-    # --- Hero enter effects (登场), sorted by 先动值 ---
-    # North always first, Jin players sorted by start_order ascending (rulebook §2.2)
-    _execute_hero_enter(state, state.north_player, agents[0])
+    # Wire select_target_callback BEFORE any effect execution.
+    # During setup_game(), the engine's _post_setup_init hasn't run yet,
+    # so we must provide a temporary callback that uses the agents list.
     agent_map = {a.player_id: a for a in agents}
+    if state.effect_resolver and not state.effect_resolver.select_target_callback:
+        state.effect_resolver.select_target_callback = lambda pid, prompt: (
+            agent_map[pid].select_target(state, prompt) if pid in agent_map else None
+        )
+
+    # --- Hero enter effects (登场), sorted by 先动值 ---
+    # North always first, Jin players sorted by start_order descending (rulebook §2.2)
+    _execute_hero_enter(state, state.north_player, agents[0])
     for jin_player in _get_jin_setup_order(state):
         _execute_hero_enter(state, jin_player, agent_map.get(jin_player.player_id))
 
@@ -382,6 +397,12 @@ def _execute_setup_effects(state: GameState, agents: list,
     state._setup_cards_played = _execute_setup_face_down_cards(
         state, action_system, logger,
     )
+
+    # --- Refill court from national decks after face-down play ---
+    # Face-down strategy cards went to the national deck (insert at top).
+    # Fill the court back to 10 cards without discarding remaining court cards.
+    _fill_court_to(state, "north", 10)
+    _fill_court_to(state, "jin", 10)
 
     # --- Count initial army placements from map ---
     state.north_player.army_placed_count = sum(
@@ -419,7 +440,7 @@ def _execute_setup_face_down_cards(state: GameState, action_system,
                                     logger=None) -> dict:
     """Execute initial face-down cards (rulebook §4.1 step 7).
 
-    North first, then Jin players sorted by 先动值 (start_order, ascending).
+    North first, then Jin players sorted by 先动值 (start_order, descending).
     Delegates to PlayCardAction via action_system.execute() — same code path
     as normal card play.  Faction restriction and event condition checks are
     handled inside PlayCardAction.execute() (cards discarded on failure).
@@ -666,6 +687,34 @@ def _refresh_court(state: GameState, faction: str, rng: random.Random):
             target.append(deck.pop(0))
 
 
+def _fill_court_to(state: GameState, faction: str, target_size: int = 10):
+    """Fill the court to target_size from the national deck WITHOUT discarding.
+
+    Unlike _refresh_court, this preserves existing court cards — used during
+    setup when face-down strategy cards have been added to the national deck
+    and the court needs to be topped up.
+    """
+    import random as _random
+    if faction == "north":
+        court = state.north_court
+        deck = state.north_deck
+        discard = state.north_discard
+    else:
+        court = state.jin_court
+        deck = state.jin_deck
+        discard = state.jin_discard
+
+    while len(court) < target_size:
+        if not deck and discard:
+            _random.shuffle(discard)
+            deck.extend(discard)
+            discard.clear()
+        if deck:
+            court.append(deck.pop(0))
+        else:
+            break
+
+
 def _execute_hero_enter(state: GameState, player: PlayerState, agent):
     """Execute a hero card's 登场 (enter play) effect.
 
@@ -683,7 +732,7 @@ def _execute_hero_enter(state: GameState, player: PlayerState, agent):
     player.contribution = min(9, defn.initial_contribution)
     player.prestige = min(9, defn.initial_prestige)
     player.order = defn.initial_order
-    player.order_seq = defn.start_order  # 初始到达顺序=先动值（越高=棋子越在上面=后到者优先）
+    player.order_seq = 0  # 初始到达顺序均为0，先动值仅在初设阶段决定登场顺序
 
     # Delegate enter effects to EffectResolver
     parsed = defn.parsed_effect

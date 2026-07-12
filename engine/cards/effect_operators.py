@@ -245,6 +245,8 @@ class PlayCardOperator(EffectOperator):
         result = ResolveResult()
         player = state.get_player(player_id)
         count = step.params.get("count", 1)
+        may = step.params.get("may", False)
+        card_type_filter = step.params.get("card_type")  # e.g. "friend" for 刘裕 active
         filter_spec = step.params.get("filter")  # e.g. {"marker": "military"} or {"exclude_marker": "military"}
         for i in range(count):
             card_ids = context.get("play_card_ids", []) if context else []
@@ -263,6 +265,16 @@ class PlayCardOperator(EffectOperator):
                             if not r.success:
                                 if not r.success: result.errors.append(r.error or "action failed")
                         break
+            elif may and player:
+                # may=True without card_id: grant extra hand action so the player
+                # can choose to play a card (or skip — logged at end of turn).
+                player.extra_hand_actions += 1
+                result.events.append({
+                    "type": "extra_action_granted", "action_type": "hand_action",
+                    "count": 1, "may": True,
+                    "card_type": card_type_filter, "filter": filter_spec,
+                    "source": "play_card_effect",
+                })
             else:
                 result.events.append({
                     "type": "play_card_requested", "count": count,
@@ -594,6 +606,20 @@ class ConvertOperator(EffectOperator):
         neutral_only = ('neutral' in restriction)
         filter_spec = p.get("filter")
 
+        # 0. Context-provided location (from targeted_effect location resolution)
+        ctx_loc = (context or {}).get("target_location")
+        if ctx_loc:
+            action = ConvertAction(
+                player_id=player_id,
+                target_location=ctx_loc,
+                neutral_only=neutral_only,
+            )
+            r = resolver.action_system.execute(state, action)
+            result.events.extend(r.events if r.success else [])
+            if not r.success:
+                if not r.success: result.errors.append(r.error or "action failed")
+            return result
+
         # 1. Hardcoded locations — execute directly
         if locs:
             count = p.get("count", len(locs))
@@ -624,6 +650,7 @@ class ConvertOperator(EffectOperator):
                             player_id=player_id,
                             target_location=target,
                             neutral_only=neutral_only,
+                            from_filtered_choice=True,
                         )
                         r = resolver.action_system.execute(state, action)
                         result.events.extend(r.events if r.success else [])
@@ -1008,8 +1035,10 @@ class AddRefugeeOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         count = step.params.get("count", 1)
+        target = step.params.get("target", "")
         # TODO: Phase 2a — implement refugee supply population logic
-        result.events.append({"type": "add_refugee_requested", "count": count})
+        result.events.append({"type": "add_refugee_requested",
+                              "count": count, "target": target})
         return result
 
 
@@ -1068,9 +1097,15 @@ class ChooseOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        # Meta type — choice resolution happens at the block level (_resolve_block)
-        # Individual choice options are executed as their own steps
-        result.events.append({"type": "choose", "options": len(step.params.get("options", []))})
+        # Retrieve options from params (placed there by _dict_to_step
+        # when compiled JSON has choice_options at step level)
+        options = step.params.get("choice_options") or step.params.get("options", [])
+        choice_idx = (context or {}).get("choice_index", 0)
+        chosen_label = f"option_{choice_idx + 1}" if options else "none"
+        result.events.append({"type": "choose",
+                              "options": len(options),
+                              "chosen": choice_idx,
+                              "chosen_label": chosen_label})
         return result
 
 
@@ -1114,4 +1149,579 @@ class RawOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         result.events.append({"type": "raw_effect", "text": step.source_text})
+        return result
+
+
+@register
+class StealRandomCardOperator(EffectOperator):
+    """Randomly steal card(s) from target player's hand.
+
+    Used by 轻骑兵 and other cards via targeted_effect:
+    target a player, then steal_random_card from them.
+    The source_player (who activated the card) is read from context.
+    """
+    effect_type = "steal_random_card"
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        import random
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+        target = state.get_player(player_id)
+        if not target or not target.hand:
+            result.events.append({"type": "steal_random_card",
+                                  "skipped": True, "reason": "no_cards_in_hand",
+                                  "from_player": player_id})
+            return result
+
+        # Steal random cards from target's hand
+        # player_id = victim (target of steal)
+        # context.source_player = original card activator (who receives stolen cards)
+        source_player_id = (context or {}).get("source_player", player_id)
+        source_player = state.get_player(source_player_id)
+        rng = random.Random(state.seed + state.round + hash(player_id) % 10000)
+        stolen = []
+        for _ in range(min(count, len(target.hand))):
+            idx = rng.randint(0, len(target.hand) - 1)
+            card = target.hand.pop(idx)
+            if source_player and source_player_id != player_id:
+                source_player.hand.append(card)
+                stolen.append({"card": card.name, "from": player_id, "to": source_player_id})
+            else:
+                state.main_discard.append(card)
+                stolen.append({"card": card.name, "from": player_id, "to": "discard"})
+
+        for s in stolen:
+            result.events.append({"type": "steal_random_card",
+                                  "card": s["card"], "from_player": s["from"],
+                                  "to_player": s["to"]})
+        return result
+
+
+@register
+class ExtraActionOperator(EffectOperator):
+    """Grant an extra action (court_action or hand_action) this turn.
+
+    Used by cards like 慕容儁 (extra court action) and 苻坚 (extra hand action).
+    The operator increments the player's extra action counter; the action system
+    reads this counter to determine availability.
+    """
+    effect_type = EffectType.EXTRA_ACTION
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        player = state.get_player(player_id)
+        if not player:
+            return ResolveResult(success=False, errors=["Player not found"])
+
+        action_type = step.params.get("action_type", "court_action")
+        may = step.params.get("may", False)
+        count = step.params.get("count", 1)
+
+        if action_type == "court_action":
+            player.extra_court_actions += count
+        elif action_type == "hand_action":
+            player.extra_hand_actions += count
+
+        result.events.append({
+            "type": "extra_action_granted",
+            "action_type": action_type,
+            "count": count,
+            "may": may,
+        })
+        return result
+
+
+@register
+class TargetedEffectOperator(EffectOperator):
+    """Meta-effect: resolve sub_effects against a different target.
+
+    Used by 21+ cards (功高不赏, 衣冠南渡, 鸩酒, etc.) to apply effects
+    to players/cards/locations other than the card activator.
+
+    Target spec structure:
+      {
+        "type": "player" | "jin_player" | "north_player" | "other_jin_player" | ...,
+        "selection": "choose" | "each" | "random" | "all",
+        "count": 1,
+        "filters": [{"type": "highest_contribution"}, ...]
+      }
+    """
+    effect_type = EffectType.TARGETED_EFFECT
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+
+        target_spec = step.params.get("target", {})
+        if not target_spec:
+            return ResolveResult(success=False, errors=["targeted_effect: no target spec"])
+
+        # Normalise sub_effect/sub_effects to a list
+        sub_effects = step.params.get("sub_effects", [])
+        if not sub_effects:
+            sub = step.params.get("sub_effect")
+            if sub:
+                sub_effects = [sub]
+
+        if not sub_effects:
+            return ResolveResult(success=False, errors=["targeted_effect: no sub_effects"])
+
+        # Enrich context with source player (original card activator)
+        enriched_ctx = dict(context or {})
+        enriched_ctx["source_player"] = player_id
+
+        t = target_spec.get("type", "player")
+
+        # ── Location targets ──────────────────────────────────
+        if t in ("location", "sima"):
+            location_ids = self._resolve_location_targets(
+                target_spec, state, player_id, resolver)
+            if not location_ids:
+                result.events.append({
+                    "type": "targeted_effect",
+                    "target_type": t,
+                    "targets_found": 0,
+                    "skipped": True,
+                    "reason": "no_matching_locations",
+                })
+                return result
+
+            for loc_id in location_ids:
+                # Pass location_id through context for sub-effects
+                loc_ctx = dict(enriched_ctx)
+                loc_ctx["target_location"] = loc_id
+                for sub_dict in sub_effects:
+                    sub_step = self._dict_to_effect_step(sub_dict)
+                    sub_result = resolver._execute_step(
+                        sub_step, state, player_id, loc_ctx)
+                    result.events.extend(sub_result.events)
+                    result.errors.extend(sub_result.errors)
+
+            result.events.insert(0, {
+                "type": "targeted_effect",
+                "target_type": t,
+                "targets_found": len(location_ids),
+                "targets": location_ids,
+            })
+            return result
+
+        # ── Player targets ────────────────────────────────────
+        target_pids = self._resolve_target_players(
+            target_spec, state, player_id, resolver)
+
+        if not target_pids:
+            result.events.append({
+                "type": "targeted_effect",
+                "target_type": t,
+                "targets_found": 0,
+                "skipped": True,
+                "reason": "no_matching_targets",
+            })
+            return result
+
+        # Apply sub-effects to each target player
+        for target_pid in target_pids:
+            for sub_dict in sub_effects:
+                sub_step = self._dict_to_effect_step(sub_dict)
+                sub_result = resolver._execute_step(
+                    sub_step, state, target_pid, enriched_ctx)
+                result.events.extend(sub_result.events)
+                result.errors.extend(sub_result.errors)
+
+        result.events.insert(0, {
+            "type": "targeted_effect",
+            "target_type": t,
+            "targets_found": len(target_pids),
+            "targets": target_pids,
+        })
+        return result
+
+    # ---- target resolution ------------------------------------------------
+
+    def _resolve_target_players(self, spec, state, source_pid, resolver):
+        """Return list of player IDs matching the target spec."""
+        t = spec.get("type", "player")
+        selection = spec.get("selection", "choose")
+        count = spec.get("count", 1)
+        filters = spec.get("filters", [])
+
+        candidates = self._collect_candidates(t, state, source_pid)
+        candidates = self._apply_filters(candidates, filters, state)
+
+        if selection == "each" or selection == "all":
+            return candidates
+
+        # "random": pick randomly
+        if selection == "random":
+            import random
+            rng = random.Random(state.seed + state.round)
+            return rng.sample(candidates, min(count, len(candidates))) if candidates else []
+
+        # "choose": ask agent via callback
+        if selection == "choose" and len(candidates) > 1:
+            if resolver and resolver.select_target_callback:
+                prompt = {
+                    "type": "player",
+                    "options": candidates,
+                    "message": f"Choose target for effect (type={t})",
+                }
+                chosen = resolver.select_target_callback(source_pid, prompt)
+                if chosen and chosen in candidates:
+                    return [chosen]
+
+        # Default: first N candidates
+        return candidates[:count]
+
+    @staticmethod
+    def _collect_candidates(target_type, state, source_pid):
+        """Collect candidate player IDs based on target type."""
+        all_players = state.get_all_players()
+        from models.enums import FactionType
+
+        if target_type == "player":
+            return [p.player_id for p in all_players]
+
+        if target_type == "jin_player":
+            return [p.player_id for p in all_players
+                    if p.faction == FactionType.JIN]
+
+        if target_type == "north_player":
+            return [p.player_id for p in all_players
+                    if p.faction == FactionType.NORTH]
+
+        if target_type == "other_jin_player":
+            return [p.player_id for p in all_players
+                    if p.player_id != source_pid
+                    and p.faction == FactionType.JIN]
+
+        if target_type == "other_player":
+            return [p.player_id for p in all_players
+                    if p.player_id != source_pid]
+
+        if target_type == "friendly_player":
+            source = state.get_player(source_pid)
+            if source:
+                return [p.player_id for p in all_players
+                        if p.faction == source.faction]
+
+        # card / friend_card / location types — return source for now
+        return [source_pid]
+
+    # ---- location target resolution -----------------------------------------
+
+    def _resolve_location_targets(self, spec, state, source_pid, resolver):
+        """Return list of location IDs matching the target spec."""
+        from models.enums import ControlState
+
+        selection = spec.get("selection", "choose")
+        count = spec.get("count", 1)
+        filters = spec.get("filters", [])
+
+        # Collect candidates from all locations
+        candidates = list(state.locations.keys())
+        candidates = self._apply_location_filters(candidates, filters, state, source_pid)
+
+        if selection == "each" or selection == "all":
+            return candidates[:count] if count else candidates
+
+        if selection == "random":
+            import random
+            rng = random.Random(state.seed + state.round)
+            return rng.sample(candidates, min(count, len(candidates))) if candidates else []
+
+        if selection == "choose" and len(candidates) > 1:
+            if resolver and resolver.select_target_callback:
+                prompt = {
+                    "type": "location",
+                    "options": candidates,
+                    "message": f"Choose location for effect (type={spec.get('type', '?')})",
+                }
+                chosen = resolver.select_target_callback(source_pid, prompt)
+                if chosen and chosen in candidates:
+                    return [chosen]
+
+        return candidates[:count]
+
+    @staticmethod
+    def _apply_location_filters(candidates, filters, state, source_pid):
+        """Filter location candidates by filter specs."""
+        if not filters:
+            return candidates
+
+        from models.enums import ControlState
+        player_cs = state._player_control_state(source_pid)
+
+        for f in filters:
+            ft = f.get("type", "")
+            controller = f.get("controller")
+            if controller:
+                if controller == "sima":
+                    candidates = [lid for lid in candidates
+                                  if state.locations.get(lid) and
+                                  state.locations[lid].controller == ControlState.SIMA]
+                elif controller == "jin":
+                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                    candidates = [lid for lid in candidates
+                                  if state.locations.get(lid) and
+                                  state.locations[lid].controller in jin_states]
+                elif controller == "neutral":
+                    candidates = [lid for lid in candidates
+                                  if state.locations.get(lid) and
+                                  state.locations[lid].controller in (ControlState.NEUTRAL, ControlState.EMPTY)]
+                elif controller == "north":
+                    candidates = [lid for lid in candidates
+                                  if state.locations.get(lid) and
+                                  state.locations[lid].controller == ControlState.NORTH]
+                elif controller == "not_jin_controlled":
+                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                    candidates = [lid for lid in candidates
+                                  if state.locations.get(lid) and
+                                  state.locations[lid].controller not in jin_states]
+                continue
+
+            if ft == "not_jin_controlled":
+                jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                candidates = [lid for lid in candidates
+                              if state.locations.get(lid) and
+                              state.locations[lid].controller not in jin_states]
+            elif ft == "not_fortified":
+                candidates = [lid for lid in candidates
+                              if state.locations.get(lid) and
+                              not state.locations[lid].is_fortified]
+            elif controller is None and "culture_region" in f:
+                culture_type = f.get("culture_region", "")
+                from rules.area_control import REGION_CONFIG
+                from models.enums import Region
+                locs_in_culture_region = set()
+                for reg, cfg in REGION_CONFIG.items():
+                    if cfg.get("initial_culture") == culture_type:
+                        locs_in_culture_region.update(cfg.get("locations", []))
+                    # Also match regions that have this culture placed
+                    for loc_id in cfg.get("locations", []):
+                        loc = state.locations.get(loc_id)
+                        if loc and loc.culture_marker and loc.culture_marker.value == culture_type:
+                            locs_in_culture_region.update(cfg.get("locations", []))
+                candidates = [lid for lid in candidates if lid in locs_in_culture_region]
+
+        return candidates
+
+    @staticmethod
+    def _apply_filters(candidates, filters, state):
+        """Filter/sort candidates by filter specs."""
+        if not filters:
+            return candidates
+
+        for f in filters:
+            ft = f.get("type", "")
+            if ft == "highest_contribution":
+                candidates = TargetedEffectOperator._filter_highest(
+                    candidates, state, "contribution")
+            elif ft == "lowest_contribution":
+                candidates = TargetedEffectOperator._filter_highest(
+                    candidates, state, "contribution", reverse=True)
+            elif ft == "highest_prestige":
+                candidates = TargetedEffectOperator._filter_highest(
+                    candidates, state, "prestige")
+            elif ft == "fewest_staff_slots":
+                candidates = TargetedEffectOperator._filter_highest(
+                    candidates, state, "staff_free_slots", reverse=True)
+            elif ft == "highest_military":
+                candidates = TargetedEffectOperator._filter_highest(
+                    candidates, state, "military")
+
+        return candidates
+
+    @staticmethod
+    def _filter_highest(candidates, state, attr, reverse=False):
+        """Keep only candidates with the highest (or lowest) value of attr."""
+        if not candidates:
+            return []
+        scored = []
+        for pid in candidates:
+            p = state.get_player(pid)
+            if p:
+                val = getattr(p, attr, 0)
+                if callable(val):
+                    val = val()
+                scored.append((pid, val))
+        if not scored:
+            return []
+        scored.sort(key=lambda x: x[1], reverse=not reverse)
+        best_val = scored[0][1]
+        return [pid for pid, val in scored if val == best_val]
+
+    # ---- sub-effect deserialisation ---------------------------------------
+
+    @staticmethod
+    def _dict_to_effect_step(d):
+        """Convert a sub_effect dict from compiled JSON back into an EffectStep."""
+        from .effect_ast import EffectStep
+        return EffectStep(
+            effect_type=d.get("effect_type", ""),
+            params=d.get("params", {}),
+            condition=None,  # Conditions on sub-effects deferred
+            source_text=d.get("source_text", ""),
+        )
+
+
+# ============================================================
+# Aliases — register same operator under alternate names
+# used in cards_compiled.json that don't match EffectType constants
+# ============================================================
+
+# choice (JSON) → choose (code)
+OPERATOR_REGISTRY["choice"] = OPERATOR_REGISTRY["choose"]
+
+# gain_prestige (JSON) → raise_prestige (code)
+OPERATOR_REGISTRY["gain_prestige"] = OPERATOR_REGISTRY["raise_prestige"]
+
+# lose_contribution (JSON) → lower_contribution (code)
+OPERATOR_REGISTRY["lose_contribution"] = OPERATOR_REGISTRY["lower_contribution"]
+
+# place_refugee (JSON) → add_refugee (code)
+OPERATOR_REGISTRY["place_refugee"] = OPERATOR_REGISTRY["add_refugee"]
+
+# raise_culture_contribution (JSON) → raise_culture_level (code)
+OPERATOR_REGISTRY["raise_culture_contribution"] = OPERATOR_REGISTRY["raise_culture_level"]
+
+
+# ============================================================
+# Map-action variants with distinct semantics
+# ============================================================
+
+@register
+class ConvertOwnToNeutralOperator(EffectOperator):
+    """Convert friendly (own-controlled) locations to neutral.
+
+    Used by 姚苌 passive: on leaving play, convert 2 own locations to neutral.
+    """
+    effect_type = EffectType.CONVERT_OWN_TO_NEUTRAL
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+
+        # Find player-controlled locations
+        friendly = state.get_friendly_locations(player_id)
+        neutral_candidates = [lid for lid in friendly
+                             if state.locations.get(lid)]
+
+        if not neutral_candidates:
+            result.events.append({"type": "convert_own_to_neutral",
+                                  "skipped": True, "reason": "no_own_locations"})
+            return result
+
+        # Ask agent to choose
+        chosen = []
+        if resolver and resolver.select_target_callback:
+            for _ in range(min(count, len(neutral_candidates))):
+                prompt = {
+                    "type": "location",
+                    "options": [c for c in neutral_candidates if c not in chosen],
+                    "message": f"Choose location to convert to neutral",
+                }
+                pick = resolver.select_target_callback(player_id, prompt)
+                if pick and pick in neutral_candidates and pick not in chosen:
+                    chosen.append(pick)
+
+        if not chosen and neutral_candidates:
+            chosen = neutral_candidates[:min(count, len(neutral_candidates))]
+
+        for loc_id in chosen:
+            loc = state.locations.get(loc_id)
+            if loc:
+                from models.enums import ControlState
+                loc.controller = ControlState.NEUTRAL
+                result.events.append({"type": "convert_own_to_neutral",
+                                     "location": loc_id})
+
+        return result
+
+
+@register
+class ConvertToNeutralOperator(EffectOperator):
+    """Convert target locations to neutral (used in targeted_effect sub-effects).
+
+    Used by 功高不赏 variant effects: convert locations to neutral.
+    """
+    effect_type = EffectType.CONVERT_TO_NEUTRAL
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+
+        # Find all non-neutral locations
+        from models.enums import ControlState
+        candidates = [lid for lid, loc in state.locations.items()
+                     if loc.controller not in (ControlState.NEUTRAL, ControlState.EMPTY)]
+
+        chosen = []
+        if resolver and resolver.select_target_callback and candidates:
+            for _ in range(min(count, len(candidates))):
+                prompt = {
+                    "type": "location",
+                    "options": [c for c in candidates if c not in chosen],
+                    "message": "Choose location to convert to neutral",
+                }
+                pick = resolver.select_target_callback(player_id, prompt)
+                if pick and pick in candidates and pick not in chosen:
+                    chosen.append(pick)
+
+        if not chosen and candidates:
+            chosen = candidates[:min(count, len(candidates))]
+
+        for loc_id in chosen:
+            loc = state.locations.get(loc_id)
+            if loc:
+                loc.controller = ControlState.NEUTRAL
+                result.events.append({"type": "convert_to_neutral",
+                                     "location": loc_id})
+
+        return result
+
+
+@register
+class ConvertToSimaOperator(EffectOperator):
+    """Convert target locations to Sima control.
+
+    Used by 遣使请降: convert locations to Sima faction.
+    """
+    effect_type = EffectType.CONVERT_TO_SIMA
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+
+        from models.enums import ControlState
+        candidates = [lid for lid, loc in state.locations.items()
+                     if loc.controller not in (ControlState.SIMA,)]
+
+        chosen = []
+        if resolver and resolver.select_target_callback and candidates:
+            for _ in range(min(count, len(candidates))):
+                prompt = {
+                    "type": "location",
+                    "options": [c for c in candidates if c not in chosen],
+                    "message": "Choose location to convert to Sima",
+                }
+                pick = resolver.select_target_callback(player_id, prompt)
+                if pick and pick in candidates and pick not in chosen:
+                    chosen.append(pick)
+
+        if not chosen and candidates:
+            chosen = candidates[:min(count, len(candidates))]
+
+        for loc_id in chosen:
+            loc = state.locations.get(loc_id)
+            if loc:
+                loc.controller = ControlState.SIMA
+                result.events.append({"type": "convert_to_sima",
+                                     "location": loc_id})
+
+        return result
         return result

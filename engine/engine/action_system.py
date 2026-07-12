@@ -57,20 +57,21 @@ class ActionSystem:
 
         available = []
 
-        # Occupy — check for adjacent neutral locations
+        # Occupy — check for adjacent empty (unoccupied) locations
         friendly = state.get_friendly_locations(player_id)
         for loc_id, loc in state.locations.items():
-            if loc.controller != ControlState.NEUTRAL:
+            if loc.controller != ControlState.EMPTY:
                 continue
             if any(n in friendly for n in state.get_adjacent_locations(loc_id)):
                 action = OccupyAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)
 
-        # March — check for adjacent enemy locations
+        # March — check for adjacent non-friendly, non-empty locations
+        # (NEUTRAL = neutral forces present; EMPTY = unoccupied → use Occupy instead)
         for loc_id, loc in state.locations.items():
             cs = state._player_control_state(player_id)
-            if loc.is_friendly_to(cs) or loc.controller == ControlState.NEUTRAL:
+            if loc.is_friendly_to(cs) or loc.controller == ControlState.EMPTY:
                 continue
             if any(n in friendly for n in state.get_adjacent_locations(loc_id)):
                 action = MarchAction(player_id=player_id, target_location=loc_id)
@@ -103,7 +104,7 @@ class ActionSystem:
     def get_available_hand_actions(self, state: "GameState", player_id: str) -> list[PlayCardAction]:
         """Get all legal hand card play actions."""
         player = state.get_player(player_id)
-        if not player or player.has_taken_hand_action:
+        if not player or not player.can_take_hand_action():
             return []
 
         available = []
@@ -152,7 +153,7 @@ class ActionSystem:
     def get_available_court_actions(self, state: "GameState", player_id: str) -> list[CourtAction]:
         """Get all legal court actions."""
         player = state.get_player(player_id)
-        if not player or player.has_taken_court_action:
+        if not player or not player.can_take_court_action():
             return []
 
         available = []
@@ -176,7 +177,7 @@ class ActionSystem:
     def get_available_public_actions(self, state: "GameState", player_id: str) -> list[PublicCardAction]:
         """Get all legal public action card plays."""
         player = state.get_player(player_id)
-        if not player or player.has_taken_hand_action:
+        if not player or not player.can_take_hand_action():
             return []
 
         available = []

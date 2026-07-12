@@ -34,7 +34,7 @@ class CardDef:
     culture_taoism: int = 0                # 玄学 contribution
     culture_buddhism: int = 0              # 佛学 contribution
     # For hero cards
-    start_order: int = 0                   # 先动值 (initial turn order, lower=earlier)
+    start_order: int = 0                   # 先动值 (initial turn order, higher=earlier)
     initial_contribution: int = 0          # 初始功绩
     initial_prestige: int = 0              # 初始威望
     initial_order: int = 1                 # 初始顺位 (default 1 if enter doesn't change)

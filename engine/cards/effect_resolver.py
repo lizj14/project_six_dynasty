@@ -84,8 +84,10 @@ class EffectResolver:
                 count = cost.params.get("count", 1)
                 for _ in range(count):
                     if player and player.hand:
-                        state.main_discard.append(player.hand.pop())
-                        result.events.append({"type": "pay_discard"})
+                        discarded = player.hand.pop()
+                        state.main_discard.append(discarded)
+                        result.events.append({"type": "pay_discard",
+                                             "card": discarded.name})
             elif cost.cost_type == "pay_military":
                 amount = cost.params.get("amount", 0)
                 if player:
@@ -213,10 +215,10 @@ class EffectResolver:
 
             # ── Standard variable map ──────────────────────────────
             var_map = {
-                'marker_count_military': player.get_marker(MarkerType.MILITARY) if player else 0,
-                'marker_count_culture': player.get_marker(MarkerType.CULTURE) if player else 0,
-                'marker_count_affair': player.get_marker(MarkerType.AFFAIR) if player else 0,
-                'marker_count_power': player.get_marker(MarkerType.POWER) if player else 0,
+                'marker_count_military': player.get_marker_total(MarkerType.MILITARY, state) if player else 0,
+                'marker_count_culture': player.get_marker_total(MarkerType.CULTURE, state) if player else 0,
+                'marker_count_affair': player.get_marker_total(MarkerType.AFFAIR, state) if player else 0,
+                'marker_count_power': player.get_marker_total(MarkerType.POWER, state) if player else 0,
                 'hand_size': len(player.hand) if player else 0,
                 'prestige': player.prestige if player else 0,
                 'contribution': player.contribution if player else 0,
@@ -361,7 +363,7 @@ class EffectResolver:
         if value in marker_map:
             from models.enums import MarkerType
             mt = MarkerType[marker_map[value]]
-            return player.get_marker(mt) if player else 0
+            return player.get_marker_total(mt, state) if player else 0
 
         # Culture level: culture_level_confucianism / taoism / buddhism
         if value.startswith("culture_level_"):

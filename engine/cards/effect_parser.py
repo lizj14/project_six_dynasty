@@ -1485,7 +1485,7 @@ def _parse_place_refugee(text: str, orig: str) -> Optional[EffectStep]:
             elif '北方' in t:
                 t = "north_discard"
             steps.append(EffectStep(
-                effect_type="place_refugee",
+                effect_type=EffectType.ADD_REFUGEE,
                 params={"target": t, "count": count},
                 source_text=orig,
             ))
@@ -1693,14 +1693,14 @@ def _parse_lose_contribution(text: str, orig: str) -> Optional[EffectStep]:
     m = re.search(r'[-−]\s*(\d+)\s*\[?功绩\]?', text)
     if m:
         return EffectStep(
-            effect_type="lose_contribution",
+            effect_type=EffectType.LOWER_CONTRIBUTION,
             params={"amount": int(m.group(1))},
             source_text=orig,
         )
     m = re.search(r'失去\s*(\d+)\s*功绩', text)
     if m:
         return EffectStep(
-            effect_type="lose_contribution",
+            effect_type=EffectType.LOWER_CONTRIBUTION,
             params={"amount": int(m.group(1))},
             source_text=orig,
         )

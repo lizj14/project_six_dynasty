@@ -73,8 +73,17 @@ class OccupyAction(GameAction):
         player.army_placed_count += 1
         player.army_reserve_count -= 1
 
+        events = [{"type": "occupy", "player": self.player_id, "location": self.target_location}]
+
+        # Check game end: last army placed
+        if player.army_reserve_count == 0:
+            state.game_end_marker = self.player_id
+            state.game_end_reason = "last_army"
+            events.append({"type": "game_end_trigger", "reason": "last_army",
+                           "player": self.player_id})
+
         state.log_event("occupy", player=self.player_id, location=self.target_location)
-        return ActionResult.ok([{"type": "occupy", "player": self.player_id, "location": self.target_location}])
+        return ActionResult.ok(events)
 
     def cost_description(self, state: "GameState") -> str:
         return "1军力"
@@ -125,9 +134,11 @@ class MarchAction(GameAction):
             cost += 1
 
         # Isolated location
-        # A location is isolated if NONE of its neighbors are friendly to the target
+        # A location is isolated if NONE of its neighbors are friendly to the target.
+        # Only applies to player/Sima-controlled targets — neutral/empty locations
+        # have no faction allegiance, so there is no concept of "isolated".
         target_cs = target_loc.controller if target_loc else None
-        if target_cs:
+        if target_cs and target_cs not in (ControlState.NEUTRAL, ControlState.EMPTY):
             isolated = True
             for nb in neighbors:
                 nb_loc = state.locations.get(nb)
@@ -200,11 +211,10 @@ class MarchAction(GameAction):
         # Remove fortification if present
         target_loc.is_fortified = False
 
-        # Place own unit
-        cs = state._player_control_state(self.player_id)
-        target_loc.controller = cs
-        player.army_placed_count += 1
-        player.army_reserve_count -= 1
+        # March clears the location (→ EMPTY) but does NOT place own unit.
+        # The player must use Occupy action separately to claim the location.
+        # This allows march → occupy chaining for AIs.
+        target_loc.controller = ControlState.EMPTY
 
         # Rewards
         # 1 VP for non-friendly target (always the case since validate checks this)
@@ -217,13 +227,6 @@ class MarchAction(GameAction):
         if player.faction == FactionType.JIN:
             player.prestige = min(9, player.prestige + 1)
             events[-1]["prestige_gained"] = 1
-
-        # Check game end: last army placed
-        if player.army_reserve_count == 0:
-            state.game_end_marker = self.player_id
-            state.game_end_reason = "last_army"
-            events.append({"type": "game_end_trigger", "reason": "last_army",
-                           "player": self.player_id})
 
         state.log_event("march", player=self.player_id,
                          target=self.target_location, cost=cost)

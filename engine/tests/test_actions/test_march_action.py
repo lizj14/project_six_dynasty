@@ -94,15 +94,17 @@ class TestMarchExecution:
         result = action.execute(state)
 
         assert result.success, f"March failed: {result.error}"
-        # North now controls 弘农
-        assert state.locations["弘农"].controller == ControlState.NORTH
+        # March clears the location → EMPTY (occupy now claims it)
+        assert state.locations["弘农"].controller == ControlState.EMPTY
         # Sima lost a unit (returned to reserve)
         assert state.sima.army_placed_count == 0  # was 1, now 0
         assert state.sima.army_reserve_count == 1
         # North paid 3 military
         assert state.north_player.military == 2  # started 5, paid 3
-        # North gained 1 VP
+        # North gained 1 VP (march VP, not occupy)
         assert state.north_player.vp == 1
+        # North does NOT place an army (occupy handles that)
+        # army counts unchanged by march
 
     def test_march_cost_difficult_terrain(self):
         from engine.actions.quick_actions import MarchAction
@@ -182,12 +184,26 @@ class TestMarchEdgeCases:
     """Edge case tests for march."""
 
     def test_march_game_end_trigger(self):
-        """When last army is placed, game_end_marker should be set."""
-        from engine.actions.quick_actions import MarchAction
+        """Game end is triggered by OCCUPY (last army placed), not march.
+
+        March no longer places armies — it clears the location to EMPTY.
+        The occupy action places the army and triggers game end.
+        """
+        from engine.actions.quick_actions import MarchAction, OccupyAction
         state = make_march_state(target_controller=ControlState.SIMA)
         state.north_player.army_reserve_count = 1  # One army left in reserve
-        action = MarchAction(player_id="north", target_location="弘农")
-        result = action.execute(state)
+
+        # March: clears enemy, gives VP, location → EMPTY
+        march = MarchAction(player_id="north", target_location="弘农")
+        result = march.execute(state)
         assert result.success
+        assert state.locations["弘农"].controller == ControlState.EMPTY
+        assert state.game_end_marker is None  # Not triggered by march
+
+        # Occupy: places army, triggers game end
+        occupy = OccupyAction(player_id="north", target_location="弘农")
+        result = occupy.execute(state)
+        assert result.success
+        assert state.locations["弘农"].controller == ControlState.NORTH
         assert state.game_end_marker == "north"
         assert state.game_end_reason == "last_army"

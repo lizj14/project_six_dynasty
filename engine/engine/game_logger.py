@@ -68,6 +68,8 @@ class GameLogger:
         self.log = GameLog()
         self._current_round: Optional[dict] = None
         self._pending_actions: list[dict] = []
+        self._effect_buffer: dict[str, list[dict]] = {}  # Effects by player_id waiting for next action
+        self._trigger_buffer: list[dict] = []   # Triggers waiting for next action
 
     # ======== Setup ========
 
@@ -131,7 +133,25 @@ class GameLogger:
             "preparation": {},
             "player_turns": [],
             "settlement": {},
+            "jin_status": [],  # Jin players' status snapshot at round start
         }
+
+    def log_jin_round_status(self, state: "GameState"):
+        """Capture all Jin players' prestige/contribution/order at round start."""
+        if not self._current_round:
+            return
+        status_list = []
+        for p in state.jin_players:
+            status_list.append({
+                "id": p.player_id,
+                "hero": p.hero.definition.name if p.hero else "?",
+                "vp": p.vp,
+                "prestige": p.prestige,
+                "contribution": p.contribution,
+                "order": p.order,
+                "military": p.military,
+            })
+        self._current_round["jin_status"] = status_list
 
     def log_preparation(self, emperor_events: list[dict], sima_dist: list[dict],
                         region_vp: list[dict]):
@@ -153,6 +173,24 @@ class GameLogger:
                 "emperor_age": emperor_age,
             }
 
+    def log_round_end_decks(self, state: "GameState"):
+        """Record deck/discard/court state for all factions at round end."""
+        if not self._current_round:
+            return
+        deck_info = {
+            "north": {
+                "deck": [c.name for c in state.north_deck],
+                "discard": [c.name for c in state.north_discard],
+                "court": [c.name for c in state.north_court],
+            },
+            "jin": {
+                "deck": [c.name for c in state.jin_deck],
+                "discard": [c.name for c in state.jin_discard],
+                "court": [c.name for c in state.jin_court],
+            },
+        }
+        self._current_round["deck_state"] = deck_info
+
     def log_round_end(self):
         """Finalize current round and append to log."""
         if self._current_round:
@@ -162,13 +200,23 @@ class GameLogger:
     # ======== Player Actions ========
 
     def log_draw(self, player_id: str, cards_drawn: list[str],
-                 forced_events: list[str]):
-        """Record card draws at start of player's turn."""
+                 forced_events: list[str], draw_events: list[dict] = None):
+        """Record card draws at start of player's turn.
+
+        Args:
+            cards_drawn: Names of cards drawn into hand (for backward compat).
+            forced_events: Names of mechanism cards drawn (for backward compat).
+            draw_events: Raw draw events from state.draw_cards() for detailed display.
+        """
+        # Flush any pending effects (e.g. from setup) before draw logging
+        self._flush_buffers_to_turn(player_id)
         turn = self._get_or_create_turn(player_id)
         turn["draw"] = {
             "cards": cards_drawn,
             "forced_events_triggered": forced_events,
         }
+        if draw_events:
+            turn["draw"]["events"] = draw_events
 
     def log_action(self, player_id: str, action_type: str,
                    description: str, params: dict = None,
@@ -199,11 +247,41 @@ class GameLogger:
         if state_snapshot:
             action_entry["state"] = state_snapshot
 
+        # Flush buffered effects for this player into this action
+        if player_id in self._effect_buffer and self._effect_buffer[player_id]:
+            action_entry["effects"] = self._effect_buffer.pop(player_id)
+        if self._trigger_buffer:
+            action_entry["triggers"] = list(self._trigger_buffer)
+            self._trigger_buffer.clear()
+
         turn["actions"].append(action_entry)
+
+    def _flush_buffers_to_turn(self, player_id: str):
+        """Flush any remaining buffered effects/triggers to a turn entry.
+
+        Called when effects fire without a subsequent action being logged
+        (e.g. draw phase effects, turn-end triggers).
+        """
+        if not self._effect_buffer and not self._trigger_buffer:
+            return
+        turn = self._get_or_create_turn(player_id)
+        # Flush effects belonging to this player
+        if player_id in self._effect_buffer and self._effect_buffer[player_id]:
+            turn.setdefault("effects", []).extend(self._effect_buffer.pop(player_id))
+        # Also flush any orphan effects (from other players) to their respective turns
+        for pid, effects in list(self._effect_buffer.items()):
+            if effects:
+                t = self._get_or_create_turn(pid)
+                t.setdefault("effects", []).extend(effects)
+            del self._effect_buffer[pid]
+        if self._trigger_buffer:
+            turn.setdefault("triggers", []).extend(list(self._trigger_buffer))
+            self._trigger_buffer.clear()
 
     def log_end_turn(self, player_id: str, hand_discarded: int,
                      final_military: int, final_vp: int):
         """Record end-of-turn state."""
+        self._flush_buffers_to_turn(player_id)
         turn = self._get_or_create_turn(player_id)
         turn["end_state"] = {
             "hand_size": "?",
@@ -218,16 +296,9 @@ class GameLogger:
                     source_card: str, context: dict = None):
         """Record a passive trigger firing.
 
-        Args:
-            trigger_type: e.g. "on_march", "on_gain_vp", "on_turn_end"
-            source_player_id: Who owns the passive card
-            source_card: Card name that has the passive ability
-            context: What triggered it (action type, target player, etc.)
+        Triggers are buffered and flushed into the next action logged, so they
+        appear inline with the action that caused them.
         """
-        if not self._current_round:
-            return
-        # Store triggers in the current round for later serialization
-        triggers = self._current_round.setdefault("triggers_fired", [])
         entry = {
             "trigger": trigger_type,
             "source_player": source_player_id,
@@ -235,7 +306,7 @@ class GameLogger:
         }
         if context:
             entry["context"] = context
-        triggers.append(entry)
+        self._trigger_buffer.append(entry)
 
     def log_effect(self, player_id: str, effect_type: str,
                    params: dict = None, events: list[dict] = None,
@@ -245,16 +316,9 @@ class GameLogger:
         Called from EffectResolver after each step executes, for both
         active card plays and passive trigger resolutions.
 
-        Args:
-            player_id: Who the effect applies to
-            effect_type: e.g. "gain_military", "gain_vp", "draw_cards"
-            params: Effect parameters (amount, target, etc.)
-            events: Resolution events produced
-            source: "card" for active play, "passive" for trigger, "enter" for hero enter
+        Effects are buffered and flushed into the next action logged via
+        log_action(), so they appear inline with the action that caused them.
         """
-        if not self._current_round:
-            return
-        effects = self._current_round.setdefault("effects_resolved", [])
         entry = {
             "player": player_id,
             "effect": effect_type,
@@ -264,8 +328,7 @@ class GameLogger:
             entry["params"] = params
         if events:
             entry["events"] = events
-        effects.append(entry)
-
+        self._effect_buffer.setdefault(player_id, []).append(entry)
     # ======== State Snapshots (periodic) ========
 
     def log_state_snapshot(self, label: str, state_data: dict):
@@ -376,6 +439,22 @@ class GameLogger:
                     if results:
                         res_str = ", ".join(f"{k}:{v}" for k, v in results.items())
                         lines.append(f"│   结果: {res_str}")
+                    # Inline effects from this action (same format as main rounds)
+                    effects = act.get("effects", [])
+                    if effects:
+                        lines.append(f"│   ↪ 效果结算:")
+                        for e in effects:
+                            lines.append(f"│     {_format_effect(e)}")
+                            evts = e.get("events", []) or []
+                            for evt in evts:
+                                t = evt.get("type", "")
+                                if t and t not in ("effect_resolved",):
+                                    detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
+                                    if detail:
+                                        lines.append(f"│       ↳ {t}: {detail}")
+                                    else:
+                                        lines.append(f"│       ↳ {t}")
+            # Legacy round-level effects (backward compat)
             effects = r.get("effects_resolved", [])
             if effects:
                 lines.append(f"│")
@@ -424,6 +503,22 @@ class GameLogger:
             # Preparation
             prep = r.get("preparation", {})
             dice = prep.get("emperor_dice", [])
+
+            # Jin player status snapshot at round start
+            jin_status = r.get("jin_status", [])
+            if jin_status:
+                lines.append(f"  [回合开始 东晋状态]")
+                for js in jin_status:
+                    hero = js.get("hero", "?")
+                    lines.append(
+                        f"    {js['id']} ({hero}): "
+                        f"VP:{js.get('vp',0)} "
+                        f"威望:{js.get('prestige',0)} "
+                        f"功绩:{js.get('contribution',0)} "
+                        f"顺位:{js.get('order',0)} "
+                        f"军力:{js.get('military',0)}"
+                    )
+
             if dice:
                 lines.append(f"  [准备] 君主骰: {len(dice)} 个")
                 for d in dice:
@@ -435,10 +530,58 @@ class GameLogger:
                 lines.append(f"")
                 lines.append(f"  ▸ {pid} 行动")
                 draw = turn.get("draw", {})
-                if draw.get("cards"):
-                    lines.append(f"    摸牌: {', '.join(draw['cards'])}")
-                if draw.get("forced_events_triggered"):
-                    lines.append(f"    强制事件触发: {', '.join(draw['forced_events_triggered'])}")
+                raw_events = draw.get("events", [])
+                if raw_events:
+                    # Detailed display: group events by mechanism card boundaries
+                    lines.append(f"    摸牌阶段 (摸2张):")
+                    in_mechanism = False
+                    for evt in raw_events:
+                        t = evt.get("type", "")
+                        card = evt.get("card", "?")
+                        if t == "draw":
+                            in_mechanism = False
+                            lines.append(f"      ▸ {card} → 加入手牌")
+                        elif t == "forced_event_drawn":
+                            in_mechanism = True
+                            lines.append(f"      ▸ {card} → [强制事件] 立即结算:")
+                        elif t == "effect_errors":
+                            lines.append(f"         ⚠ 错误: {evt.get('errors', [])}")
+                        else:
+                            prefix = "         ↳" if in_mechanism else "        ↳"
+                            detail = ", ".join(f"{k}={v}" for k, v in evt.items()
+                                             if k not in ("type",))
+                            if detail:
+                                lines.append(f"{prefix} {t}: {detail}")
+                            else:
+                                lines.append(f"{prefix} {t}")
+                elif draw.get("cards") or draw.get("forced_events_triggered"):
+                    # Fallback: simple display
+                    if draw.get("cards"):
+                        lines.append(f"    摸牌: {', '.join(draw['cards'])}")
+                    if draw.get("forced_events_triggered"):
+                        lines.append(f"    强制事件触发: {', '.join(draw['forced_events_triggered'])}")
+
+                # Turn-level effects/triggers from the draw phase (forced events, etc.)
+                # Rendered here so they immediately follow the draw display
+                turn_effects = turn.get("effects", [])
+                if turn_effects:
+                    lines.append(f"       ↪ 效果结算 (摸牌阶段):")
+                    for e in turn_effects:
+                        lines.append(f"         {_format_effect(e)}")
+                        evts = e.get("events", []) or []
+                        for evt in evts:
+                            t = evt.get("type", "")
+                            if t and t not in ("effect_resolved",):
+                                detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
+                                if detail:
+                                    lines.append(f"           ↳ {t}: {detail}")
+                turn_triggers = turn.get("triggers", [])
+                if turn_triggers:
+                    for t in turn_triggers:
+                        src = t.get("source_card", "?")
+                        tt = t.get("trigger", "?")
+                        sp = t.get("source_player", "?")
+                        lines.append(f"       ↪ 触发: {tt} — {sp}的[{src}]")
 
                 for act in turn.get("actions", []):
                     desc = act.get("description", act.get("type", "?"))
@@ -463,44 +606,57 @@ class GameLogger:
                         res_str = ", ".join(f"{k}:{v}" for k, v in results.items())
                         lines.append(f"       结果: {res_str}")
 
+                    # Inline effects triggered by this action
+                    effects = act.get("effects", [])
+                    if effects:
+                        lines.append(f"       ↪ 效果结算:")
+                        for e in effects:
+                            lines.append(f"         {_format_effect(e)}")
+                            evts = e.get("events", []) or []
+                            for evt in evts:
+                                t = evt.get("type", "")
+                                if t and t not in ("effect_resolved",):
+                                    detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
+                                    if detail:
+                                        lines.append(f"           ↳ {t}: {detail}")
+                                    else:
+                                        lines.append(f"           ↳ {t}")
+
+                    # Inline triggers fired by this action
+                    triggers = act.get("triggers", [])
+                    if triggers:
+                        for t in triggers:
+                            src = t.get("source_card", "?")
+                            tt = t.get("trigger", "?")
+                            sp = t.get("source_player", "?")
+                            ctx = t.get("context", {})
+                            ctx_str = ""
+                            if ctx.get("action_type"):
+                                ctx_str = f" → {ctx['action_type']}"
+                            lines.append(f"       ↪ 触发: {tt} — {sp}的[{src}]{ctx_str}")
+
                 end = turn.get("end_state", {})
                 if end:
                     lines.append(f"    结束 — VP:{end.get('vp', '?')} 军力:{end.get('military', '?')}")
-
-            # Triggers fired
-            triggers = r.get("triggers_fired", [])
-            if triggers:
-                lines.append(f"")
-                lines.append(f"  ⚡ 被动触发 ({len(triggers)} 次):")
-                for t in triggers:
-                    src = t.get("source_card", "?")
-                    tt = t.get("trigger", "?")
-                    sp = t.get("source_player", "?")
-                    ctx = t.get("context", {})
-                    ctx_str = ""
-                    if ctx.get("action_type"):
-                        ctx_str = f" → {ctx['action_type']}"
-                    lines.append(f"    {tt}: {sp} 的 [{src}]{ctx_str}")
-
-            # Effects resolved
-            effects = r.get("effects_resolved", [])
-            if effects:
-                lines.append(f"")
-                lines.append(f"  📋 效果结算 ({len(effects)} 次):")
-                for e in effects:
-                    lines.append(f"    {_format_effect(e)}")
-                    evts = e.get("events", []) or []
-                    for evt in evts:
-                        t = evt.get("type", "")
-                        if t and t not in ("effect_resolved",):
-                            detail = ", ".join(f"{k}={v}" for k, v in evt.items() if k != "type")
-                            if detail:
-                                lines.append(f"      ↳ {t}: {detail}")
 
             # Settlement
             settle = r.get("settlement", {})
             if settle:
                 lines.append(f"  [结算] 阶段完成")
+
+            # Deck state at round end
+            deck_info = r.get("deck_state", {})
+            if deck_info:
+                lines.append(f"  [回合结束 牌库状态]")
+                for faction_key, faction_label in [("north", "北方"), ("jin", "东晋")]:
+                    info = deck_info.get(faction_key, {})
+                    deck_cards = ' '.join(info.get('deck', [])) or '(空)'
+                    discard_cards = ' '.join(info.get('discard', [])) or '(空)'
+                    court_cards = ' '.join(info.get('court', [])) or '(空)'
+                    lines.append(f"    {faction_label}:")
+                    lines.append(f"      牌库({len(info.get('deck', []))}): {deck_cards}")
+                    lines.append(f"      弃牌({len(info.get('discard', []))}): {discard_cards}")
+                    lines.append(f"      朝堂({len(info.get('court', []))}): {court_cards}")
 
         # Final scoring
         lines.append(f"")
@@ -545,8 +701,17 @@ def snapshot_player_state(state: "GameState", player_id: str) -> dict:
     }
 
 
-def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict, dict, dict]:
+def describe_action(action: "GameAction", state: "GameState",
+                    result: "ActionResult" = None) -> tuple[str, dict, dict, dict]:
     """Produce a Chinese description + params/costs/results for an action.
+
+    Args:
+        action: The executed GameAction.
+        state: Current game state snapshot.
+        result: Optional ActionResult from execute(). When provided, card/payment
+                names are extracted from result.events (which are captured before
+                hand mutation) rather than re-reading player.hand (which has
+                already been modified by execution).
 
     Returns: (description, params, costs, results)
     """
@@ -580,31 +745,59 @@ def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict
         desc = f"占据 → {target}"
 
     elif atype == "play_card":
-        idx = getattr(action, 'card_index', -1)
-        payment_indices = getattr(action, 'payment_indices', [])
-        # Capture payment card names BEFORE they get discarded
-        payment_names = []
-        if player:
-            for pi in sorted(payment_indices, reverse=True):
-                if 0 <= pi < len(player.hand) and pi != idx:
-                    payment_names.append(player.hand[pi].name)
-        costs["payment_cards"] = payment_names if payment_names else None
+        # Prefer result.events for card/payment names — they are captured
+        # before execution mutates the hand. Fall back to reading the hand
+        # (for callers that don't pass result).
+        card_name = None
+        payment_names = None
+        card_cost = 0
+        is_friend = False
+        card_type_value = None
 
-        if player and 0 <= idx < len(player.hand):
-            card = player.hand[idx]
-            params["card"] = card.name
-            params["cost"] = card.cost
-            desc = f"打出 {card.name}"
-            if payment_names:
-                desc += f"（支付: {' '.join(payment_names)}）"
-            if card.is_friend:
-                desc += " → 幕僚区"
-            elif card.card_type.value == "strategy":
-                desc += " → 国家牌库"
-            else:
-                desc += " (事件)"
-        else:
-            desc = "打出 (手牌)"
+        if result and result.events:
+            for evt in result.events:
+                if evt.get("type") == "play_card":
+                    card_name = evt.get("card")
+                    payment_names = evt.get("payment_cards", [])
+                    break
+            # Determine card fate from events (hand may be mutated after execution)
+            for evt in result.events:
+                if evt.get("type") == "friend_played":
+                    is_friend = True
+                elif evt.get("type") == "strategy_played":
+                    card_type_value = "strategy"
+                elif evt.get("type") == "event_played":
+                    card_type_value = "event"
+
+        if card_name is None:
+            # Fallback: re-read from hand (may be stale after execution)
+            idx = getattr(action, 'card_index', -1)
+            payment_indices = getattr(action, 'payment_indices', [])
+            payment_names = []
+            if player:
+                for pi in sorted(payment_indices, reverse=True):
+                    if 0 <= pi < len(player.hand) and pi != idx:
+                        payment_names.append(player.hand[pi].name)
+            if player and 0 <= idx < len(player.hand):
+                card = player.hand[idx]
+                card_name = card.name
+                card_cost = card.cost
+                is_friend = card.is_friend
+                card_type_value = card.card_type.value if card.card_type else None
+
+        costs["payment_cards"] = payment_names if payment_names else None
+        params["card"] = card_name or "?"
+        params["cost"] = card_cost
+
+        desc = f"打出 {card_name or '(手牌)'}"
+        if payment_names:
+            desc += f"（支付: {' '.join(payment_names)}）"
+        if is_friend:
+            desc += " → 幕僚区"
+        elif card_type_value == "strategy":
+            desc += " → 国家牌库"
+        elif card_type_value == "event":
+            desc += " (事件)"
 
     elif atype == "play_public_card":
         cid = getattr(action, 'card_id', '')
@@ -634,48 +827,80 @@ def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict
     elif atype == "court_action":
         cid = getattr(action, 'card_id', '')
         params["card_id"] = cid
-        court = state.get_court_cards(getattr(action, 'player_id', ''))
-        for c in court:
-            if c.definition.card_id == cid:
-                defn = c.definition
-                params["card"] = c.name
-                # Describe court action using pre-parsed AST
-                from cards.effect_ast import AbilityType, EffectType
-                parsed = defn.parsed_effect
-                effects = []
-                if parsed:
-                    for block in parsed.blocks:
-                        if block.ability_type == AbilityType.STRATEGY_ACTION:
-                            for step in block.steps:
-                                if step.effect_type == EffectType.GAIN_MILITARY:
-                                    effects.append(f"+{step.params.get('amount','?')}军力")
-                                elif step.effect_type == EffectType.GAIN_VP:
-                                    effects.append(f"+{step.params.get('amount','?')}vp")
-                                elif step.effect_type == EffectType.DRAW_CARDS:
-                                    effects.append(f"摸{step.params.get('count','?')}张牌")
-                                elif step.effect_type == EffectType.ARCHIVE_CARD:
-                                    effects.append("存档候选牌")
-                                elif step.effect_type == EffectType.RAISE_ORDER:
-                                    effects.append("提高顺位")
-                                elif step.effect_type == EffectType.SPREAD_CULTURE:
-                                    effects.append("传播文化")
-                                elif step.effect_type == EffectType.DISCARD_CARDS:
-                                    effects.append(f"弃{step.params.get('count','?')}手牌")
-                desc = f"牌组行动: {c.name}"
-                if effects:
-                    desc += f"（{'，'.join(effects)}）"
-                break
-        if not desc:
+
+        # Prefer card name from result.events (captured before court mutation)
+        card_name = None
+        if result and result.events:
+            for evt in result.events:
+                if evt.get("type") == "court_action" and evt.get("card"):
+                    card_name = evt["card"]
+                    break
+
+        if card_name is None:
+            # Fallback: look up in court (may be empty after execution)
+            court = state.get_court_cards(getattr(action, 'player_id', ''))
+            for c in court:
+                if c.definition.card_id == cid:
+                    card_name = c.name
+                    break
+
+        # Describe court action using pre-parsed AST if card found
+        effects = []
+        if card_name:
+            params["card"] = card_name
+            # Try to get effect description from any known def
+            from cards.effect_ast import AbilityType, EffectType
+            court = state.get_court_cards(getattr(action, 'player_id', ''))
+            for c in court:
+                if c.definition.card_id == cid:
+                    parsed = c.definition.parsed_effect
+                    if parsed:
+                        for block in parsed.blocks:
+                            if block.ability_type == AbilityType.STRATEGY_ACTION:
+                                for step in block.steps:
+                                    if step.effect_type == EffectType.GAIN_MILITARY:
+                                        effects.append(f"+{step.params.get('amount','?')}军力")
+                                    elif step.effect_type == EffectType.GAIN_VP:
+                                        effects.append(f"+{step.params.get('amount','?')}vp")
+                                    elif step.effect_type == EffectType.DRAW_CARDS:
+                                        effects.append(f"摸{step.params.get('count','?')}张牌")
+                                    elif step.effect_type == EffectType.ARCHIVE_CARD:
+                                        effects.append("存档候选牌")
+                                    elif step.effect_type == EffectType.RAISE_ORDER:
+                                        effects.append("提高顺位")
+                                    elif step.effect_type == EffectType.SPREAD_CULTURE:
+                                        effects.append("传播文化")
+                                    elif step.effect_type == EffectType.DISCARD_CARDS:
+                                        effects.append(f"弃{step.params.get('count','?')}手牌")
+                    break
+
+        if card_name:
+            desc = f"牌组行动: {card_name}"
+            if effects:
+                desc += f"（{'，'.join(effects)}）"
+        else:
             desc = f"牌组行动"
 
     elif atype == "draw":
-        desc = "摸牌 (快速行动)"
+        card_name = None
+        if result and result.events:
+            for evt in result.events:
+                if evt.get("type") == "draw":
+                    card_name = evt.get("card", "?")
+                    break
+        if card_name:
+            desc = f"摸牌 (快速行动): 「{card_name}」"
+        else:
+            desc = "摸牌 (快速行动)"
 
     elif atype == "recruit":
-        idx = getattr(action, 'card_to_discard_index', 0)
+        # Card was already discarded, get name from result events not hand
         card_name = "?"
-        if player and 0 <= idx < len(player.hand):
-            card_name = player.hand[idx].name
+        if result and result.events:
+            for evt in result.events:
+                if evt.get("type") == "recruit" and evt.get("discarded"):
+                    card_name = evt["discarded"]
+                    break
         desc = f"征募: 弃{card_name}换1军力"
 
     elif atype == "fortify":
@@ -712,6 +937,43 @@ def describe_action(action: "GameAction", state: "GameState") -> tuple[str, dict
     elif atype == "lower_order":
         desc = "降低行动顺位"
 
+    elif atype == "activate_effect":
+        # Extract card name and effect summary from result events
+        card_name = None
+        effects_desc = []
+        if result and result.events:
+            for evt in result.events:
+                if evt.get("type") == "activate_effect":
+                    card_name = evt.get("card", "?")
+                elif evt.get("type") == "pay_discard":
+                    discarded = evt.get("card", "?")
+                    effects_desc.append(f"弃「{discarded}」")
+                elif evt.get("type") == "draw":
+                    drawn = evt.get("card", "?")
+                    effects_desc.append(f"摸「{drawn}」")
+                elif evt.get("type") == "gain_military":
+                    effects_desc.append(f"+{evt.get('amount', '?')}军力")
+                elif evt.get("type") == "gain_vp":
+                    effects_desc.append(f"+{evt.get('amount', '?')}vp")
+                elif evt.get("type") == "fortify_requested":
+                    target = evt.get("target", "?")
+                    if evt.get("skipped"):
+                        effects_desc.append(f"加固→{target}(跳过:{evt.get('reason','')})")
+                    else:
+                        effects_desc.append(f"加固→{target}")
+                elif evt.get("type") == "convert_requested":
+                    if not evt.get("skipped"):
+                        target = evt.get("target", "?")
+                        effects_desc.append(f"转化→{target}")
+                elif evt.get("type") == "spread_culture_vp":
+                    effects_desc.append(f"传播文化+{evt.get('vp','?')}vp")
+                elif evt.get("type") == "raise_order":
+                    effects_desc.append(f"顺位→{evt.get('new_order','?')}")
+
+        desc = f"激活「{card_name or '?'}」"
+        if effects_desc:
+            desc += f"（{'，'.join(effects_desc)}）"
+
     else:
         desc = str(atype)
 
@@ -730,7 +992,7 @@ def log_action_result(logger, action, result, state):
         result: ActionResult from action_system.execute()
         state: GameState snapshot
     """
-    desc, params, costs, _ = describe_action(action, state)
+    desc, params, costs, _ = describe_action(action, state, result)
 
     results = {}
     for evt in (result.events or []):
@@ -742,6 +1004,18 @@ def log_action_result(logger, action, result, state):
             results["military"] = evt.get("military_gained", 0)
         if evt.get("type") == "card_discarded":
             results["discard_reason"] = evt.get("reason", "")
+        if evt.get("type") == "friend_played":
+            results["staffed"] = evt.get("card", "")
+        if evt.get("type") == "strategy_played":
+            results["added_to"] = "国家牌库"
+        if evt.get("type") == "event_played":
+            results["resolved"] = "event"
+        if evt.get("type") == "staff_replaced":
+            results["replaced"] = evt.get("replaced_by", ""); results["removed"] = evt.get("card", "")
+        if evt.get("type") == "draw":
+            params["drawn_card"] = evt.get("card", "?")
+        if evt.get("type") == "forced_event_drawn":
+            params["forced_event"] = evt.get("card", "?")
 
     snap = snapshot_player_state(state, action.player_id)
     logger.log_action(

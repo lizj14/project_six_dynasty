@@ -51,7 +51,7 @@ class TestConvertAction:
         result = action.execute(state)
         assert result.success
         assert state.locations["弘农"].controller == ControlState.NORTH
-        assert state.north_player.vp == 2
+        assert state.north_player.vp == 1
 
     def test_convert_neutral_location(self):
         from engine.actions.special_actions import ConvertAction
@@ -60,7 +60,7 @@ class TestConvertAction:
         result = action.execute(state)
         assert result.success
         assert state.locations["洛阳"].controller == ControlState.NORTH
-        assert state.north_player.vp == 2
+        assert state.north_player.vp == 1
 
     def test_convert_jin_gains_prestige(self):
         from engine.actions.special_actions import ConvertAction
@@ -76,7 +76,7 @@ class TestConvertAction:
         result = action.execute(state)
         assert result.success
         assert state.jin_players[0].prestige == 1
-        assert state.jin_players[0].vp == 2
+        assert state.jin_players[0].vp == 1
 
     def test_convert_own_location_blocked(self):
         from engine.actions.special_actions import ConvertAction

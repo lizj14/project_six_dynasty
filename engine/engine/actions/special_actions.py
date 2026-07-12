@@ -31,6 +31,7 @@ class ConvertAction(GameAction):
     free: bool = False           # If True, no military cost (from card effect)
     neutral_only: bool = False   # If True, can only target neutral locations
     source: str = "card_effect"  # "card_effect" | "standard"
+    from_filtered_choice: bool = False  # True when agent chose from multiple candidates
 
     def validate(self, state: "GameState") -> ActionResult:
         player = state.get_player(self.player_id)
@@ -91,20 +92,23 @@ class ConvertAction(GameAction):
 
         # Rewards for non-friendly conversion
         if not was_friendly:
-            player.vp += 2
-            events.append({"type": "convert_vp", "vp": 2})
+            player.vp += 1
+            events.append({"type": "convert_vp", "vp": 1, "location": self.target_location})
             if player.faction == FactionType.JIN:
                 player.prestige = min(9, player.prestige + 1)
                 events.append({"type": "convert_prestige", "prestige": 1})
 
-        # Jin special penalty: converting friendly locations
-        if was_friendly and player.faction == FactionType.JIN:
-            friendly_neighbors = state.get_friendly_locations(self.player_id)
-            all_adjacent_friendly = all(
-                nb in friendly_neighbors
-                for nb in state.get_adjacent_locations(self.target_location)
-            )
-            if all_adjacent_friendly:
+        # Jin special penalty: only when choosing from multiple optional targets
+        # and the chosen target has no adjacent non-friendly troops.
+        # During setup, all targets are deterministic (specific_locations), so
+        # no penalty applies (from_filtered_choice=False).
+        if (was_friendly and player.faction == FactionType.JIN
+                and self.from_filtered_choice):
+            friendly = state.get_friendly_locations(self.player_id)
+            neighbors = state.get_adjacent_locations(self.target_location)
+            # Penalty triggers when NO neighbor is non-friendly (all are friendly)
+            has_non_friendly = any(nb not in friendly for nb in neighbors)
+            if not has_non_friendly:
                 # Penalty: lose 4vp, 1 contribution, or 1 prestige
                 # For now auto-choose VP loss (AI/choice system will handle this later)
                 penalty_event = {
@@ -279,18 +283,33 @@ class SpreadCultureAction(GameAction):
             events.append({"type": "culture_max_contribution_bonus", "vp": 3})
 
         # Place marker (locked) and award placement bonus
-        # Find a location in the target region with a culture slot
+        # Culture markers belong to regions (§board_info: 文化空位 per region).
+        # We place the marker on the first location in the target region that
+        # the player controls (or any location if none controlled).
         was_empty = False
-        for loc in state.locations.values():
-            if self.target_region in _get_location_regions(loc.location_id):
+        friendly = state.get_friendly_locations(self.player_id)
+        # Prefer a friendly location within the region
+        region_locations = [lid for lid in state.locations
+                          if self.target_region in _get_location_regions(lid)]
+        chosen_loc = None
+        for lid in region_locations:
+            if lid in friendly:
+                chosen_loc = lid
+                break
+        if not chosen_loc and region_locations:
+            chosen_loc = region_locations[0]
+
+        if chosen_loc:
+            loc = state.locations.get(chosen_loc)
+            if loc:
                 was_empty = (loc.culture_marker is None)
                 loc.culture_marker = culture
                 loc.culture_locked = True
                 events.append({"type": "culture_placed",
-                               "location": loc.location_id,
+                               "region": self.target_region,
+                               "location": chosen_loc,
                                "culture": self.culture_type,
                                "was_empty": was_empty})
-                break
 
         # Placement bonus (only if slot was empty)
         if was_empty:

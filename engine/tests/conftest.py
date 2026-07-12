@@ -171,11 +171,19 @@ def minimal_state(north_player, jin_player_1, jin_player_2, jin_player_3,
 
 @pytest.fixture
 def card_library():
-    """Load the actual card library from card_design.csv (if available)."""
-    csv_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "card_design.csv"
-    )
-    if os.path.exists(csv_path):
-        from cards.loader import load_card_design_csv
-        return load_card_design_csv(csv_path)
-    return CardLibrary([])
+    """Load the actual card library from Version.load('v1.0') (cards_compiled.json).
+
+    Falls back to card_design.csv if v1.0 version is not available.
+    """
+    try:
+        from config.version import Version
+        v = Version.load('v1.0')
+        return v.card_library
+    except Exception:
+        csv_path = os.path.join(
+            os.path.dirname(__file__), "..", "..", "card_design.csv"
+        )
+        if os.path.exists(csv_path):
+            from cards.loader import load_card_design_csv
+            return load_card_design_csv(csv_path)
+        return CardLibrary([])

@@ -138,6 +138,7 @@ class GameEngine:
 
         if self.logger:
             self.logger.log_round_start(state.round)
+            self.logger.log_jin_round_status(state)
 
         # === Preparation Phase ===
         emperor_events = run_preparation_phase(state, self.rng)
@@ -162,6 +163,7 @@ class GameEngine:
             self.logger.log_settlement(
                 court_vp={}, military_gain={}, emperor_age=[],
             )
+            self.logger.log_round_end_decks(state)
             self.logger.log_round_end()
 
     def _run_player_turn(self, state: GameState, player_id: str):
@@ -201,7 +203,7 @@ class GameEngine:
                            if e.get("type") == "draw"]
             forced = [e.get("card", "?") for e in draw_events
                       if e.get("type") == "forced_event_drawn"]
-            self.logger.log_draw(player_id, cards_drawn, forced)
+            self.logger.log_draw(player_id, cards_drawn, forced, draw_events)
             status = {
                 "vp": player.vp,
                 "military": player.military,
@@ -238,6 +240,24 @@ class GameEngine:
             if self.logger:
                 from .game_logger import log_action_result
                 log_action_result(self.logger, action, result, state)
+
+        # Log skipped extra actions (may=True actions not used)
+        if self.logger and player.extra_hand_actions > 0:
+            used = player.hand_action_taken_count
+            limit = 1 + player.extra_hand_actions
+            if used < limit:
+                self.logger.log_action(player_id, "skip_extra_hand_action",
+                    f"跳过额外手牌行动 ({used}/{limit} 已用)",
+                    params={"extra_granted": player.extra_hand_actions,
+                            "used": used, "skipped": limit - used})
+        if self.logger and player.extra_court_actions > 0:
+            used = player.court_action_taken_count
+            limit = 1 + player.extra_court_actions
+            if used < limit:
+                self.logger.log_action(player_id, "skip_extra_court_action",
+                    f"跳过额外牌组行动 ({used}/{limit} 已用)",
+                    params={"extra_granted": player.extra_court_actions,
+                            "used": used, "skipped": limit - used})
 
         # Fire turn_end triggers
         self._check_triggers("on_turn_end", {"player_id": player_id})

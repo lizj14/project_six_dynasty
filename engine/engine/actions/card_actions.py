@@ -35,7 +35,7 @@ class PlayCardAction(GameAction):
         if not player:
             return ActionResult.fail(f"Player {self.player_id} not found")
 
-        if player.has_taken_hand_action:
+        if not player.can_take_hand_action():
             return ActionResult.fail("Already used hand action this turn")
 
         if self.card_index < 0 or self.card_index >= len(player.hand):
@@ -95,14 +95,17 @@ class PlayCardAction(GameAction):
             state.main_discard.append(card)
             events.append({"type": "card_discarded", "card": card.name,
                            "reason": "faction_restriction"})
+            player.hand_action_taken_count += 1
             player.has_taken_hand_action = True
             state.log_event("play_card_failed", player=self.player_id,
                            card=card.name, reason="faction_restriction")
             return ActionResult.ok(events)
 
-        # === Event condition check ===
-        # Event card's play_condition not met → discard (no effect, cost already paid)
-        if card.card_type == CardType.EVENT:
+        # === Play condition check (all card types) ===
+        # Card's play_condition not met → discard (no effect, cost already paid).
+        # Applies to EVENT, STRATEGY, and FRIEND cards alike — e.g. 凉州大马
+        # requires 控制[西凉] and is a STRATEGY card.
+        if card.card_type != CardType.HERO:
             parsed = card.definition.parsed_effect
             if parsed and parsed.play_condition:
                 resolver = getattr(state, 'effect_resolver', None)
@@ -111,6 +114,7 @@ class PlayCardAction(GameAction):
                     state.main_discard.append(card)
                     events.append({"type": "card_discarded", "card": card.name,
                                    "reason": "condition_not_met"})
+                    player.hand_action_taken_count += 1
                     player.has_taken_hand_action = True
                     state.log_event("play_card_failed", player=self.player_id,
                                    card=card.name, reason="condition_not_met")
@@ -145,8 +149,12 @@ class PlayCardAction(GameAction):
             events.append({"type": "strategy_played", "card": card.name,
                            "added_to": f"{self.player_id}_deck"})
 
-            # Jin players: gain 1 contribution for adding strategy to deck
+            # Jin players: reform (改革) grants VP = card cost + 1,
+            # plus 1 contribution for adding strategy to deck
             if player.faction == FactionType.JIN:
+                reform_vp = card.cost + 1
+                player.vp += reform_vp
+                events.append({"type": "reform_vp", "vp": reform_vp, "card_cost": card.cost})
                 player.contribution = min(9, player.contribution + 1)
                 events.append({"type": "contribution_gained", "amount": 1})
 
@@ -168,6 +176,7 @@ class PlayCardAction(GameAction):
                 if effect_result.errors:
                     events.append({"type": "effect_errors", "errors": effect_result.errors})
 
+        player.hand_action_taken_count += 1
         player.has_taken_hand_action = True
         state.log_event("play_card", player=self.player_id, card=card.name)
         return ActionResult.ok(events)
@@ -204,7 +213,7 @@ class PublicCardAction(GameAction):
         if not player:
             return ActionResult.fail(f"Player {self.player_id} not found")
 
-        if player.has_taken_hand_action:
+        if not player.can_take_hand_action():
             return ActionResult.fail("Already used hand action this turn")
 
         # Find card in public pool
@@ -289,6 +298,7 @@ class PublicCardAction(GameAction):
             events.append({"type": "game_end_trigger", "reason": "150vp",
                            "player": self.player_id})
 
+        player.hand_action_taken_count += 1
         player.has_taken_hand_action = True
         state.log_event("play_public_card", player=self.player_id,
                         card=pool_card.name)
@@ -321,7 +331,7 @@ class CourtAction(GameAction):
         if not player:
             return ActionResult.fail(f"Player {self.player_id} not found")
 
-        if player.has_taken_court_action:
+        if not player.can_take_court_action():
             return ActionResult.fail("Already used court action this turn")
 
         court = state.get_court_cards(self.player_id)
@@ -394,6 +404,7 @@ class CourtAction(GameAction):
                            "player": self.player_id})
 
         player.has_taken_court_action = True
+        player.court_action_taken_count += 1
         state.log_event("court_action", player=self.player_id, card=card.name)
         return ActionResult.ok(events)
 

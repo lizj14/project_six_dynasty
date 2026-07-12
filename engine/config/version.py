@@ -223,11 +223,12 @@ def _dict_to_step(sd: dict) -> "EffectStep":
     params = dict(sd.get("params", {}))
     if sd.get("sub_effect"):
         params["sub_effect"] = sd["sub_effect"]
-    # Compatibility: step-level "filter" should be merged into params
-    if "filter" in sd and sd["filter"] is not None:
-        import warnings
-        warnings.warn(f"Step has top-level 'filter', merging into params: {sd.get('effect_type', '?')}")
-        params["filter"] = sd["filter"]
+    if sd.get("sub_effects"):
+        params["sub_effects"] = sd["sub_effects"]
+    # Compatibility: step-level fields that should be in params
+    for key in ("filter", "choice_options", "target"):
+        if key in sd and sd[key] is not None:
+            params[key] = sd[key]
     return EffectStep(
         effect_type=sd["effect_type"], params=params,
         condition=_dict_to_condition(sd.get("condition")),
