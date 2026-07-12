@@ -82,6 +82,10 @@ class EffectResolver:
         for cost in block.costs:
             if cost.cost_type == "discard_cards":
                 count = cost.params.get("count", 1)
+                if player and len(player.hand) < count:
+                    result.errors.append(
+                        f"Not enough hand cards to pay cost: need {count}, have {len(player.hand)}")
+                    return result
                 for _ in range(count):
                     if player and player.hand:
                         discarded = player.hand.pop()
@@ -91,12 +95,20 @@ class EffectResolver:
             elif cost.cost_type == "pay_military":
                 amount = cost.params.get("amount", 0)
                 if player:
-                    player.military = max(0, player.military - amount)
+                    if player.military < amount:
+                        result.errors.append(
+                            f"Not enough military to pay cost: need {amount}, have {player.military}")
+                        return result
+                    player.military -= amount
                     result.events.append({"type": "pay_military", "amount": amount})
             elif cost.cost_type == "pay_vp":
                 amount = cost.params.get("amount", 0)
                 if player:
-                    player.vp = max(0, player.vp - amount)
+                    if player.vp < amount:
+                        result.errors.append(
+                            f"Not enough VP to pay cost: need {amount}, have {player.vp}")
+                        return result
+                    player.vp -= amount
                     result.events.append({"type": "pay_vp", "amount": amount})
 
         # Handle strategy action (牌组行动) — these are resource gains

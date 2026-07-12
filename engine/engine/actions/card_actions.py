@@ -367,12 +367,6 @@ class CourtAction(GameAction):
         if not card:
             return ActionResult.fail("Card not found in court")
 
-        # Move to played-this-round area
-        if self.player_id == "north":
-            state.north_played_this_round.append(card)
-        else:
-            state.jin_played_this_round.append(card)
-
         events = [{"type": "court_action", "player": self.player_id,
                     "card": card.name}]
 
@@ -397,6 +391,22 @@ class CourtAction(GameAction):
             if defn.resource_vp > 0:
                 player.vp += defn.resource_vp
                 events.append({"type": "court_vp", "amount": defn.resource_vp})
+
+        # Determine card destination: archive (archive_this) or played-this-round
+        archived = False
+        for evt in events:
+            if evt.get("type") == "archive_this":
+                player.history_area.append(card)
+                player.vp += defn.history_vp
+                events.append({"type": "archive_card", "card": card.name,
+                               "history_vp": defn.history_vp})
+                archived = True
+                break
+        if not archived:
+            if self.player_id == "north":
+                state.north_played_this_round.append(card)
+            else:
+                state.jin_played_this_round.append(card)
 
         # Check end condition: VP >= 150
         if state.check_vp_game_end(self.player_id):

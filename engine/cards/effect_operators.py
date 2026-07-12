@@ -1096,6 +1096,7 @@ class ChooseOperator(EffectOperator):
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
+        from .effect_ast import EffectStep as ES
         result = ResolveResult()
         # Retrieve options from params (placed there by _dict_to_step
         # when compiled JSON has choice_options at step level)
@@ -1106,6 +1107,21 @@ class ChooseOperator(EffectOperator):
                               "options": len(options),
                               "chosen": choice_idx,
                               "chosen_label": chosen_label})
+
+        # Execute the chosen option's sub-steps
+        if options and 0 <= choice_idx < len(options):
+            chosen_option = options[choice_idx]
+            for sub_step_dict in chosen_option:
+                if isinstance(sub_step_dict, dict):
+                    nested = ES(
+                        effect_type=sub_step_dict.get("effect_type", ""),
+                        params=sub_step_dict.get("params", {}),
+                        source_text=sub_step_dict.get("source_text", ""),
+                        condition=sub_step_dict.get("condition"),
+                    )
+                    inner = resolver._execute_step(nested, state, player_id, context)
+                    result.events.extend(inner.events)
+                    result.errors.extend(inner.errors)
         return result
 
 

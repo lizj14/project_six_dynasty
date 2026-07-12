@@ -85,7 +85,7 @@ def setup_game(library: CardLibrary, agents: list,
     )
 
     # Phase 6+7: Execute hero enter, face-down cards, count armies
-    _execute_setup_effects(state, agents, action_system, logger)
+    _execute_setup_effects(state, agents, action_system, logger, rng)
 
     state.phase = PhaseType.PREPARATION
     state.round = 1
@@ -373,7 +373,7 @@ def _build_game_state(library: CardLibrary,
 
 
 def _execute_setup_effects(state: GameState, agents: list,
-                           action_system, logger):
+                           action_system, logger, rng: "random.Random" = None):
     """Execute hero enter effects, face-down cards, and count initial armies.
 
     Hero enter: North always first, then Jin sorted by 先动值 (start_order) descending (higher = earlier).
@@ -401,8 +401,8 @@ def _execute_setup_effects(state: GameState, agents: list,
     # --- Refill court from national decks after face-down play ---
     # Face-down strategy cards went to the national deck (insert at top).
     # Fill the court back to 10 cards without discarding remaining court cards.
-    _fill_court_to(state, "north", 10)
-    _fill_court_to(state, "jin", 10)
+    _fill_court_to(state, "north", 10, rng)
+    _fill_court_to(state, "jin", 10, rng)
 
     # --- Count initial army placements from map ---
     state.north_player.army_placed_count = sum(
@@ -687,14 +687,16 @@ def _refresh_court(state: GameState, faction: str, rng: random.Random):
             target.append(deck.pop(0))
 
 
-def _fill_court_to(state: GameState, faction: str, target_size: int = 10):
+def _fill_court_to(state: GameState, faction: str, target_size: int = 10,
+                   rng: "random.Random" = None):
     """Fill the court to target_size from the national deck WITHOUT discarding.
 
     Unlike _refresh_court, this preserves existing court cards — used during
     setup when face-down strategy cards have been added to the national deck
     and the court needs to be topped up.
     """
-    import random as _random
+    if rng is None:
+        rng = random.Random()
     if faction == "north":
         court = state.north_court
         deck = state.north_deck
@@ -706,7 +708,7 @@ def _fill_court_to(state: GameState, faction: str, target_size: int = 10):
 
     while len(court) < target_size:
         if not deck and discard:
-            _random.shuffle(discard)
+            rng.shuffle(discard)
             deck.extend(discard)
             discard.clear()
         if deck:

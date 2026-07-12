@@ -191,6 +191,42 @@ class GameLogger:
         }
         self._current_round["deck_state"] = deck_info
 
+    def log_round_end_locations(self, state: "GameState"):
+        """Record location control and region control for all players + Sima at round end."""
+        if not self._current_round:
+            return
+
+        # Map control state to player IDs
+        from models.location import ControlState
+        cs_to_player = {
+            ControlState.NORTH: "north",
+            ControlState.JIN_P1: "jin_1",
+            ControlState.JIN_P2: "jin_2",
+            ControlState.JIN_P3: "jin_3",
+            ControlState.SIMA: "sima",
+        }
+
+        loc_info: dict[str, dict] = {}  # player_id → {locations: [], regions: []}
+
+        # Occupied locations
+        for loc_id, loc in state.locations.items():
+            pid = cs_to_player.get(loc.controller)
+            if pid:
+                if pid not in loc_info:
+                    loc_info[pid] = {"locations": [], "regions": []}
+                fortified = "★" if loc.is_fortified else ""
+                loc_info[pid]["locations"].append(f"{loc_id}{fortified}")
+
+        # Controlled regions
+        for region, rs in state.regions.items():
+            pid = cs_to_player.get(rs.control_marker)
+            if pid:
+                if pid not in loc_info:
+                    loc_info[pid] = {"locations": [], "regions": []}
+                loc_info[pid]["regions"].append(region.value)
+
+        self._current_round["location_state"] = loc_info
+
     def log_round_end(self):
         """Finalize current round and append to log."""
         if self._current_round:
@@ -658,6 +694,20 @@ class GameLogger:
                     lines.append(f"      弃牌({len(info.get('discard', []))}): {discard_cards}")
                     lines.append(f"      朝堂({len(info.get('court', []))}): {court_cards}")
 
+            # Location control at round end
+            loc_state = r.get("location_state", {})
+            if loc_state:
+                lines.append(f"  [回合结束 地区控制]")
+                # Sort: north first, then jin players, then sima
+                priority = {"north": 0, "jin_1": 1, "jin_2": 2, "jin_3": 3, "sima": 4}
+                for pid in sorted(loc_state.keys(), key=lambda p: priority.get(p, 99)):
+                    info = loc_state[pid]
+                    locs = ' '.join(info.get('locations', [])) or '(无)'
+                    regions = ' '.join(info.get('regions', [])) or '(无)'
+                    lines.append(f"    {pid}:")
+                    lines.append(f"      占据地点: {locs}")
+                    lines.append(f"      控制区域: {regions}")
+
         # Final scoring
         lines.append(f"")
         lines.append(f"═══════════════════════════════════")
@@ -1016,6 +1066,17 @@ def log_action_result(logger, action, result, state):
             params["drawn_card"] = evt.get("card", "?")
         if evt.get("type") == "forced_event_drawn":
             params["forced_event"] = evt.get("card", "?")
+        # Block-level costs
+        if evt.get("type") == "pay_military":
+            costs["pay_military"] = evt.get("amount", 0)
+        if evt.get("type") == "pay_vp":
+            costs["pay_vp"] = evt.get("amount", 0)
+        if evt.get("type") == "gain_vp":
+            results["vp"] = (results.get("vp") or 0) + evt.get("amount", 0)
+        if evt.get("type") == "reform_vp":
+            results["reform_vp"] = evt.get("vp", 0)
+        if evt.get("type") == "archive_this":
+            results["archived"] = True
 
     snap = snapshot_player_state(state, action.player_id)
     logger.log_action(

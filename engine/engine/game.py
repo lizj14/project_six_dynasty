@@ -164,6 +164,7 @@ class GameEngine:
                 court_vp={}, military_gain={}, emperor_age=[],
             )
             self.logger.log_round_end_decks(state)
+            self.logger.log_round_end_locations(state)
             self.logger.log_round_end()
 
     def _run_player_turn(self, state: GameState, player_id: str):
