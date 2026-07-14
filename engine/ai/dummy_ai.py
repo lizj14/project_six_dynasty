@@ -287,7 +287,13 @@ class DummyAI(GameAgent):
 
     def select_target(self, state: "GameState", prompt: dict) -> Optional[str]:
         options = prompt.get("options", [])
-        return self.rng.choice(options) if options else None
+        if not options:
+            return None
+        # If dict options, extract 'id'
+        if isinstance(options[0], dict):
+            chosen = self.rng.choice(options)
+            return chosen.get("id", str(chosen))
+        return self.rng.choice(options)
 
     def choose_discards(self, state: "GameState", hand_cards: list[str],
                         count: int) -> list[int]:

@@ -66,6 +66,10 @@ class OccupyAction(GameAction):
         loc = state.locations[self.target_location]
         loc.controller = cs
 
+        # Track region control change
+        from rules.area_control import on_location_change
+        on_location_change(state, self.target_location)
+
         # Pay cost
         player.military -= 1
 
@@ -225,8 +229,7 @@ class MarchAction(GameAction):
 
         # 1 prestige for 东晋 players
         if player.faction == FactionType.JIN:
-            player.prestige = min(9, player.prestige + 1)
-            events[-1]["prestige_gained"] = 1
+            events.extend(state.add_prestige(self.player_id, 1))
 
         state.log_event("march", player=self.player_id,
                          target=self.target_location, cost=cost)

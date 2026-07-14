@@ -58,22 +58,24 @@ class ActionSystem:
         available = []
 
         # Occupy — check for adjacent empty (unoccupied) locations
-        friendly = state.get_friendly_locations(player_id)
+        # Use own locations only (not allied/Sima) for adjacency source
+        own_locs = state.get_own_locations(player_id)
         for loc_id, loc in state.locations.items():
             if loc.controller != ControlState.EMPTY:
                 continue
-            if any(n in friendly for n in state.get_adjacent_locations(loc_id)):
+            if any(n in own_locs for n in state.get_adjacent_locations(loc_id)):
                 action = OccupyAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)
 
         # March — check for adjacent non-friendly, non-empty locations
         # (NEUTRAL = neutral forces present; EMPTY = unoccupied → use Occupy instead)
+        # Use own locations only for adjacency — you march from your own territory
         for loc_id, loc in state.locations.items():
             cs = state._player_control_state(player_id)
             if loc.is_friendly_to(cs) or loc.controller == ControlState.EMPTY:
                 continue
-            if any(n in friendly for n in state.get_adjacent_locations(loc_id)):
+            if any(n in own_locs for n in state.get_adjacent_locations(loc_id)):
                 action = MarchAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)
@@ -90,7 +92,8 @@ class ActionSystem:
                 action = RecruitAction(player_id=player_id, card_to_discard_index=i)
                 available.append(action)
 
-        # Fortify — once per turn, adjacent friendly locations
+        # Fortify — once per turn, can fortify friendly locations (including allies)
+        friendly = state.get_friendly_locations(player_id)
         if not player.has_fortified_quick and player.military >= 1:
             for loc_id in friendly:
                 loc = state.locations.get(loc_id)

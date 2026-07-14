@@ -35,6 +35,7 @@ class EffectResolver:
         self.trigger_callback = None       # Set by GameEngine: fn(trigger_type, context)
         self.log_callback = None           # Set by GameEngine: fn(player_id, effect_type, params, events, source)
         self.select_target_callback = None # Set by GameEngine: fn(player_id, prompt) -> Optional[str]
+        self.make_choice_callback = None   # Set by GameEngine: fn(player_id, prompt) -> int
 
     # ================================================================
     # Public API

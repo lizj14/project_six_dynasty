@@ -196,6 +196,12 @@ class GameLogger:
         if not self._current_round:
             return
 
+        # Recalculate all region controls before recording — ensures
+        # RegionState.control_marker is up to date even if on_location_change
+        # wasn't called for recent location controller changes.
+        from rules.area_control import check_all_regions
+        check_all_regions(state)
+
         # Map control state to player IDs
         from models.location import ControlState
         cs_to_player = {
@@ -944,14 +950,19 @@ def describe_action(action: "GameAction", state: "GameState",
             desc = "摸牌 (快速行动)"
 
     elif atype == "recruit":
-        # Card was already discarded, get name from result events not hand
+        # Card was already discarded, get name from result events not hand.
+        # Fall back to reading from hand if result not available (preview mode).
         card_name = "?"
         if result and result.events:
             for evt in result.events:
                 if evt.get("type") == "recruit" and evt.get("discarded"):
                     card_name = evt["discarded"]
                     break
-        desc = f"征募: 弃{card_name}换1军力"
+        if card_name == "?" and player:
+            idx = getattr(action, 'card_to_discard_index', -1)
+            if 0 <= idx < len(player.hand):
+                card_name = player.hand[idx].name
+        desc = f"征募: 弃「{card_name}」换1军力"
 
     elif atype == "fortify":
         target = getattr(action, 'target_location', '?')
@@ -988,7 +999,8 @@ def describe_action(action: "GameAction", state: "GameState",
         desc = "降低行动顺位"
 
     elif atype == "activate_effect":
-        # Extract card name and effect summary from result events
+        # Extract card name and effect summary from result events.
+        # Fall back to looking up card from state if result not available (preview mode).
         card_name = None
         effects_desc = []
         if result and result.events:
@@ -1019,6 +1031,18 @@ def describe_action(action: "GameAction", state: "GameState",
                     effects_desc.append(f"传播文化+{evt.get('vp','?')}vp")
                 elif evt.get("type") == "raise_order":
                     effects_desc.append(f"顺位→{evt.get('new_order','?')}")
+
+        # Fallback: look up card from state when result is not available
+        if card_name is None and player:
+            card_id = getattr(action, 'card_id', '')
+            if card_id:
+                if player.hero and player.hero.definition.card_id == card_id:
+                    card_name = player.hero.name
+                else:
+                    for c in player.staff_area:
+                        if c.definition.card_id == card_id:
+                            card_name = c.name
+                            break
 
         desc = f"激活「{card_name or '?'}」"
         if effects_desc:

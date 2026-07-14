@@ -246,6 +246,181 @@ class GameState:
     def get_jin_players(self) -> list[PlayerState]:
         return list(self.jin_players)
 
+    # ======== Value Tracker (功绩/威望 overflow) ========
+
+    def add_contribution(self, player_id: str, amount: int) -> list[dict]:
+        """Add contribution with overflow mechanic.
+
+        Cap is 9. When the gain would push past 9, the player caps at 9 and
+        for each untaken point, chooses another Jin player to lose 1 功绩.
+
+        Returns events to be merged into the action/effect result.
+        """
+        from .enums import FactionType as FT
+        player = self.get_player(player_id)
+        if not player or amount <= 0:
+            return []
+
+        events = []
+        current = player.contribution
+        new_val = current + amount
+
+        if new_val <= 9:
+            player.contribution = new_val
+            events.append({"type": "contribution_gained", "player": player_id,
+                           "amount": amount})
+            return events
+
+        # Overflow
+        taken = max(0, 9 - current)
+        overflow = new_val - 9
+        player.contribution = 9
+        if taken > 0:
+            events.append({"type": "contribution_gained", "player": player_id,
+                           "amount": taken})
+
+        # Get callback from effect resolver
+        callback = None
+        resolver = getattr(self, 'effect_resolver', None)
+        if resolver:
+            callback = getattr(resolver, 'select_target_callback', None)
+
+        for i in range(overflow):
+            # Find eligible targets: other Jin players with contribution > 0
+            targets = [p for p in self.jin_players
+                       if p.player_id != player_id and p.contribution > 0]
+            if not targets:
+                events.append({"type": "contribution_overflow",
+                               "overflow": overflow - i,
+                               "skipped": True, "reason": "no_valid_targets"})
+                break
+
+            if callback:
+                prompt = {
+                    "type": "overflow_contribution",
+                    "title": f"功绩已达上限(9)，选择一个其他玩家使其功绩-1 ({i+1}/{overflow})",
+                    "options": [{"id": p.player_id,
+                                 "label": f"{p.player_id} (当前功绩:{p.contribution})"}
+                                for p in targets],
+                }
+                chosen = callback(player_id, prompt)
+            else:
+                chosen = None
+
+            if chosen:
+                target = self.get_player(chosen)
+                if target and target.contribution > 0:
+                    target.contribution -= 1
+                    events.append({"type": "contribution_reduced",
+                                   "player": chosen, "amount": 1,
+                                   "source_player": player_id})
+                else:
+                    events.append({"type": "contribution_overflow",
+                                   "overflow": 1, "skipped": True,
+                                   "reason": "target_no_longer_valid"})
+            else:
+                events.append({"type": "contribution_overflow",
+                               "overflow": 1, "skipped": True,
+                               "reason": "no_choice"})
+
+        return events
+
+    def add_prestige(self, player_id: str, amount: int) -> list[dict]:
+        """Add prestige with overflow mechanic.
+
+        Cap is 9. When the gain would push past 9, the player caps at 9 and
+        for each untaken point, chooses another player (or 司马家) to lose 1 威望.
+
+        Returns events to be merged into the action/effect result.
+        """
+        from .enums import FactionType as FT
+        player = self.get_player(player_id)
+        if not player or amount <= 0:
+            return []
+
+        events = []
+        current = player.prestige
+        new_val = current + amount
+
+        if new_val <= 9:
+            player.prestige = new_val
+            events.append({"type": "prestige_gained", "player": player_id,
+                           "amount": amount})
+            return events
+
+        # Overflow
+        taken = max(0, 9 - current)
+        overflow = new_val - 9
+        player.prestige = 9
+        if taken > 0:
+            events.append({"type": "prestige_gained", "player": player_id,
+                           "amount": taken})
+
+        # Get callback from effect resolver
+        callback = None
+        resolver = getattr(self, 'effect_resolver', None)
+        if resolver:
+            callback = getattr(resolver, 'select_target_callback', None)
+
+        for i in range(overflow):
+            # Eligible targets: other Jin players OR Sima with prestige > 0
+            targets = [p for p in self.jin_players
+                       if p.player_id != player_id and p.prestige > 0]
+            # Sima can also be targeted for prestige
+            if self.sima and self.sima.prestige > 0:
+                targets.append(self.sima)  # SimaState has prestige and a name
+
+            if not targets:
+                events.append({"type": "prestige_overflow",
+                               "overflow": overflow - i,
+                               "skipped": True, "reason": "no_valid_targets"})
+                break
+
+            if callback:
+                options = []
+                for t in targets:
+                    if hasattr(t, 'player_id'):
+                        label = f"{t.player_id} (当前威望:{t.prestige})"
+                        tid = t.player_id
+                    else:
+                        # SimaState
+                        label = f"司马家 (当前威望:{t.prestige})"
+                        tid = "sima"
+                    options.append({"id": tid, "label": label})
+                prompt = {
+                    "type": "overflow_prestige",
+                    "title": f"威望已达上限(9)，选择一个目标使其威望-1 ({i+1}/{overflow})",
+                    "options": options,
+                }
+                chosen = callback(player_id, prompt)
+            else:
+                chosen = None
+
+            if chosen:
+                if chosen == "sima":
+                    if self.sima and self.sima.prestige > 0:
+                        self.sima.prestige -= 1
+                        events.append({"type": "prestige_reduced",
+                                       "player": "sima", "amount": 1,
+                                       "source_player": player_id})
+                else:
+                    target = self.get_player(chosen)
+                    if target and target.prestige > 0:
+                        target.prestige -= 1
+                        events.append({"type": "prestige_reduced",
+                                       "player": chosen, "amount": 1,
+                                       "source_player": player_id})
+                    else:
+                        events.append({"type": "prestige_overflow",
+                                       "overflow": 1, "skipped": True,
+                                       "reason": "target_no_longer_valid"})
+            else:
+                events.append({"type": "prestige_overflow",
+                               "overflow": 1, "skipped": True,
+                               "reason": "no_choice"})
+
+        return events
+
     def get_active_player(self) -> Optional[PlayerState]:
         """Get the player whose turn it currently is."""
         if self.turn_order and self.active_player_index < len(self.turn_order):
@@ -294,6 +469,19 @@ class GameState:
                     if loc_id not in friendly:
                         friendly.append(loc_id)
         return friendly
+
+    def get_own_locations(self, player_id: str) -> list[str]:
+        """Get locations directly controlled by this player (NOT allies).
+
+        Unlike get_friendly_locations(), this only returns locations where
+        the controller IS this player's ControlState, not friendly allies.
+        """
+        cs = self._player_control_state(player_id)
+        own = []
+        for loc_id, loc in self.locations.items():
+            if loc.controller == cs:
+                own.append(loc_id)
+        return own
 
     def is_friendly_location(self, location_id: str, player_id: str) -> bool:
         cs = self._player_control_state(player_id)

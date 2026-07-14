@@ -49,6 +49,30 @@ REGION_CONFIG: dict[Region, dict] = {
 }
 
 
+# Region adjacency — used by spread_culture to determine valid target regions.
+# Two regions are adjacent if any location in one borders any location in the other
+# (derived from map_adjacencies in board data).
+REGION_ADJACENCY: dict[Region, set[Region]] = {
+    Region.XILIANG:   {Region.GUANZHONG},
+    Region.GUANZHONG: {Region.XILIANG, Region.BASHU, Region.JINGXIANG, Region.ZHONGYUAN, Region.SHANXI},
+    Region.BASHU:     {Region.GUANZHONG, Region.JINGXIANG},
+    Region.JINGXIANG: {Region.GUANZHONG, Region.BASHU, Region.JIANGNAN, Region.ZHONGYUAN, Region.HUAINAN},
+    Region.JIANGNAN:  {Region.JINGXIANG, Region.HUAINAN},
+    Region.ZHONGYUAN: {Region.GUANZHONG, Region.JINGXIANG, Region.HUAINAN, Region.SHANDONG, Region.HEBEI, Region.SHANXI},
+    Region.SHANXI:    {Region.GUANZHONG, Region.ZHONGYUAN, Region.HEBEI, Region.GUANWAI},
+    Region.SHANDONG:  {Region.ZHONGYUAN, Region.HEBEI, Region.HUAINAN},
+    Region.HUAINAN:   {Region.JINGXIANG, Region.JIANGNAN, Region.ZHONGYUAN, Region.SHANDONG},
+    Region.HEBEI:     {Region.ZHONGYUAN, Region.SHANXI, Region.SHANDONG, Region.YOUYAN},
+    Region.YOUYAN:    {Region.HEBEI, Region.GUANWAI},
+    Region.GUANWAI:   {Region.SHANXI, Region.YOUYAN},
+}
+
+
+def get_adjacent_regions(region: Region) -> set[Region]:
+    """Return the set of regions adjacent to the given region."""
+    return REGION_ADJACENCY.get(region, set())
+
+
 @dataclass
 class ControlResult:
     """Result of a region control check."""
@@ -117,6 +141,23 @@ def check_region_control(state: "GameState", region: Region) -> ControlResult:
             full_controller = pid
             break
     # Sima can't have full control (it's NPC)
+
+    # Update RegionState control_marker so it can be queried later (e.g. by game logger)
+    # Initialize RegionState if missing (lazy init)
+    if region not in state.regions:
+        from models.location import RegionState as RS
+        state.regions[region] = RS(region=region)
+    rs = state.regions[region]
+
+    # Priority: full controller > partial controller > sima
+    if full_controller:
+        rs.control_marker = _player_id_to_control_state(full_controller)
+    elif partial_controller == "sima":
+        rs.control_marker = ControlState.SIMA
+    elif partial_controller:
+        rs.control_marker = _player_id_to_control_state(partial_controller)
+    else:
+        rs.control_marker = None
 
     return ControlResult(
         region=region,
@@ -195,3 +236,15 @@ def _control_state_to_player_id(cs: ControlState) -> Optional[str]:
         ControlState.SIMA: "sima",
     }
     return mapping.get(cs)
+
+
+def _player_id_to_control_state(pid: str) -> Optional[ControlState]:
+    """Map player_id back to ControlState."""
+    mapping = {
+        "north": ControlState.NORTH,
+        "jin_1": ControlState.JIN_P1,
+        "jin_2": ControlState.JIN_P2,
+        "jin_3": ControlState.JIN_P3,
+        "sima": ControlState.SIMA,
+    }
+    return mapping.get(pid)

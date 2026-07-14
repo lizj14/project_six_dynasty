@@ -85,10 +85,7 @@ def move_sima_capital(state: "GameState", new_location: str,
     events.append({"type": "capital_moved", "to": new_location})
 
     if is_player_location:
-        player = state.get_player(chosen_by_player)
-        if player:
-            player.contribution = min(9, player.contribution + 1)
-            events.append({"type": "contribution_for_capital",
-                           "player": chosen_by_player})
+        if state.get_player(chosen_by_player):
+            events.extend(state.add_contribution(chosen_by_player, 1))
 
     return events

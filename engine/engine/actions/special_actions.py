@@ -90,13 +90,16 @@ class ConvertAction(GameAction):
         player.army_placed_count += 1
         player.army_reserve_count -= 1
 
+        # Track region control change
+        from rules.area_control import on_location_change
+        on_location_change(state, self.target_location)
+
         # Rewards for non-friendly conversion
         if not was_friendly:
             player.vp += 1
             events.append({"type": "convert_vp", "vp": 1, "location": self.target_location})
             if player.faction == FactionType.JIN:
-                player.prestige = min(9, player.prestige + 1)
-                events.append({"type": "convert_prestige", "prestige": 1})
+                events.extend(state.add_prestige(self.player_id, 1))
 
         # Jin special penalty: only when choosing from multiple optional targets
         # and the chosen target has no adjacent non-friendly troops.
@@ -197,8 +200,7 @@ class ArchiveAction(GameAction):
 
         # Jin players gain 1 contribution for archiving
         if player.faction == FactionType.JIN:
-            player.contribution = min(9, player.contribution + 1)
-            events.append({"type": "contribution_gained", "amount": 1})
+            events.extend(state.add_contribution(self.player_id, 1))
 
         state.log_event("archive", player=self.player_id,
                          card=card.name, source=self.source)

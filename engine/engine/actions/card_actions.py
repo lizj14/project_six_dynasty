@@ -101,10 +101,12 @@ class PlayCardAction(GameAction):
                            card=card.name, reason="faction_restriction")
             return ActionResult.ok(events)
 
-        # === Play condition check (all card types) ===
+        # === Play condition check (all card types except HERO) ===
         # Card's play_condition not met → discard (no effect, cost already paid).
         # Applies to EVENT, STRATEGY, and FRIEND cards alike — e.g. 凉州大马
         # requires 控制[西凉] and is a STRATEGY card.
+        # STRATEGY conditions are also checked in CourtAction (double-check:
+        # you need the condition both to add it to deck AND to execute it).
         if card.card_type != CardType.HERO:
             parsed = card.definition.parsed_effect
             if parsed and parsed.play_condition:
@@ -149,14 +151,17 @@ class PlayCardAction(GameAction):
             events.append({"type": "strategy_played", "card": card.name,
                            "added_to": f"{self.player_id}_deck"})
 
-            # Jin players: reform (改革) grants VP = card cost + 1,
-            # plus 1 contribution for adding strategy to deck
+            # Jin players: reform (改革) rewards based on card cost:
+            #   1-cost → +1 功绩
+            #   2-cost → +1 功绩 +3 VP
+            #   3-cost → +2 功绩
+            # (Rulebook §4.2 + design notes §策略牌费用)
             if player.faction == FactionType.JIN:
-                reform_vp = card.cost + 1
-                player.vp += reform_vp
-                events.append({"type": "reform_vp", "vp": reform_vp, "card_cost": card.cost})
-                player.contribution = min(9, player.contribution + 1)
-                events.append({"type": "contribution_gained", "amount": 1})
+                if card.cost >= 2:
+                    player.vp += 3
+                    events.append({"type": "reform_vp", "vp": 3, "card_cost": card.cost})
+                contribution_gain = 2 if card.cost >= 3 else 1
+                events.extend(state.add_contribution(self.player_id, contribution_gain))
 
         # === Resolve card effects via EffectResolver ===
         # Strategy cards go to deck; effects fire later via CourtAction.
@@ -347,6 +352,17 @@ class CourtAction(GameAction):
         if not target_card.definition.has_strategy_action:
             return ActionResult.fail(f"{target_card.name} has no court action effect")
 
+        # Check play_condition — STRATEGY card conditions are enforced at
+        # court execution time, not when the card is added to the deck.
+        # e.g. 凉州大马 requires 控制[西凉] to be executed from court.
+        parsed = target_card.definition.parsed_effect
+        if parsed and parsed.play_condition:
+            resolver = getattr(state, 'effect_resolver', None)
+            if resolver and not resolver.check_condition(
+                parsed.play_condition, state, self.player_id):
+                return ActionResult.fail(
+                    f"Cannot execute {target_card.name} — condition not met")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
@@ -392,6 +408,10 @@ class CourtAction(GameAction):
                 player.vp += defn.resource_vp
                 events.append({"type": "court_vp", "amount": defn.resource_vp})
 
+        # Note: court action itself does NOT grant contribution.
+        # Contribution comes from: (a) archiving cards from court (ArchiveAction
+        # or archive_this effect), (b) playing strategy cards via hand action.
+
         # Determine card destination: archive (archive_this) or played-this-round
         archived = False
         for evt in events:
@@ -400,6 +420,9 @@ class CourtAction(GameAction):
                 player.vp += defn.history_vp
                 events.append({"type": "archive_card", "card": card.name,
                                "history_vp": defn.history_vp})
+                # Jin players gain 1 contribution for archiving from court
+                if player.faction == FactionType.JIN:
+                    events.extend(state.add_contribution(self.player_id, 1))
                 archived = True
                 break
         if not archived:

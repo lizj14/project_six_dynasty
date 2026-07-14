@@ -204,9 +204,58 @@ class ArchiveCardOperator(EffectOperator):
         result = ResolveResult()
         player = state.get_player(player_id)
         count = step.params.get("count", 1)
+        card_type_filter = step.params.get("card_type")  # "court", "friend", "any", or None
+        source = step.params.get("from")  # "staff", "hand", or None
+
         for _ in range(count):
-            if player and player.hand:
-                card = player.hand.pop()
+            card = None
+
+            if card_type_filter == "court":
+                # Archive from court cards — ask agent to choose
+                court = state.get_court_cards(player_id)
+                if not court:
+                    continue
+                if resolver.select_target_callback:
+                    prompt = {
+                        "type": "archive_card",
+                        "title": "选择1张朝堂牌存档",
+                        "options": [
+                            {"id": c.definition.card_id,
+                             "label": f"{c.name} (费用{c.cost}, 史书{c.definition.history_vp}vp)"}
+                            for c in court
+                        ],
+                    }
+                    chosen_id = resolver.select_target_callback(player_id, prompt)
+                    if chosen_id:
+                        for i, c in enumerate(court):
+                            if c.definition.card_id == chosen_id:
+                                card = court.pop(i)
+                                break
+            elif source == "staff":
+                # Archive from staff area
+                if player and player.staff_area:
+                    if resolver.select_target_callback:
+                        prompt = {
+                            "type": "archive_card",
+                            "title": "选择1张幕僚存档",
+                            "options": [
+                                {"id": c.definition.card_id,
+                                 "label": f"{c.name} (史书{c.definition.history_vp}vp)"}
+                                for c in player.staff_area
+                            ],
+                        }
+                        chosen_id = resolver.select_target_callback(player_id, prompt)
+                        if chosen_id:
+                            for i, c in enumerate(player.staff_area):
+                                if c.definition.card_id == chosen_id:
+                                    card = player.staff_area.pop(i)
+                                    break
+            else:
+                # Default: archive from hand (last card)
+                if player and player.hand:
+                    card = player.hand.pop()
+
+            if card:
                 player.history_area.append(card)
                 player.vp += card.definition.history_vp
                 result.events.append({"type": "archive_card", "card": card.name})
@@ -214,7 +263,7 @@ class ArchiveCardOperator(EffectOperator):
                                        {"card": card})
                 from models.enums import FactionType
                 if player.faction == FactionType.JIN:
-                    player.contribution = min(9, player.contribution + 1)
+                    result.events.extend(state.add_contribution(player_id, 1))
         return result
 
 
@@ -312,6 +361,7 @@ class DraftOperator(EffectOperator):
         result = ResolveResult()
         if resolver.action_system:
             from engine.actions.special_actions import LevyAction
+            from models.enums import CardType
             p = step.params
             count = p.get("count", 1)
             filter_spec = p.get("filter")
@@ -323,7 +373,60 @@ class DraftOperator(EffectOperator):
                     r = resolver.action_system.execute(state, action)
                     result.events.extend(r.events if r.success else [])
                     if not r.success:
-                        if not r.success: result.errors.append(r.error or "action failed")
+                        result.errors.append(r.error or "action failed")
+                elif resolver.select_target_callback:
+                    # No card_id specified — ask agent to choose from court
+                    court = state.get_court_cards(player_id)
+                    if not court:
+                        result.events.append({
+                            "type": "draft_requested",
+                            "count": count, "filter": filter_spec, "index": i,
+                            "skipped": True, "reason": "empty_court",
+                        })
+                        continue
+
+                    # Apply filter if specified
+                    candidates = court
+                    if filter_spec:
+                        marker = filter_spec.get("marker")
+                        if marker:
+                            candidates = [c for c in court
+                                         if c.definition.has_marker(marker)]
+                        card_type_filter = filter_spec.get("card_type")
+                        if card_type_filter:
+                            ct = CardType(card_type_filter) if isinstance(card_type_filter, str) else card_type_filter
+                            candidates = [c for c in candidates if c.card_type == ct]
+
+                    if not candidates:
+                        result.events.append({
+                            "type": "draft_requested",
+                            "count": count, "filter": filter_spec, "index": i,
+                            "skipped": True, "reason": "no_matching_cards",
+                        })
+                        continue
+
+                    prompt = {
+                        "type": "draft_card",
+                        "title": f"选择1张候选策略牌征发 ({i+1}/{count})",
+                        "options": [
+                            {"id": c.definition.card_id,
+                             "label": f"{c.name} (+{c.definition.resource_option_army}军/+{c.definition.resource_option_vp}vp)"}
+                            for c in candidates
+                        ],
+                    }
+                    chosen_id = resolver.select_target_callback(player_id, prompt)
+                    if chosen_id:
+                        action = LevyAction(player_id=player_id, card_id=chosen_id)
+                        r = resolver.action_system.execute(state, action)
+                        result.events.extend(r.events if r.success else [])
+                        if not r.success:
+                            result.errors.append(r.error or "action failed")
+                    else:
+                        result.events.append({
+                            "type": "draft_requested",
+                            "count": count, "filter": filter_spec, "index": i,
+                            "skipped": True, "reason": "no_choice",
+                        })
                 else:
                     result.events.append({
                         "type": "draft_requested",
@@ -389,6 +492,9 @@ class _TargetedMapOperator(EffectOperator, ABC):
         if valid and resolver.select_target_callback:
             prompt = {
                 "type": self.event_type,
+                "title": {"march_requested": "选择进军目标",
+                         "occupy_requested": "选择占据目标",
+                         "fortify_requested": "选择加固目标"}.get(self.event_type, "选择目标"),
                 "options": valid,
             }
             if extra_info:
@@ -415,15 +521,15 @@ class MarchOperator(_TargetedMapOperator):
     context_key = "march_targets"
 
     def _get_valid_targets(self, state, player_id, step):
-        """Enemy or neutral locations adjacent to friendly."""
-        friendly = state.get_friendly_locations(player_id)
+        """Enemy or neutral locations adjacent to own locations (not allies/Sima)."""
+        own_locs = state.get_own_locations(player_id)
         player_cs = state._player_control_state(player_id)
         valid = []
         for loc_id, loc in state.locations.items():
             if loc.is_friendly_to(player_cs):
                 continue
             neighbors = state.get_adjacent_locations(loc_id)
-            if any(n in friendly for n in neighbors):
+            if any(n in own_locs for n in neighbors):
                 valid.append(loc_id)
         return valid
 
@@ -488,14 +594,14 @@ class OccupyOperator(_TargetedMapOperator):
     context_key = "occupy_targets"
 
     def _get_valid_targets(self, state, player_id, step):
-        """Empty/neutral locations adjacent to friendly."""
-        friendly = state.get_friendly_locations(player_id)
+        """Empty/neutral locations adjacent to own locations (not allies/Sima)."""
+        own_locs = state.get_own_locations(player_id)
         valid = []
         for loc_id, loc in state.locations.items():
             if loc.controller != ControlState.EMPTY:
                 continue
             neighbors = state.get_adjacent_locations(loc_id)
-            if any(n in friendly for n in neighbors):
+            if any(n in own_locs for n in neighbors):
                 valid.append(loc_id)
         return valid
 
@@ -766,7 +872,14 @@ class ConvertOperator(EffectOperator):
         """Helper: ask agent to select from valid targets."""
         if not valid or not resolver.select_target_callback:
             return None
-        prompt = {"type": event_type, "options": valid}
+        prompt = {
+            "type": event_type,
+            "title": {"convert_requested": "选择转化目标",
+                     "march_requested": "选择进军目标",
+                     "occupy_requested": "选择占据目标",
+                     "fortify_requested": "选择加固目标"}.get(event_type, "选择目标"),
+            "options": valid,
+        }
         if extra_info:
             prompt.update(extra_info)
         return resolver.select_target_callback(player_id, prompt)
@@ -789,11 +902,25 @@ class SpreadCultureOperator(EffectOperator):
 
         culture = step.params.get("culture")
         if not culture:
-            result.events.append({
-                "type": "spread_culture_requested",
-                "skipped": True, "reason": "no_culture_specified",
-            })
-            return result
+            # No culture specified — let the agent choose which culture to spread
+            # (e.g. 鸠摩罗什 active: "传播1次文化")
+            if resolver.select_target_callback:
+                prompt = {
+                    "type": "spread_culture_requested",
+                    "title": "选择要传播的文化类型",
+                    "options": [
+                        {"id": "confucianism", "label": "儒学"},
+                        {"id": "taoism", "label": "玄学"},
+                        {"id": "buddhism", "label": "佛学"},
+                    ],
+                }
+                culture = resolver.select_target_callback(player_id, prompt)
+            if not culture:
+                result.events.append({
+                    "type": "spread_culture_requested",
+                    "skipped": True, "reason": "no_culture_specified",
+                })
+                return result
 
         # 1. Hardcoded target_region in params
         if step.params.get("target_region"):
@@ -811,8 +938,11 @@ class SpreadCultureOperator(EffectOperator):
         # 2. Agent selects region
         valid_regions = self._get_valid_regions(state, player_id, culture)
         if valid_regions and resolver.select_target_callback:
+            culture_label = {"confucianism": "儒学", "taoism": "玄学",
+                           "buddhism": "佛学"}.get(culture, culture)
             prompt = {
                 "type": "spread_culture_requested",
+                "title": f"选择传播{culture_label}的目标区域",
                 "options": valid_regions,
                 "culture": culture,
             }
@@ -856,15 +986,16 @@ class SpreadCultureOperator(EffectOperator):
         """Enumerate regions where the player can spread this culture.
 
         Valid if: player controls at least one location in the region, OR
-        region is adjacent to a region that already has this culture marker.
+        region is adjacent to a region that already has this culture marker, OR
+        region has this culture as its initial_culture.
         """
-        from rules.area_control import REGION_CONFIG
+        from rules.area_control import REGION_CONFIG, get_adjacent_regions
         from models.enums import CultureType
 
         friendly = state.get_friendly_locations(player_id)
         culture_ct = CultureType(culture) if culture else None
 
-        # Regions that already have culture markers on map
+        # Regions that already have culture markers of this type on the map
         regions_with_culture = set()
         for loc_id, loc in state.locations.items():
             if loc.culture_marker and loc.culture_marker == culture_ct:
@@ -877,9 +1008,10 @@ class SpreadCultureOperator(EffectOperator):
             reg_locs = cfg.get("locations", [])
             # Player controls at least one location in this region
             controls = any(loc in friendly for loc in reg_locs)
-            # Adjacent to a region that has this culture
-            adjacent = reg in regions_with_culture
-            # Initial culture match
+            # Adjacent to a region that already has this culture marker on the map
+            adjacent_regions = get_adjacent_regions(reg)
+            adjacent = bool(adjacent_regions & regions_with_culture)
+            # Initial culture match (for regions that natively have this culture)
             initial_culture = cfg.get("initial_culture", "")
             has_initial = (initial_culture == culture)
 
@@ -936,8 +1068,8 @@ class RaisePrestigeOperator(EffectOperator):
         player = state.get_player(player_id)
         amount = step.params.get("amount", 1)
         if player:
-            player.prestige = min(10, player.prestige + amount)
-            result.events.append({"type": "raise_prestige", "amount": amount})
+            events = state.add_prestige(player_id, amount)
+            result.events.extend(events)
             resolver._fire_trigger("on_gain_prestige", player_id,
                                    {"amount": amount})
         return result
@@ -968,8 +1100,8 @@ class RaiseContributionOperator(EffectOperator):
         player = state.get_player(player_id)
         amount = step.params.get("amount", 1)
         if player:
-            player.contribution = min(9, player.contribution + amount)
-            result.events.append({"type": "raise_contribution", "amount": amount})
+            events = state.add_contribution(player_id, amount)
+            result.events.extend(events)
             resolver._fire_trigger("on_gain_contribution", player_id,
                                    {"amount": amount})
         return result
@@ -1101,7 +1233,55 @@ class ChooseOperator(EffectOperator):
         # Retrieve options from params (placed there by _dict_to_step
         # when compiled JSON has choice_options at step level)
         options = step.params.get("choice_options") or step.params.get("options", [])
-        choice_idx = (context or {}).get("choice_index", 0)
+
+        # choice_index resolution:
+        #  1. step.params.get("choice_index") — explicitly specified by caller
+        #  2. context.get("_step_choice_index") — passed through from an outer choose
+        #  3. resolver.make_choice_callback — ask the agent (used for 刘穆之, 桓石虔, etc.)
+        #  NOTE: explicitly does NOT use context.get("choice_index") which is for
+        #        block-level choice_options (set by ActivateEffectAction)
+        choice_idx = step.params.get("choice_index")
+        if choice_idx is None:
+            choice_idx = (context or {}).get("_step_choice_index")
+        if choice_idx is None and options and resolver.make_choice_callback:
+            # Build prompt and ask agent to choose
+            prompt = {
+                "type": "choose_effect",
+                "title": step.params.get("prompt_text", "选择一个选项"),
+                "options": [],
+            }
+            for i, opt_steps in enumerate(options):
+                # Summarize each option from its steps
+                labels = []
+                for s in opt_steps:
+                    if isinstance(s, dict):
+                        et = s.get("effect_type", "")
+                        p = s.get("params", {})
+                        cnt = p.get("count", p.get("amount", 1))
+                        try:
+                            cnt = int(cnt)
+                        except (ValueError, TypeError):
+                            cnt = 1
+                        label_map = {
+                            "draw_cards": f"摸{cnt}张牌",
+                            "draft": f"征发{cnt}张候选策略牌" if cnt > 1 else "征发1张候选策略牌",
+                            "play_card": f"打出{cnt}张牌" if cnt > 1 else "打出1张牌",
+                            "gain_military": f"+{cnt}军力",
+                            "gain_vp": f"+{cnt}VP",
+                            "spread_culture": "传播文化",
+                            "archive_card": "存档",
+                            "search": "检索",
+                        }
+                        labels.append(label_map.get(et, et))
+                prompt["options"].append({
+                    "id": str(i),
+                    "label": f"选项{i+1}: {'，'.join(labels)}" if labels else f"选项{i+1}",
+                })
+            choice_idx = resolver.make_choice_callback(player_id, prompt)
+
+        if choice_idx is None:
+            choice_idx = 0
+
         chosen_label = f"option_{choice_idx + 1}" if options else "none"
         result.events.append({"type": "choose",
                               "options": len(options),

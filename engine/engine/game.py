@@ -27,7 +27,8 @@ class GameEngine:
                  library: CardLibrary = None,
                  version: "Version" = None,
                  seed: int = 0, action_system: ActionSystem = None,
-                 logger: "GameLogger" = None):
+                 logger: "GameLogger" = None,
+                 on_action_executed: callable = None):
         # Support both old (library=) and new (version=) API
         if version is not None:
             self.library = version.card_library
@@ -46,6 +47,8 @@ class GameEngine:
         self.state: Optional[GameState] = None
         self.max_rounds = self.version.get("max_rounds", 10) if self.version else 10
         self.logger = logger
+        self.on_action_executed = on_action_executed  # Optional: fn(state, player_id, action, result)
+        self.check_early_quit = None  # Optional: fn() -> bool, called after each player turn
 
     def run(self) -> GameState:
         """Run a complete game from setup to game over."""
@@ -113,6 +116,7 @@ class GameEngine:
         if self.state and self.state.effect_resolver:
             self.state.effect_resolver.trigger_callback = self._check_triggers
             self.state.effect_resolver.select_target_callback = self._select_target_for_effect
+            self.state.effect_resolver.make_choice_callback = self._make_choice_for_effect
             # Re-attach log_callback via engine (takes priority over wrapper)
             if self.logger:
                 self.state.effect_resolver.log_callback = self._log_effect
@@ -132,6 +136,202 @@ class GameEngine:
             self.logger.log_setup_cards(self.state, setup_cards_simple, initial_hands)
             self.logger.log_initial_court(self.state)
 
+            # Print setup summary for human players (same format as test log)
+            self._print_setup_for_human(initial_hands)
+
+    def _has_human_player(self) -> bool:
+        """Check if any agent is a HumanPlayer (interactive)."""
+        for agent in self.agents:
+            if agent.__class__.__name__ == 'HumanPlayer':
+                return True
+        return False
+
+    def _print_round_public_info(self, state: GameState):
+        """Print public information visible to all players at round start.
+
+        Shows: turn order, VP, contribution/prestige, deck/discard sizes,
+        court cards, and controlled locations for all players.
+        """
+        if not self._has_human_player():
+            return
+
+        print(f"\n{'='*60}")
+        print(f"  第 {state.round} 回合 — 公开信息")
+        print(f"{'='*60}")
+
+        # Turn order
+        faction_labels = {"north": "北方", "jin": "东晋"}
+        print(f"\n【行动顺位】")
+        order_parts = []
+        for pid in state.turn_order:
+            p = state.get_player(pid)
+            if p:
+                f = faction_labels.get(p.faction.value if hasattr(p.faction, 'value') else str(p.faction), '?')
+                order_parts.append(f"{pid}({f})")
+        print(f"  {' → '.join(order_parts)}")
+
+        # Player stats table
+        print(f"\n【玩家状态】")
+        print(f"  {'玩家':<8} {'阵营':<6} {'VP':>4} {'军力':>4} {'功绩':>4} {'威望':>4} {'顺位':>4} {'手牌':>4}")
+        print(f"  {'-'*48}")
+        for p in state.get_all_players():
+            f = faction_labels.get(p.faction.value if hasattr(p.faction, 'value') else str(p.faction), '?')
+            contrib = str(p.contribution) if p.faction.value == "jin" else "-"
+            prestige = str(p.prestige) if p.faction.value == "jin" else "-"
+            order = str(p.order) if p.faction.value == "jin" else "-"
+            print(f"  {p.player_id:<8} {f:<6} {p.vp:>4} {p.military:>4} {contrib:>4} {prestige:>4} {order:>4} {len(p.hand):>4}")
+
+        # Deck sizes
+        print(f"\n【牌库信息】")
+        for p in state.get_all_players():
+            deck = state.get_national_deck(p.player_id)
+            discard = state.get_national_discard(p.player_id)
+            court = state.get_court_cards(p.player_id)
+            print(f"  {p.player_id}: 抽牌区={len(deck)}张  弃牌区={len(discard)}张  朝堂区={len(court)}张")
+            if court:
+                court_str = ", ".join(
+                    f"{c.name}(+{c.definition.resource_option_army}军/+{c.definition.resource_option_vp}vp)"
+                    for c in court
+                )
+                print(f"    朝堂牌: {court_str}")
+
+        # Controlled locations
+        print(f"\n【地盘控制】")
+        for p in state.get_all_players():
+            friendly = state.get_friendly_locations(p.player_id)
+            own = state.get_own_locations(p.player_id)
+            if own:
+                print(f"  {p.player_id}: 控制 {' '.join(own)}")
+            elif friendly:
+                print(f"  {p.player_id}: 友方 {' '.join(friendly)} (无己方据点)")
+            else:
+                print(f"  {p.player_id}: 无据点")
+
+        # Public action pool
+        if state.public_action_pool:
+            exhausted = getattr(state, 'public_exhausted', set())
+            print(f"\n【公共行动牌池】")
+            for card in state.public_action_pool:
+                cid = card.definition.card_id
+                status = " (已用)" if cid in exhausted else ""
+                print(f"  {card.name} (费用{card.cost}){status}")
+
+        print(f"{'='*60}\n")
+        """Check if any agent is a HumanPlayer (interactive)."""
+        for agent in self.agents:
+            if agent.__class__.__name__ == 'HumanPlayer':
+                return True
+        return False
+
+    def _print_setup_for_human(self, initial_hands: dict[str, list[str]]):
+        """Print setup summary for the human player, matching test log format.
+
+        Shows: player heroes, face-down cards, and face-down card effects.
+        Called from _post_setup_init() after logging is complete.
+        """
+        if not self._has_human_player():
+            return
+        if not self.logger:
+            return
+
+        log = self.logger.log
+        setup_cards = getattr(log, 'setup_cards', {})
+        if not setup_cards:
+            return
+
+        # Build faction label map
+        faction_labels = {"north": "北方", "jin": "东晋", "sima": "司马家"}
+
+        print(f"\n{'='*60}")
+        print(f"  初设结果 — 所有玩家选择与暗置牌结算")
+        print(f"{'='*60}")
+
+        # --- Player heroes ---
+        print(f"\n【英雄选择】")
+        for p in log.players:
+            if p.get("id") == "sima":
+                continue
+            f = faction_labels.get(p.get("faction", ""), p.get("faction", ""))
+            print(f"  {p['id']} — {f} — {p['hero']}")
+
+        # --- Face-down cards ---
+        print(f"\n【初始暗置打出的牌（已弃置）】")
+        for pid, card_info in setup_cards.items():
+            hand_str = ""
+            if pid in initial_hands:
+                hand_str = f"（手牌: {' '.join(initial_hands[pid])}）"
+            print(f"  {pid}: {card_info} {hand_str}")
+
+        # --- Face-down card effects (round 0) ---
+        setup_rounds = [r for r in log.rounds if r["round"] == 0]
+        if setup_rounds:
+            r = setup_rounds[0]
+            print(f"\n┌─ 初始暗置牌结算 ─────────────────────────────")
+            from .game_logger import _format_effect
+            for turn in r.get("player_turns", []):
+                pid = turn["player"]
+                for act in turn.get("actions", []):
+                    desc = act.get("description", act.get("type", "?"))
+                    print(f"│ {pid}: {desc}")
+                    costs = act.get("costs", {})
+                    if costs:
+                        cost_parts = []
+                        for k, v in costs.items():
+                            if v:
+                                cost_parts.append(f"{k}:{v}")
+                        if cost_parts:
+                            print(f"│   费用: {', '.join(cost_parts)}")
+                    results = act.get("results", {})
+                    if results:
+                        res_parts = []
+                        for k, v in results.items():
+                            if v:
+                                res_parts.append(f"{k}:{v}")
+                        if res_parts:
+                            print(f"│   结果: {', '.join(res_parts)}")
+                    effects = act.get("effects", [])
+                    if effects:
+                        print(f"│   ↪ 效果结算:")
+                        for e in effects:
+                            print(f"│     {_format_effect(e)}")
+                            evts = e.get("events", []) or []
+                            for evt in evts:
+                                t = evt.get("type", "")
+                                if t and t not in ("effect_resolved",):
+                                    detail = ", ".join(
+                                        f"{k}={v}" for k, v in evt.items()
+                                        if k != "type")
+                                    if detail:
+                                        print(f"│       ↳ {t}: {detail}")
+                                    else:
+                                        print(f"│       ↳ {t}")
+            triggers = r.get("triggers_fired", [])
+            if triggers:
+                for t in triggers:
+                    src = t.get("source_card", "?")
+                    tt = t.get("trigger", "?")
+                    sp = t.get("source_player", "?")
+                    print(f"│ 触发: {tt} — {sp}的[{src}]")
+            print(f"└──────────────────────────────────────────────")
+
+        # --- Initial court cards ---
+        nc = getattr(log, 'north_initial_court', [])
+        jc = getattr(log, 'jin_initial_court', [])
+        if nc or jc:
+            print(f"\n【初始朝堂牌】")
+            if nc:
+                cards_str = ", ".join(
+                    f"{c['name']}(+{c['army']}军/+{c['vp']}vp)" for c in nc)
+                print(f"  北方: {cards_str}")
+            if jc:
+                cards_str = ", ".join(
+                    f"{c['name']}(+{c['army']}军/+{c['vp']}vp)" for c in jc)
+                print(f"  东晋: {cards_str}")
+
+        print(f"\n{'='*60}")
+        print(f"  游戏正式开始!")
+        print(f"{'='*60}\n")
+
     def _run_round(self):
         """Execute one full round."""
         state = self.state
@@ -139,6 +339,9 @@ class GameEngine:
         if self.logger:
             self.logger.log_round_start(state.round)
             self.logger.log_jin_round_status(state)
+
+        # Print public info for human players at round start
+        self._print_round_public_info(state)
 
         # === Preparation Phase ===
         emperor_events = run_preparation_phase(state, self.rng)
@@ -155,6 +358,11 @@ class GameEngine:
         # === Action Phase ===
         for player_id in state.turn_order:
             self._run_player_turn(state, player_id)
+            # Check for early quit (human player pressed 'q')
+            if self.check_early_quit and self.check_early_quit():
+                state.phase = PhaseType.GAME_OVER
+                state.game_end_reason = "early_quit"
+                return
 
         # === Settlement Phase ===
         run_settlement_phase(state, self.rng)
@@ -241,6 +449,10 @@ class GameEngine:
             if self.logger:
                 from .game_logger import log_action_result
                 log_action_result(self.logger, action, result, state)
+
+            # Notify observer (e.g. human player UI) about the action result
+            if self.on_action_executed:
+                self.on_action_executed(state, player_id, action, result)
 
         # Log skipped extra actions (may=True actions not used)
         if self.logger and player.extra_hand_actions > 0:
@@ -333,6 +545,19 @@ class GameEngine:
             return None
         return agent.select_target(self.state, prompt)
 
+    def _make_choice_for_effect(self, player_id: str, prompt: dict) -> int:
+        """Callback from EffectResolver — ask agent to make a choice.
+
+        Bridges the resolver's choice request to agent.make_choice().
+        Used by ChooseOperator for step-level choice_options
+        (e.g. 刘穆之 active: draw 1 card OR draft 1 strategy).
+        Returns the chosen option index, or 0 if no agent.
+        """
+        agent = self._get_agent(player_id)
+        if not agent:
+            return 0
+        return agent.make_choice(self.state, prompt)
+
     # ================================================================
     # Passive trigger system
     # ================================================================
@@ -409,10 +634,14 @@ class GameEngine:
         """Collect all in-play cards that may have passive abilities.
 
         Returns list of (card, owner_player_id).
+        Scans hero cards, staff_area, and history_area of all players.
         """
         sources = []
         for player in self.state.get_all_players():
             pid = player.player_id
+            # Hero card can have passive abilities too (e.g. 桓温 on_archive → +2vp)
+            if player.hero:
+                sources.append((player.hero, pid))
             for card in player.staff_area:
                 sources.append((card, pid))
             for card in player.history_area:

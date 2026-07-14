@@ -244,6 +244,7 @@ def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
                            "full_condition": g.goal_full_condition}
                           for g in goal_choices],
             hand_cards=[c.name for c in player.hand],
+            hand_card_costs=[c.cost for c in player.hand],
             other_jin_heroes=[],
         )
 
@@ -488,6 +489,10 @@ def _execute_setup_face_down_cards(state: GameState, action_system,
                 payment_names.append(player.hand[pi].name)
 
         if len(other_indices) >= cost:
+            # All card types route through PlayCardAction.execute() for unified
+            # effect resolution. Reform VP and contribution are handled there.
+            # STRATEGY play conditions are NOT checked here (they're enforced
+            # at court execution via CourtAction).
             action = PlayCardAction(
                 player_id=player.player_id,
                 card_index=idx,
@@ -497,7 +502,7 @@ def _execute_setup_face_down_cards(state: GameState, action_system,
             # Execute via normal PlayCardAction flow
             result = action_system.execute(state, action)
 
-            # Log (shared helper, same format as _run_round)
+            # Log via GameLogger
             if logger:
                 from .game_logger import log_action_result
                 log_action_result(logger, action, result, state)

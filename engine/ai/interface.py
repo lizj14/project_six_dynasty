@@ -23,6 +23,8 @@ class SetupContext:
     #             "simple_condition": str, "full_condition": str}
     hand_cards: list[str] = field(default_factory=list)
     # Card names in current hand (hero starting cards + initial draws)
+    hand_card_costs: list[int] = field(default_factory=list)
+    # Parallel list: cost of each card in hand_cards (same length)
     # Jin only: additional info
     other_jin_heroes: list[str] = field(default_factory=list)
     # Names of heroes already taken by other Jin players (for coordination)

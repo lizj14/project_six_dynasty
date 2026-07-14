@@ -690,8 +690,12 @@ class HeuristicAI(GameAgent):
         if not options:
             return None
 
-        # If locations, prefer higher VP regions
+        # If dict options, extract 'id' from the chosen dict
+        if options and isinstance(options[0], dict):
+            chosen = self.rng.choice(options)
+            return chosen.get("id", str(chosen))
 
+        # If locations, prefer higher VP regions
         def location_value(loc_id):
             for reg, cfg in REGION_CONFIG.items():
                 if loc_id in cfg.get("locations", []):
