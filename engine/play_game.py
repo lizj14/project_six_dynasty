@@ -50,6 +50,9 @@ AI_SEEDS = {
 class LoggingAgentWrapper:
     """Wraps an AI agent to print each action it takes in real time."""
 
+    _setup_buffer: list[str] = []
+    _buffer_enabled: bool = False
+
     def __init__(self, agent):
         self._agent = agent
 
@@ -59,19 +62,42 @@ class LoggingAgentWrapper:
 
     def setup_decision(self, ctx):
         decision = self._agent.setup_decision(ctx)
-        # Print AI's setup choices so human can see what happened
+        # Build setup summary line(s)
+        lines = []
         hero_name = ctx.hero_choices[decision.hero_index]['name'] if ctx.hero_choices else '?'
-        print(f"  [{self.player_id}] 选择英雄: {hero_name}")
+        lines.append(f"  [{self.player_id}] 选择英雄: {hero_name}")
         if ctx.goal_choices:
             g_name = ctx.goal_choices[decision.public_goal_index]['name'] if ctx.goal_choices else '?'
-            print(f"  [{self.player_id}] 公开目标: {g_name}")
+            lines.append(f"  [{self.player_id}] 公开目标: {g_name}")
         if ctx.hand_cards and decision.face_down_card_index < len(ctx.hand_cards):
             fd_name = ctx.hand_cards[decision.face_down_card_index]
             pay_names = [ctx.hand_cards[i] for i in decision.payment_indices
                         if i < len(ctx.hand_cards)]
             pay_str = f"（支付: {' '.join(pay_names)}）" if pay_names else ""
-            print(f"  [{self.player_id}] 暗置打出: {fd_name} {pay_str}")
+            lines.append(f"  [{self.player_id}] 暗置打出: {fd_name} {pay_str}")
+
+        if LoggingAgentWrapper._buffer_enabled:
+            LoggingAgentWrapper._setup_buffer.extend(lines)
+        else:
+            for line in lines:
+                print(line)
         return decision
+
+    @classmethod
+    def enable_setup_buffer(cls):
+        """Buffer AI setup decisions instead of printing immediately.
+        Flushed by HumanPlayer.setup_decision() so the human doesn't see
+        AI choices before making their own (simultaneous selection)."""
+        cls._setup_buffer.clear()
+        cls._buffer_enabled = True
+
+    @classmethod
+    def flush_setup_buffer(cls):
+        """Print all buffered AI setup decisions."""
+        for line in cls._setup_buffer:
+            print(line)
+        cls._setup_buffer.clear()
+        cls._buffer_enabled = False
 
     def decide_action(self, state, available_actions):
         action = self._agent.decide_action(state, available_actions)
@@ -177,6 +203,13 @@ def main():
         else:
             ai = HeuristicAI(player_id=pid, seed=AI_SEEDS[pid])
             agents.append(LoggingAgentWrapper(ai))
+
+    # Enable setup buffer: AI setup decisions are buffered during the
+    # sequential _deal_and_select_cards loop so the human player doesn't
+    # see opposing choices before making their own (simultaneous selection).
+    # HumanPlayer.setup_decision() flushes the buffer when it's the human's turn.
+    LoggingAgentWrapper.enable_setup_buffer()
+    human_player._on_setup_begin = lambda: LoggingAgentWrapper.flush_setup_buffer()
 
     # Create logger and engine
     logger = GameLogger()

@@ -175,10 +175,17 @@ class DiscardCardsOperator(EffectOperator):
         result = ResolveResult()
         player = state.get_player(player_id)
         count = step.params.get("count", 1)
+        target = step.params.get("target", "main")  # "main" or "national"
+        discarded = []
         for _ in range(count):
             if player and player.hand:
-                state.main_discard.append(player.hand.pop())
-                result.events.append({"type": "discard"})
+                discarded.append(player.hand.pop())
+        if discarded:
+            events = state.discard_cards(
+                player_id, discarded, target=target, source="hand",
+                reason="effect")
+            result.events.extend(events)
+            for _ in discarded:
                 resolver._fire_trigger("on_discard", player_id)
         return result
 
@@ -248,6 +255,10 @@ class ArchiveCardOperator(EffectOperator):
                         if chosen_id:
                             for i, c in enumerate(player.staff_area):
                                 if c.definition.card_id == chosen_id:
+                                    # Fire on_card_leave triggers BEFORE removing from staff
+                                    resolver.fire_card_leave_triggers(
+                                        c, player_id, state,
+                                        context={"source": "archive_from_staff"})
                                     card = player.staff_area.pop(i)
                                     break
             else:
@@ -274,14 +285,18 @@ class ArchiveCourtOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        # Remove a card from court to discard
+        # Remove cards from court to national discard (NOT main discard)
         court = state.get_court_cards(player_id)
         count = step.params.get("count", 1)
+        abandoned = []
         for _ in range(count):
             if court:
-                card = court.pop()
-                state.main_discard.append(card)
-                result.events.append({"type": "archive_court", "card": card.name})
+                abandoned.append(court.pop())
+        if abandoned:
+            events = state.discard_cards(
+                player_id, abandoned, target="national", source="court",
+                reason="archive_court")
+            result.events.extend(events)
         return result
 
 
@@ -318,6 +333,8 @@ class PlayCardOperator(EffectOperator):
                 # may=True without card_id: grant extra hand action so the player
                 # can choose to play a card (or skip — logged at end of turn).
                 player.extra_hand_actions += 1
+                if card_type_filter:
+                    player.extra_hand_action_filter = card_type_filter
                 result.events.append({
                     "type": "extra_action_granted", "action_type": "hand_action",
                     "count": 1, "may": True,
@@ -514,6 +531,93 @@ class _TargetedMapOperator(EffectOperator, ABC):
         return resolver.action_system.execute(state, action)
 
 
+# ============================================================
+# Passive-effect operators (triggered via _check_triggers)
+# ============================================================
+
+@register
+class MarchCostReductionOperator(EffectOperator):
+    """Passive: reduce march cost by N.
+
+    The cost reduction is applied PRE-PAYMENT by MarchAction._calculate_cost()
+    via GameState.query_march_cost_reduction(). This operator fires after the
+    march (via _check_triggers) and handles:
+      - Per-turn limit tracking (increment counter)
+      - Event emission for logging/display
+
+    It does NOT refund military — that would double-count since the cost
+    was already reduced before payment.
+    """
+
+    effect_type = "march_cost_reduction"
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        player = state.get_player(player_id)
+        if not player:
+            return result
+
+        amount = step.params.get("amount", 0)
+        per_turn_limit = step.params.get("per_turn_limit", 999)
+
+        # Per-card per-turn tracking
+        card_id = (context or {}).get("passive_card_id", "unknown")
+        key = f"{card_id}:march_cost_reduction"
+        used = player.passive_trigger_count.get(key, 0)
+
+        if used >= per_turn_limit:
+            return result
+
+        # Cost reduction was already applied pre-payment in _calculate_cost().
+        # Here we only update the per-turn counter and emit the event.
+        # We do NOT refund military — that would double-count.
+        player.passive_trigger_count[key] = used + 1
+        result.events.append({
+            "type": "march_cost_reduction",
+            "amount": amount,
+            "card_id": card_id,
+            "remaining": per_turn_limit - (used + 1),
+            "applied": "pre_cost",  # indicates reduction was in cost calc, not refund
+        })
+
+        return result
+
+
+@register
+class RegionRewardOverrideOperator(EffectOperator):
+    """Passive: override region control VP rewards.
+
+    Trigger: on_region_reward
+    Params: partial (int), full (int) — VP for partial/full control
+    """
+
+    effect_type = "region_reward_override"
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        player = state.get_player(player_id)
+        if not player:
+            return result
+
+        partial_vp = step.params.get("partial", 0)
+        full_vp = step.params.get("full", 1)
+
+        # Store override on the player for the region reward phase to read.
+        player.region_reward_override = {
+            "partial": partial_vp,
+            "full": full_vp,
+        }
+        result.events.append({
+            "type": "region_reward_override",
+            "partial": partial_vp,
+            "full": full_vp,
+        })
+
+        return result
+
+
 @register
 class MarchOperator(_TargetedMapOperator):
     effect_type = EffectType.MARCH
@@ -562,14 +666,11 @@ class MarchOperator(_TargetedMapOperator):
                     cost = action._calculate_cost(state)
                     reduction = cost if free else min(cost_reduction, cost - 1)
                     if reduction > 0 and player:
+                        # Pre-grant the reduction, then let action.execute() deduct
+                        # the full cost. Net: player pays (cost - reduction).
+                        # e.g. cost=3, reduction=2 → grant 2, deduct 3 → net -1 ✓
                         player.military += reduction
                         r = resolver.action_system.execute(state, action)
-                        # action.execute() deducts full cost; refund unapplied reduction
-                        net_cost = cost - reduction
-                        actual_cost = cost  # action already deducted full cost
-                        refund = actual_cost - net_cost
-                        if refund > 0 and player:
-                            player.military += refund
                         result.events.extend(r.events if r.success else [])
                         if not r.success:
                             if not r.success: result.errors.append(r.error or "action failed")
@@ -1798,11 +1899,23 @@ class ConvertOwnToNeutralOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
+
+        # 0. Context-provided location (from targeted_effect location resolution)
+        ctx_loc = (context or {}).get("target_location")
+        if ctx_loc:
+            loc = state.locations.get(ctx_loc)
+            if loc:
+                from models.enums import ControlState
+                loc.controller = ControlState.NEUTRAL
+                result.events.append({"type": "convert_own_to_neutral",
+                                     "location": ctx_loc})
+            return result
+
         count = step.params.get("count", 1)
 
-        # Find player-controlled locations
-        friendly = state.get_friendly_locations(player_id)
-        neutral_candidates = [lid for lid in friendly
+        # Find player's own locations (not allies like Sima for Jin)
+        own = state.get_own_locations(player_id)
+        neutral_candidates = [lid for lid in own
                              if state.locations.get(lid)]
 
         if not neutral_candidates:
@@ -1848,6 +1961,18 @@ class ConvertToNeutralOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
+
+        # 0. Context-provided location (from targeted_effect location resolution)
+        ctx_loc = (context or {}).get("target_location")
+        if ctx_loc:
+            loc = state.locations.get(ctx_loc)
+            if loc:
+                from models.enums import ControlState
+                loc.controller = ControlState.NEUTRAL
+                result.events.append({"type": "convert_to_neutral",
+                                     "location": ctx_loc})
+            return result
+
         count = step.params.get("count", 1)
 
         # Find all non-neutral locations
@@ -1891,6 +2016,18 @@ class ConvertToSimaOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
+
+        # 0. Context-provided location (from targeted_effect location resolution)
+        ctx_loc = (context or {}).get("target_location")
+        if ctx_loc:
+            loc = state.locations.get(ctx_loc)
+            if loc:
+                from models.enums import ControlState
+                loc.controller = ControlState.SIMA
+                result.events.append({"type": "convert_to_sima",
+                                     "location": ctx_loc})
+            return result
+
         count = step.params.get("count", 1)
 
         from models.enums import ControlState

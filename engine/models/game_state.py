@@ -203,7 +203,9 @@ class GameState:
             # 强制性事件牌 → 立刻结算效果，放入强制事件牌区，不加入手牌
             if card.card_type == _CardType.MECHANISM:
                 self.forced_event_pile.append(card)
-                events.append({"type": "forced_event_drawn", "card": card.name})
+                events.append({"type": "forced_event_drawn", "card": card.name,
+                               "card_id": card.definition.card_id,
+                               "card_text": getattr(card.definition, 'effect_text', '')})
 
                 # 立刻结算强制事件牌效果
                 if self.effect_resolver and card.definition.parsed_effect:
@@ -453,7 +455,12 @@ class GameState:
         return self.get_terrain(loc_a, loc_b) is not None
 
     def get_friendly_locations(self, player_id: str) -> list[str]:
-        """Get all locations friendly to a player (considering expedition marker)."""
+        """Get all locations friendly to a player.
+
+        Friendly locations are used for: fortify, convert, and other
+        "friendly territory" checks. For march/occupy adjacency source,
+        use get_adjacency_source_locations() instead.
+        """
         player = self.get_player(player_id)
         if not player:
             return []
@@ -462,13 +469,187 @@ class GameState:
         for loc_id, loc in self.locations.items():
             if loc.is_friendly_to(cs):
                 friendly.append(loc_id)
-        # Check expedition marker (北伐) for Jin players
+        return friendly
+
+    def get_adjacency_source_locations(self, player_id: str) -> list[str]:
+        """Get locations that can serve as adjacency sources for march/occupy.
+
+        Rulebook §3.2: 进军/占据的相邻计算起点:
+          - 北方玩家: 仅自己占据的地点
+          - 东晋玩家 (正常): 仅自己占据的地点
+          - 东晋玩家 (有北伐标记): 自己占据 + 司马家占据的地点
+
+        This is DIFFERENT from get_friendly_locations() — other Jin players'
+        locations are friendly but are NEVER adjacency sources, even with
+        the expedition marker.
+        """
+        player = self.get_player(player_id)
+        if not player:
+            return []
+        cs = self._player_control_state(player_id)
+        sources = []
+        for loc_id, loc in self.locations.items():
+            if loc.controller == cs:
+                sources.append(loc_id)
+
+        # Expedition marker (北伐): Jin players can also use Sima locations
+        # as adjacency sources. Rulebook: "可以将东晋占据地点视为你占据的地点"
+        # Here "东晋占据地点" refers to Sima (司马家) locations.
         if player.has_expedition_marker and player.faction == FactionType.JIN:
             for loc_id, loc in self.locations.items():
-                if loc.controller in (ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3):
-                    if loc_id not in friendly:
-                        friendly.append(loc_id)
-        return friendly
+                if loc.controller == ControlState.SIMA and loc_id not in sources:
+                    sources.append(loc_id)
+
+        return sources
+
+    # ================================================================
+    # Passive effect query system
+    # ================================================================
+
+    def get_all_passive_sources(self) -> list[tuple["Card", str]]:
+        """Collect all in-play cards that may have passive abilities.
+
+        Returns list of (card, owner_player_id).
+        Scans: hero, staff_area, history_area, and court (朝堂) of all players.
+
+        Court cards are included because strategy cards (策略牌) with passive
+        effects (e.g. 草原部落: on_march → cost -1) are active while in court.
+        """
+        sources = []
+        for player in self.get_all_players():
+            pid = player.player_id
+            if player.hero:
+                sources.append((player.hero, pid))
+            for card in player.staff_area:
+                sources.append((card, pid))
+            for card in player.history_area:
+                sources.append((card, pid))
+
+        # Court cards (策略牌) — faction-level, not per-player
+        # North court belongs to north player; Jin court is shared by all Jin players
+        for card in self.north_court:
+            sources.append((card, "north"))
+        for card in self.jin_court:
+            # Jin court passives affect all Jin players — register under each
+            for player in self.get_all_players():
+                if player.faction == FactionType.JIN:
+                    sources.append((card, player.player_id))
+
+        return sources
+
+    def query_march_cost_reduction(self, player_id: str,
+                                   context: dict = None) -> int:
+        """Query total march cost reduction from passive sources.
+
+        Scans all in-play passives for march_cost_reduction blocks with
+        matching trigger (on_march) that pass scope/filter checks.
+        Respects per_turn_limit tracking.
+
+        Returns the total reduction amount (non-negative). The caller
+        should apply this as a discount on the base march cost.
+        """
+        player = self.get_player(player_id)
+        if not player:
+            return 0
+
+        total_reduction = 0
+        for card, owner_id in self.get_all_passive_sources():
+            parsed = card.definition.parsed_effect
+            if not parsed:
+                continue
+
+            for block in parsed.blocks:
+                if block.ability_type != "passive":
+                    continue
+                if block.trigger != "on_march":
+                    continue
+
+                # Scope check
+                trigger_player = (context or {}).get("player_id", player_id)
+                if block.trigger_scope == "self" and trigger_player != owner_id:
+                    continue
+
+                # Trigger filter check
+                if block.trigger_filter:
+                    if not self._match_passive_filter(
+                        block.trigger_filter, context or {}):
+                        continue
+
+                # Sum reductions from steps
+                for step in block.steps:
+                    if step.effect_type == "march_cost_reduction":
+                        amount = step.params.get("amount", 0)
+                        per_turn_limit = step.params.get("per_turn_limit", 999)
+                        card_id = card.definition.card_id
+                        key = f"{card_id}:march_cost_reduction"
+                        used = player.passive_trigger_count.get(key, 0)
+                        if used < per_turn_limit:
+                            total_reduction += amount
+
+        return total_reduction
+
+    def record_march_cost_reduction_used(self, player_id: str):
+        """Increment per-turn counters for all march_cost_reduction passives.
+
+        Called by MarchAction.execute() after applying the cost reduction,
+        so that subsequent marches see the updated usage count.
+        """
+        player = self.get_player(player_id)
+        if not player:
+            return
+
+        for card, owner_id in self.get_all_passive_sources():
+            parsed = card.definition.parsed_effect
+            if not parsed:
+                continue
+
+            for block in parsed.blocks:
+                if block.ability_type != "passive":
+                    continue
+                if block.trigger != "on_march":
+                    continue
+
+                for step in block.steps:
+                    if step.effect_type == "march_cost_reduction":
+                        per_turn_limit = step.params.get("per_turn_limit", 999)
+                        card_id = card.definition.card_id
+                        key = f"{card_id}:march_cost_reduction"
+                        used = player.passive_trigger_count.get(key, 0)
+                        if used < per_turn_limit:
+                            player.passive_trigger_count[key] = used + 1
+
+    @staticmethod
+    def _match_passive_filter(filter_dict: dict, context: dict) -> bool:
+        """Check if event context matches a passive trigger filter."""
+        if "marker" in filter_dict:
+            marker_type = filter_dict["marker"]
+            action = context.get("action")
+            if action:
+                params = getattr(action, 'params', None) or {}
+                card_markers = params.get("markers", {})
+                if card_markers.get(marker_type, 0) <= 0:
+                    return False
+            else:
+                return False
+        if "card" in filter_dict:
+            card_name = filter_dict["card"]
+            action = context.get("action")
+            if action:
+                card_id = getattr(action, 'card_id', '') or ''
+                if card_name not in card_id:
+                    return False
+            else:
+                return False
+        if "culture" in filter_dict:
+            culture_type = filter_dict["culture"]
+            action = context.get("action")
+            if action:
+                params = getattr(action, 'params', None) or {}
+                if params.get("culture") != culture_type:
+                    return False
+            else:
+                return False
+        return True
 
     def get_own_locations(self, player_id: str) -> list[str]:
         """Get locations directly controlled by this player (NOT allies).
@@ -530,6 +711,40 @@ class GameState:
             return self.north_discard
         else:
             return self.jin_discard
+
+    def discard_cards(self, player_id: str, cards: list["Card"],
+                       target: str = "main", source: str = "hand",
+                       reason: str = "") -> list[dict]:
+        """Unified card discard — all discard paths go through this method.
+
+        Args:
+            player_id: The player discarding (for national discard routing).
+            cards: Cards to discard.
+            target: "main" → main_discard (shared pile);
+                    "national" → faction national discard (north_discard / jin_discard).
+            source: "hand", "court", "staff", "deck" — informational for logging.
+            reason: Why these cards are being discarded (e.g. "cost", "recruit").
+
+        Returns:
+            List of events describing each discard.
+        """
+        if target == "national":
+            pile = self.get_national_discard(player_id)
+        else:
+            pile = self.main_discard
+
+        events = []
+        for card in cards:
+            pile.append(card)
+            events.append({
+                "type": "discard",
+                "card": card.name,
+                "card_id": card.definition.card_id if card.definition else "",
+                "target": target,
+                "source": source,
+                "reason": reason,
+            })
+        return events
 
     def log_event(self, event_type: str, **kwargs):
         """Append an event to the game log."""

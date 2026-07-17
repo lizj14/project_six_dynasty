@@ -42,6 +42,7 @@ class PlayerState:
     # Special flags
     has_expedition_marker: bool = False     # 拥有北伐标记
     game_end_marker: bool = False           # 拥有游戏结束标记
+    region_reward_override: Optional[dict] = None  # 区域奖励覆盖 (from 草原部落 etc.)
     # North-specific
     north_deck: list[Card] = field(default_factory=list)
     north_discard: list[Card] = field(default_factory=list)
@@ -54,9 +55,11 @@ class PlayerState:
     court_action_taken_count: int = 0       # 本回合实际执行的牌组行动次数
     extra_court_actions: int = 0            # 由效果授予的额外牌组行动次数
     extra_hand_actions: int = 0             # 由效果授予的额外手牌行动次数
+    extra_hand_action_filter: Optional[str] = None  # 额外手牌行动的卡牌类型限制 (e.g. "friend")
     has_drawn_quick: bool = False           # 已执行快速摸牌（每回合限1次）
     has_fortified_quick: bool = False       # 已执行快速加固（每回合限1次）
     activated_card_ids: set[str] = field(default_factory=set)  # 本回合已激活过主动效果的卡牌ID
+    passive_trigger_count: dict[str, int] = field(default_factory=dict)  # 被动效果每回合触发计数 key="card_id:trigger"
 
     @property
     def staff_limit(self) -> int:
@@ -184,9 +187,12 @@ class PlayerState:
         self.court_action_taken_count = 0
         self.extra_court_actions = 0
         self.extra_hand_actions = 0
+        self.extra_hand_action_filter = None
         self.has_drawn_quick = False
         self.has_fortified_quick = False
         self.activated_card_ids.clear()
+        self.passive_trigger_count.clear()
+        self.region_reward_override = None
 
     def end_turn_cleanup(self):
         """Reset military and check hand limit at end of player's turn."""

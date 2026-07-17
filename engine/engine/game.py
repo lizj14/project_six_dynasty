@@ -117,6 +117,8 @@ class GameEngine:
             self.state.effect_resolver.trigger_callback = self._check_triggers
             self.state.effect_resolver.select_target_callback = self._select_target_for_effect
             self.state.effect_resolver.make_choice_callback = self._make_choice_for_effect
+            self.state.effect_resolver.choose_discard_callback = self._choose_discard_for_cost
+            self.state.effect_resolver.choose_court_callback = self._choose_court_for_cost
             # Re-attach log_callback via engine (takes priority over wrapper)
             if self.logger:
                 self.state.effect_resolver.log_callback = self._log_effect
@@ -407,6 +409,16 @@ class GameEngine:
         # Draw 2 cards
         draw_events = run_player_draw(state, player_id)
 
+        # Print forced event triggers to terminal (for all players — useful debugging)
+        for e in draw_events:
+            if e.get("type") == "forced_event_drawn":
+                card_name = e.get("card", "?")
+                card_text = e.get("card_text", "")
+                print(f"\n  ⚡ [强制事件] {card_name} 触发!")
+                if card_text:
+                    print(f"     效果: {card_text}")
+                print()
+
         if self.logger:
             cards_drawn = [e.get("card", "?") for e in draw_events
                            if e.get("type") == "draw"]
@@ -453,6 +465,40 @@ class GameEngine:
             # Notify observer (e.g. human player UI) about the action result
             if self.on_action_executed:
                 self.on_action_executed(state, player_id, action, result)
+
+            # Handle play_card_requested events (e.g. 桓石虔 active effect)
+            # These require the player to immediately choose and play a card.
+            # The play is granted by the effect — it doesn't consume the player's
+            # regular hand action for the turn.
+            if result.success:
+                for evt in result.events:
+                    if evt.get("type") == "play_card_requested":
+                        filter_spec = evt.get("filter", {})
+                        eligible = []
+                        for i, c in enumerate(player.hand):
+                            if self._card_matches_filter(c, filter_spec):
+                                eligible.append(i)
+                        if eligible:
+                            # Grant a temporary extra hand action so
+                            # PlayCardAction.validate() passes the action check
+                            player.extra_hand_actions += 1
+                            try:
+                                play_action = agent.request_card_play(
+                                    state, eligible, filter_spec)
+                                if play_action is not None:
+                                    r2 = self.action_system.execute(state, play_action)
+                                    if self.logger:
+                                        log_action_result(self.logger, play_action, r2, state)
+                                    if self.on_action_executed:
+                                        self.on_action_executed(
+                                            state, player_id, play_action, r2)
+                                else:
+                                    player.extra_hand_actions -= 1
+                            except Exception:
+                                player.extra_hand_actions -= 1
+                                raise
+                            # else: player declined — continue
+                        break  # Only handle one play_card_requested per action
 
         # Log skipped extra actions (may=True actions not used)
         if self.logger and player.extra_hand_actions > 0:
@@ -558,6 +604,50 @@ class GameEngine:
             return 0
         return agent.make_choice(self.state, prompt)
 
+    def _choose_discard_for_cost(self, player_id: str, hand_cards: list[str],
+                                  count: int) -> list[int]:
+        """Callback from EffectResolver — ask agent to choose cards to discard as cost.
+
+        Bridges the resolver's cost-payment request to agent.choose_discards().
+        Used when a cost_type='discard_cards' is paid (e.g. 郗超 active: 弃1张手牌).
+        Returns list of indices to discard.
+        """
+        agent = self._get_agent(player_id)
+        if not agent:
+            return list(range(max(0, len(hand_cards) - count), len(hand_cards)))
+        return agent.choose_discards(self.state, hand_cards, count)
+
+    def _choose_court_for_cost(self, player_id: str, court_cards: list[str],
+                                count: int) -> list[int]:
+        """Callback from EffectResolver — ask agent to choose court cards to abandon.
+
+        Bridges the resolver's cost-payment request for abandon_court_card costs
+        (e.g. 郗超 active: 弃置1张候选策略牌).
+        Returns list of indices (into the original list) to abandon, in reverse-sorted order.
+        """
+        agent = self._get_agent(player_id)
+        if not agent or count == 0:
+            return []
+        # For human players, use make_choice with court card options.
+        if agent.__class__.__name__ == 'HumanPlayer':
+            chosen = []
+            remaining = list(court_cards)  # Local copy to track remaining choices
+            remaining_map = list(range(len(court_cards)))  # Map to original indices
+            for _ in range(count):
+                if not remaining:
+                    break
+                idx = agent.make_choice(self.state, {
+                    "title": f"选择要弃置的朝堂牌 ({len(chosen)+1}/{count})",
+                    "options": [{"label": name} for name in remaining],
+                })
+                if 0 <= idx < len(remaining):
+                    chosen.append(remaining_map[idx])
+                    remaining.pop(idx)
+                    remaining_map.pop(idx)
+            return sorted(chosen, reverse=True)
+        else:
+            return list(range(max(0, len(court_cards) - count), len(court_cards)))
+
     # ================================================================
     # Passive trigger system
     # ================================================================
@@ -614,8 +704,11 @@ class GameEngine:
                         block.trigger_filter, context):
                         continue
 
-                # Execute the passive block
-                resolver._resolve_block(block, state, owner_id, context)
+                # Execute the passive block with card info for per-turn tracking
+                block_ctx = dict(context)
+                block_ctx["passive_card_id"] = card.definition.card_id
+                block_ctx["passive_trigger"] = trigger_type
+                resolver._resolve_block(block, state, owner_id, block_ctx)
 
                 # Log the trigger firing
                 if self.logger:
@@ -634,19 +727,10 @@ class GameEngine:
         """Collect all in-play cards that may have passive abilities.
 
         Returns list of (card, owner_player_id).
-        Scans hero cards, staff_area, and history_area of all players.
+        Delegates to GameState.get_all_passive_sources() which scans
+        hero, staff_area, history_area, and court cards.
         """
-        sources = []
-        for player in self.state.get_all_players():
-            pid = player.player_id
-            # Hero card can have passive abilities too (e.g. 桓温 on_archive → +2vp)
-            if player.hero:
-                sources.append((player.hero, pid))
-            for card in player.staff_area:
-                sources.append((card, pid))
-            for card in player.history_area:
-                sources.append((card, pid))
-        return sources
+        return self.state.get_all_passive_sources()
 
     @staticmethod
     def _match_trigger_filter(filter_dict: dict, context: dict) -> bool:
@@ -671,6 +755,40 @@ class GameEngine:
             card = context.get("card")
             if card and card_name not in (card.name if hasattr(card, 'name') else str(card)):
                 return False
+        return True
+
+    @staticmethod
+    def _card_matches_filter(card: "Card", filter_spec: dict) -> bool:
+        """Check if a card matches a play_card filter spec.
+
+        Supported filter keys:
+          - marker: card must have the specified marker type
+          - exclude_marker: card must NOT have the specified marker type
+          - card_type: card type must match (e.g. "friend", "event")
+        """
+        if not filter_spec:
+            return True
+        defn = card.definition
+        if not defn:
+            return False
+
+        if "marker" in filter_spec:
+            marker_type = filter_spec["marker"]
+            markers = getattr(defn, 'markers', None) or {}
+            if markers.get(marker_type, 0) <= 0:
+                return False
+
+        if "exclude_marker" in filter_spec:
+            marker_type = filter_spec["exclude_marker"]
+            markers = getattr(defn, 'markers', None) or {}
+            if markers.get(marker_type, 0) > 0:
+                return False
+
+        if "card_type" in filter_spec:
+            ct = filter_spec["card_type"]
+            if str(card.card_type) != ct:
+                return False
+
         return True
 
     def _determine_winner(self) -> Optional[str]:

@@ -36,6 +36,8 @@ class EffectResolver:
         self.log_callback = None           # Set by GameEngine: fn(player_id, effect_type, params, events, source)
         self.select_target_callback = None # Set by GameEngine: fn(player_id, prompt) -> Optional[str]
         self.make_choice_callback = None   # Set by GameEngine: fn(player_id, prompt) -> int
+        self.choose_discard_callback = None  # Set by GameEngine: fn(player_id, hand_cards, count) -> list[int]
+        self.choose_court_callback = None    # Set by GameEngine: fn(player_id, court_cards, count) -> list[int]
 
     # ================================================================
     # Public API
@@ -69,6 +71,25 @@ class EffectResolver:
 
         return result
 
+    def fire_card_leave_triggers(self, card: "Card", player_id: str,
+                                 state: "GameState", context: dict = None):
+        """Execute on_card_leave passive blocks on a card about to leave play.
+
+        Must be called BEFORE the card is removed from its in-play location
+        (staff_area, etc.). Only fires the card's own leave blocks directly;
+        does NOT fan out to _check_triggers (which would double-fire this
+        card since it's still in staff_area).
+        """
+        parsed = card.definition.parsed_effect if card.definition else None
+        if not parsed:
+            return
+        from .effect_ast import AbilityType
+        ctx = context or {}
+        for block in parsed.blocks:
+            if (block.ability_type == AbilityType.PASSIVE
+                    and block.trigger == "on_card_leave"):
+                self._resolve_block(block, state, player_id, ctx)
+
     # ================================================================
     # Block-level resolution
     # ================================================================
@@ -87,12 +108,23 @@ class EffectResolver:
                     result.errors.append(
                         f"Not enough hand cards to pay cost: need {count}, have {len(player.hand)}")
                     return result
-                for _ in range(count):
-                    if player and player.hand:
-                        discarded = player.hand.pop()
-                        state.main_discard.append(discarded)
-                        result.events.append({"type": "pay_discard",
-                                             "card": discarded.name})
+                discarded = []
+                if self.choose_discard_callback:
+                    hand_names = [c.name for c in player.hand]
+                    chosen = self.choose_discard_callback(player_id, hand_names, count)
+                    for idx in sorted(chosen, reverse=True):
+                        if 0 <= idx < len(player.hand):
+                            discarded.append(player.hand.pop(idx))
+                else:
+                    for _ in range(count):
+                        if player and player.hand:
+                            discarded.append(player.hand.pop())
+                if discarded:
+                    target = cost.params.get("target", "main")
+                    events = state.discard_cards(
+                        player_id, discarded, target=target, source="hand",
+                        reason="cost")
+                    result.events.extend(events)
             elif cost.cost_type == "pay_military":
                 amount = cost.params.get("amount", 0)
                 if player:
@@ -111,6 +143,37 @@ class EffectResolver:
                         return result
                     player.vp -= amount
                     result.events.append({"type": "pay_vp", "amount": amount})
+            elif cost.cost_type == "abandon_court_card":
+                count = cost.params.get("count", 1)
+                court = state.get_court_cards(player_id)
+                if len(court) < count:
+                    result.errors.append(
+                        f"Not enough court cards to abandon: need {count}, have {len(court)}")
+                    return result
+                abandoned = []
+                if self.choose_court_callback:
+                    court_names = [c.name for c in court]
+                    chosen = self.choose_court_callback(player_id, court_names, count)
+                    for idx in sorted(chosen, reverse=True):
+                        if 0 <= idx < len(court):
+                            abandoned.append(court.pop(idx))
+                else:
+                    for _ in range(count):
+                        if court:
+                            abandoned.append(court.pop())
+                if abandoned:
+                    # Court cards go to national discard, NOT main discard
+                    events = state.discard_cards(
+                        player_id, abandoned, target="national", source="court",
+                        reason="abandon_court_card")
+                    result.events.extend(events)
+
+        # Cost handling done — proceed to execute the block.
+        # NOTE: passive blocks are NOT skipped here. Callers that should not
+        # execute passives (e.g. card play) must pass exclude_ability_types
+        # to resolve(). The trigger system (_check_triggers) and
+        # fire_card_leave_triggers() call _resolve_block directly and DO
+        # expect passives to execute.
 
         # Handle strategy action (牌组行动) — these are resource gains
         if block.ability_type == AbilityType.STRATEGY_ACTION:

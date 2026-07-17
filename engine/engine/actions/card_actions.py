@@ -58,6 +58,13 @@ class PlayCardAction(GameAction):
                 return ActionResult.fail(f"Duplicate index {pi} in payment")
             used_indices.add(pi)
 
+        # Check extra hand action filter (e.g. 招抚: only friend cards)
+        extra_filter = getattr(player, 'extra_hand_action_filter', None)
+        if extra_filter and player.hand_action_taken_count >= 1:
+            if extra_filter == "friend" and not card.is_friend:
+                return ActionResult.fail(
+                    f"本轮额外手牌行动只能打出幕僚牌（{card.name} 不是幕僚）")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
@@ -80,12 +87,15 @@ class PlayCardAction(GameAction):
                 adjusted_index -= 1
         card = player.hand.pop(adjusted_index)
 
-        # Discard payment cards to main discard
-        state.main_discard.extend(payment_cards)
+        # Discard payment cards to main discard — unified path
+        discard_events = state.discard_cards(
+            self.player_id, payment_cards, target="main", source="hand",
+            reason="play_cost")
 
         events = [{"type": "play_card", "player": self.player_id,
                     "card": card.name, "cost_paid": len(payment_cards),
                     "payment_cards": [c.name for c in payment_cards]}]
+        events.extend(discard_events)
 
         # === Faction restriction check ===
         # Card cannot be played by this faction → discard (no effect, cost already paid).
@@ -128,6 +138,14 @@ class PlayCardAction(GameAction):
             # If staff area is full, replace the staff member at replace_staff_index
             if not player.can_play_friend():
                 if 0 <= self.replace_staff_index < len(player.staff_area):
+                    # Fire on_card_leave triggers BEFORE removing the replaced card
+                    replaced_card = player.staff_area[self.replace_staff_index]
+                    resolver = getattr(state, 'effect_resolver', None)
+                    if resolver:
+                        resolver.fire_card_leave_triggers(
+                            replaced_card, self.player_id, state,
+                            context={"source": "staff_replaced",
+                                     "replaced_by": card.name})
                     replaced = player.staff_area.pop(self.replace_staff_index)
                     state.main_discard.append(replaced)
                     events.append({"type": "staff_replaced",
@@ -143,6 +161,11 @@ class PlayCardAction(GameAction):
             # 事件牌 — resolve effect, then discard to main discard
             state.main_discard.append(card)
             events.append({"type": "event_played", "card": card.name})
+
+        elif card.card_type == CardType.MECHANISM:
+            # 强制事件牌 — like event but always fires (forced effects)
+            state.main_discard.append(card)
+            events.append({"type": "mechanism_played", "card": card.name})
 
         elif card.card_type == CardType.STRATEGY:
             # 策略牌 — place on top of national deck
@@ -168,18 +191,24 @@ class PlayCardAction(GameAction):
         # Friend and event cards fire effects immediately on play.
         # Active ability blocks are excluded — they must be activated
         # explicitly via ActivateEffectAction during the player's turn.
-        if card.card_type in (CardType.FRIEND, CardType.EVENT):
+        if card.card_type in (CardType.FRIEND, CardType.EVENT, CardType.MECHANISM):
             parsed = card.definition.parsed_effect
             resolver = getattr(state, 'effect_resolver', None)
             if resolver and parsed:
                 effect_result = resolver.resolve(
                     parsed, state, self.player_id,
                     context={"source": "play_card", "card_id": card.definition.card_id},
-                    exclude_ability_types={"active"},
+                    exclude_ability_types={"active", "passive"},
                 )
                 events.extend(effect_result.events)
                 if effect_result.errors:
                     events.append({"type": "effect_errors", "errors": effect_result.errors})
+
+        # Clear extra hand action filter on use (consumed by this play)
+        extra_filter = getattr(player, 'extra_hand_action_filter', None)
+        if extra_filter and player.hand_action_taken_count >= 1:
+            player.extra_hand_action_filter = None
+            events.append({"type": "extra_action_consumed", "filter": extra_filter})
 
         player.hand_action_taken_count += 1
         player.has_taken_hand_action = True

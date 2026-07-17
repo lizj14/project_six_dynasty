@@ -337,9 +337,11 @@ def _build_game_state(library: CardLibrary,
     # Public action card pool (5 shared cards, rulebook §2.1)
     state.public_action_pool = public_pool_cards
 
-    # National decks
-    state.jin_court = jin_national
-    state.north_court = north_national
+    # National decks — basic court cards go to the deck first.
+    # Court is filled from the deck later (in _execute_setup_effects),
+    # AFTER face-down strategy cards are resolved, so they appear in T1 court.
+    state.jin_deck = jin_national
+    state.north_deck = north_national
 
     # Main deck
     state.main_deck = main_deck_cards
@@ -399,9 +401,9 @@ def _execute_setup_effects(state: GameState, agents: list,
         state, action_system, logger,
     )
 
-    # --- Refill court from national decks after face-down play ---
-    # Face-down strategy cards went to the national deck (insert at top).
-    # Fill the court back to 10 cards without discarding remaining court cards.
+    # --- Fill court from national decks ---
+    # Court is populated from the deck AFTER face-down cards are resolved,
+    # so strategy cards that went to the deck top appear in T1 court.
     _fill_court_to(state, "north", 10, rng)
     _fill_court_to(state, "jin", 10, rng)
 

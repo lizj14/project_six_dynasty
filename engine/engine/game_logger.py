@@ -1007,9 +1007,13 @@ def describe_action(action: "GameAction", state: "GameState",
             for evt in result.events:
                 if evt.get("type") == "activate_effect":
                     card_name = evt.get("card", "?")
-                elif evt.get("type") == "pay_discard":
+                elif evt.get("type") == "discard":
                     discarded = evt.get("card", "?")
-                    effects_desc.append(f"弃「{discarded}」")
+                    source = evt.get("source", "")
+                    if source == "court":
+                        effects_desc.append(f"弃朝堂「{discarded}」")
+                    else:
+                        effects_desc.append(f"弃「{discarded}」")
                 elif evt.get("type") == "draw":
                     drawn = evt.get("card", "?")
                     effects_desc.append(f"摸「{drawn}」")

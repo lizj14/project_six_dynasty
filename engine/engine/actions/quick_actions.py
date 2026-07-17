@@ -42,11 +42,12 @@ class OccupyAction(GameAction):
         if loc.controller != ControlState.EMPTY:
             return ActionResult.fail(f"Location {self.target_location} is occupied — must march first")
 
-        # Must be adjacent to a friendly location (or have expedition marker)
-        friendly = state.get_friendly_locations(self.player_id)
+        # Must be adjacent to an adjacency source location
+        # (own locations; own + Sima with expedition marker)
+        sources = state.get_adjacency_source_locations(self.player_id)
         neighbors = state.get_adjacent_locations(self.target_location)
-        if not any(n in friendly for n in neighbors):
-            return ActionResult.fail(f"Location {self.target_location} is not adjacent to any friendly location")
+        if not any(n in sources for n in neighbors):
+            return ActionResult.fail(f"Location {self.target_location} is not adjacent to any of your adjacency sources")
 
         return ActionResult.ok()
 
@@ -122,11 +123,11 @@ class MarchAction(GameAction):
         cost = 3  # base
 
         # Difficult terrain
-        # Find which friendly adjacent location we're marching from
-        friendly = state.get_friendly_locations(self.player_id)
+        # Find which adjacency source location we're marching from
+        sources = state.get_adjacency_source_locations(self.player_id)
         neighbors = state.get_adjacent_locations(self.target_location)
         for nb in neighbors:
-            if nb in friendly:
+            if nb in sources:
                 terrain = state.get_terrain(nb, self.target_location)
                 if terrain == TerrainType.DIFFICULT:
                     cost += 1
@@ -151,6 +152,14 @@ class MarchAction(GameAction):
                     break
             if isolated:
                 cost -= 1
+
+        # Passive cost reduction (e.g. 草原部落: 进军费用-1)
+        # Query all in-play passives for march_cost_reduction effects.
+        # This is a true pre-cost reduction, not a post-hoc reimbursement.
+        reduction = state.query_march_cost_reduction(
+            self.player_id,
+            context={"player_id": self.player_id, "action": self})
+        cost -= reduction
 
         return max(1, cost)  # minimum 1
 
@@ -177,11 +186,12 @@ class MarchAction(GameAction):
         # (rulebook §3.2: locations can be 玩家占据/司马家占据/中立势力占据/未被占据)
         # Only truly empty (unoccupied) locations should use occupy, not march
 
-        # Must be adjacent to a friendly location
-        friendly = state.get_friendly_locations(self.player_id)
+        # Must be adjacent to an adjacency source location
+        # (own locations; own + Sima with expedition marker)
+        sources = state.get_adjacency_source_locations(self.player_id)
         neighbors = state.get_adjacent_locations(self.target_location)
-        if not any(n in friendly for n in neighbors):
-            return ActionResult.fail(f"No friendly location adjacent to {self.target_location}")
+        if not any(n in sources for n in neighbors):
+            return ActionResult.fail(f"No adjacency source adjacent to {self.target_location}")
 
         return ActionResult.ok()
 
@@ -196,7 +206,7 @@ class MarchAction(GameAction):
 
         events = []
 
-        # Pay cost
+        # Pay cost (already reduced by passive effects in _calculate_cost)
         player.military -= cost
 
         # Remove existing unit (return to owner's reserve, or remove neutral)
@@ -322,12 +332,15 @@ class RecruitAction(GameAction):
 
         player = state.get_player(self.player_id)
         card = player.hand.pop(self.card_to_discard_index)
-        state.main_discard.append(card)
+        discard_events = state.discard_cards(
+            self.player_id, [card], target="main", source="hand",
+            reason="recruit")
         player.military += 1
 
         state.log_event("recruit", player=self.player_id, discarded=card.name)
         return ActionResult.ok([{"type": "recruit", "player": self.player_id,
-                                  "discarded": card.name, "military_gained": 1}])
+                                  "discarded": card.name, "military_gained": 1}]
+                                + discard_events)
 
     def cost_description(self, state: "GameState") -> str:
         return "弃1张手牌"

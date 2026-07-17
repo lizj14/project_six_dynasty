@@ -58,24 +58,25 @@ class ActionSystem:
         available = []
 
         # Occupy — check for adjacent empty (unoccupied) locations
-        # Use own locations only (not allied/Sima) for adjacency source
-        own_locs = state.get_own_locations(player_id)
+        # Use adjacency source locations (own; own + Sima with expedition marker).
+        # Rulebook: 正常只有自己地点; 北伐标记使司马家地点也作为相邻起点。
+        source_locs = state.get_adjacency_source_locations(player_id)
         for loc_id, loc in state.locations.items():
             if loc.controller != ControlState.EMPTY:
                 continue
-            if any(n in own_locs for n in state.get_adjacent_locations(loc_id)):
+            if any(n in source_locs for n in state.get_adjacent_locations(loc_id)):
                 action = OccupyAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)
 
         # March — check for adjacent non-friendly, non-empty locations
         # (NEUTRAL = neutral forces present; EMPTY = unoccupied → use Occupy instead)
-        # Use own locations only for adjacency — you march from your own territory
+        # Use adjacency source locations — consistent with MarchAction.validate().
         for loc_id, loc in state.locations.items():
             cs = state._player_control_state(player_id)
             if loc.is_friendly_to(cs) or loc.controller == ControlState.EMPTY:
                 continue
-            if any(n in own_locs for n in state.get_adjacent_locations(loc_id)):
+            if any(n in source_locs for n in state.get_adjacent_locations(loc_id)):
                 action = MarchAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)

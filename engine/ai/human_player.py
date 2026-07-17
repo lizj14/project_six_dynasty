@@ -41,6 +41,12 @@ class HumanPlayer(GameAgent):
 
         Order: show hand → show hero options → pick hero → pick goals → pick face-down card + payment.
         """
+        # Flush buffered AI setup decisions (if any) before showing our own.
+        # This ensures simultaneous selection: the human doesn't see AI choices first.
+        on_setup = getattr(self, '_on_setup_begin', None)
+        if on_setup:
+            on_setup()
+
         d = SetupDecision()
         faction_label = "北方" if ctx.faction == "north" else "东晋"
 
@@ -343,6 +349,72 @@ class HumanPlayer(GameAgent):
             return opt.get("id", str(opt))
         return str(opt)
 
+    def request_card_play(self, state: "GameState",
+                          eligible_indices: list[int],
+                          filter_spec: dict = None) -> Optional["GameAction"]:
+        """Called when an effect requests immediate card play (e.g. 桓石虔).
+
+        Shows eligible cards and lets the player choose one to play immediately.
+        Payment cards are auto-selected from the end of hand.
+        """
+        player = state.get_player(self.player_id)
+        if not player or not eligible_indices:
+            return None
+
+        print(f"\n  ⚡ 效果要求立刻打出一张牌!")
+
+        # Build filter description
+        filter_desc = ""
+        if filter_spec:
+            marker = filter_spec.get("marker", "")
+            if marker:
+                marker_labels = {"military": "军事", "culture": "文化",
+                                 "affair": "内政", "power": "权谋"}
+                filter_desc = f" (需[{marker_labels.get(marker, marker)}]标记)"
+
+        print(f"  选择要打出的牌{filter_desc}:")
+        for i, idx in enumerate(eligible_indices):
+            card = player.hand[idx]
+            cost = card.cost
+            ct = getattr(card, 'card_type', '?')
+            ct_label = {"friend": "幕僚", "event": "事件", "strategy": "策略",
+                        "mechanism": "强制事件"}.get(str(ct), str(ct))
+            print(f"    {i+1}. [{idx+1}] {card.name} ({ct_label}, 费用={cost})")
+        print(f"    0. 取消 (不打出)")
+
+        while True:
+            choice = input("  > ").strip()
+            if choice.lower() == 'q':
+                from engine.engine.game import GameQuitException
+                raise GameQuitException("quit")
+            if choice == '0':
+                return None
+            try:
+                n = int(choice) - 1
+                if 0 <= n < len(eligible_indices):
+                    card_idx = eligible_indices[n]
+                    card = player.hand[card_idx]
+                    cost = card.cost
+
+                    # Auto-select payment: last N cards from hand (excluding the target)
+                    payment_indices = []
+                    if cost > 0:
+                        for idx in range(len(player.hand) - 1, -1, -1):
+                            if idx != card_idx:
+                                payment_indices.append(idx)
+                            if len(payment_indices) >= cost:
+                                break
+
+                    from engine.actions.card_actions import PlayCardAction
+                    return PlayCardAction(
+                        player_id=self.player_id,
+                        card_index=card_idx,
+                        payment_indices=payment_indices,
+                    )
+            except ValueError:
+                pass
+            print("  无效选择，重新输入")
+
     # ================================================================
     # State summary display
     # ================================================================
@@ -416,55 +488,111 @@ class HumanPlayer(GameAgent):
             return ""
         parts = []
         for block in parsed.blocks:
-            ab = block.ability_type or ""
-            et = block.effect_type or ""
-            if et == "gain":
-                for step in block.steps:
-                    p = step.params
-                    res_type = p.get("resource", "")
+            for step in block.steps:
+                et = step.effect_type or ""
+                p = step.params
+                if et == EffectType.GAIN_MILITARY:
                     amount = p.get("amount", "?")
-                    if res_type == "military":
-                        parts.append(f"+{amount}军力")
-                    elif res_type == "vp":
-                        parts.append(f"+{amount}VP")
-                    elif res_type == "order":
-                        parts.append(f"+{amount}顺位")
-                    elif res_type:
-                        parts.append(f"+{amount}{res_type}")
-            elif et == "draw":
-                parts.append("摸牌")
-            elif et == "spread_culture":
-                culture = ""
-                for step in block.steps:
-                    c = step.params.get("culture", "")
-                    if c:
-                        culture_map = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
-                        culture = culture_map.get(c, c)
-                parts.append(f"传播{culture}" if culture else "传播文化")
-            elif et == "march":
-                parts.append("进军")
-            elif et == "fortify":
-                parts.append("加固")
-            elif et == "convert":
-                parts.append("转化")
-            elif et == "occupy":
-                parts.append("占据")
-            elif et == "draft":
-                parts.append("征发")
-            elif et == "levy":
-                parts.append("征发")
-            elif et == "archive":
-                parts.append("存档")
-            elif et == "search":
-                parts.append("检索")
-            elif et == "activate_effect":
-                parts.append("激活效果")
-            elif ab == "active":
-                parts.append("[主动技能]")
-            elif ab == "passive":
-                parts.append("[被动技能]")
+                    parts.append(f"+{amount}军力")
+                elif et == EffectType.GAIN_VP:
+                    amount = p.get("amount", "?")
+                    parts.append(f"+{amount}VP")
+                elif et == EffectType.LOSE_MILITARY:
+                    amount = p.get("amount", "?")
+                    parts.append(f"-{amount}军力")
+                elif et == EffectType.LOSE_VP:
+                    amount = p.get("amount", "?")
+                    parts.append(f"-{amount}VP")
+                elif et == EffectType.PAY_MILITARY:
+                    amount = p.get("amount", "?")
+                    parts.append(f"支付{amount}军力")
+                elif et == EffectType.DRAW_CARDS:
+                    amount = p.get("amount", 1)
+                    parts.append(f"摸{amount}牌" if amount > 1 else "摸牌")
+                elif et == EffectType.DISCARD_CARDS:
+                    parts.append("弃牌")
+                elif et == EffectType.MARCH:
+                    parts.append("进军")
+                elif et == EffectType.OCCUPY:
+                    parts.append("占据")
+                elif et == EffectType.CONVERT:
+                    parts.append("转化")
+                elif et == EffectType.FORTIFY:
+                    parts.append("加固")
+                elif et == EffectType.DRAFT:
+                    parts.append("征发")
+                elif et == EffectType.ARCHIVE_THIS:
+                    parts.append("存档此牌")
+                elif et == EffectType.ARCHIVE_CARD:
+                    parts.append("存档")
+                elif et == EffectType.ARCHIVE_COURT:
+                    parts.append("存档朝堂牌")
+                elif et == EffectType.SEARCH:
+                    parts.append("检索")
+                elif et == EffectType.SPREAD_CULTURE:
+                    c = p.get("culture", "")
+                    culture_map = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
+                    culture = culture_map.get(c, c)
+                    parts.append(f"传播{culture}" if culture else "传播文化")
+                elif et == EffectType.RAISE_ORDER:
+                    amount = p.get("amount", "?")
+                    parts.append(f"+{amount}顺位")
+                elif et == EffectType.LOWER_ORDER:
+                    amount = p.get("amount", "?")
+                    parts.append(f"-{amount}顺位")
+                elif et == EffectType.RAISE_PRESTIGE:
+                    amount = p.get("amount", "?")
+                    parts.append(f"+{amount}威望")
+                elif et == EffectType.LOWER_PRESTIGE:
+                    amount = p.get("amount", "?")
+                    parts.append(f"-{amount}威望")
+                elif et == EffectType.RAISE_CONTRIBUTION:
+                    amount = p.get("amount", "?")
+                    parts.append(f"+{amount}功绩")
+                elif et == EffectType.LOWER_CONTRIBUTION:
+                    amount = p.get("amount", "?")
+                    parts.append(f"-{amount}功绩")
+                elif et == EffectType.PLACE_ARMY:
+                    parts.append("放置部队")
+                elif et == EffectType.REMOVE_ARMY:
+                    parts.append("移除部队")
+                elif et == EffectType.GET_EXPEDITION:
+                    parts.append("远征标记")
+                elif et == EffectType.ADD_REFUGEE:
+                    parts.append("增加流民")
+                elif et == EffectType.SUPPLY_COURT:
+                    parts.append("补充朝堂")
+                elif et == EffectType.PLAY_CARD:
+                    parts.append("打出卡牌")
+                elif et == EffectType.RAISE_CULTURE_LEVEL:
+                    parts.append("提升文化")
+                elif et == EffectType.REMOVE_FROM_GAME:
+                    parts.append("移出游戏")
+                elif et == EffectType.CHOOSE:
+                    parts.append("[选择效果]")
+                if len(parts) >= 3:
+                    break
             if len(parts) >= 3:
                 break
+
+        # Fallback: show ability_type if no steps matched
+        if not parts:
+            for block in parsed.blocks:
+                ab = block.ability_type or ""
+                if ab == AbilityType.ACTIVE:
+                    parts.append("[主动]")
+                elif ab == AbilityType.PASSIVE:
+                    trigger = block.trigger or ""
+                    parts.append(f"[被动:{trigger}]" if trigger else "[被动]")
+                elif ab == AbilityType.ENTER:
+                    parts.append("[登场]")
+                elif ab == AbilityType.FORCED:
+                    parts.append("[强制]")
+                elif ab == AbilityType.STRATEGY_ACTION:
+                    parts.append("[牌组行动]")
+                if len(parts) >= 2:
+                    break
+
         return " | ".join(parts[:3])
 
     # ================================================================
@@ -545,9 +673,45 @@ class HumanPlayer(GameAgent):
                     print(f"     ↳ 传播文化 (跳过: {evt.get('reason', '')})")
             elif t == "choose":
                 print(f"     ↳ 选择了选项 {evt.get('chosen_label', '?')}")
+            elif t == "play_card":
+                card_name = evt.get("card", "?")
+                payment_cards = evt.get("payment_cards", [])
+                if payment_cards:
+                    print(f"     ↳ 打出「{card_name}」→ 弃: {' '.join(payment_cards)}")
+                else:
+                    print(f"     ↳ 打出「{card_name}」")
+            elif t == "play_public_card":
+                card_name = evt.get("card", "?")
+                payment_cards = evt.get("payment_cards", [])
+                if payment_cards:
+                    print(f"     ↳ 使用公共牌「{card_name}」→ 弃: {' '.join(payment_cards)}")
+                else:
+                    print(f"     ↳ 使用公共牌「{card_name}」")
             elif t == "extra_action_granted":
                 action_type = evt.get("action_type", "?")
-                print(f"     ↳ 获得额外行动: {action_type}")
+                card_type = evt.get("card_type", "")
+                if card_type:
+                    print(f"     ↳ 获得额外行动: {action_type} (仅{card_type})")
+                else:
+                    print(f"     ↳ 获得额外行动: {action_type}")
+            elif t == "discard":
+                card_name = evt.get("card", "?")
+                target = evt.get("target", "main")
+                source = evt.get("source", "?")
+                target_label = "国家弃牌区" if target == "national" else "弃牌区"
+                if source == "court":
+                    print(f"     ↳ 弃朝堂牌「{card_name}」→ {target_label}")
+                elif source == "hand":
+                    reason = evt.get("reason", "")
+                    if reason == "recruit":
+                        pass  # recruit prints its own line
+                    else:
+                        print(f"     ↳ 弃「{card_name}」→ {target_label}")
+                else:
+                    print(f"     ↳ 弃「{card_name}」→ {target_label}")
+            elif t == "march_cost_reduction":
+                print(f"     ↳ 进军费用返还 +{evt.get('amount', '?')} 军力"
+                      f" (剩余 {evt.get('remaining', '?')} 次)")
             elif t == "game_end_trigger":
                 print(f"     ↳ ⚠ 游戏结束触发: {evt.get('reason', '')}")
 

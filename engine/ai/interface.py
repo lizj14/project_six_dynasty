@@ -99,6 +99,19 @@ class GameAgent(ABC):
         """
         return list(range(len(hand_cards) - count, len(hand_cards)))
 
+    def request_card_play(self, state: "GameState",
+                          eligible_indices: list[int],
+                          filter_spec: dict = None) -> Optional["GameAction"]:
+        """Called when an effect requests the player to play a card immediately.
+
+        e.g. 桓石虔 active → play 1 card with [军事] marker.
+        The agent should select a card from eligible_indices and return a
+        PlayCardAction, or return None to decline.
+
+        Default: return None (AI agents that don't support this).
+        """
+        return None
+
     @abstractmethod
     def select_target(self, state: "GameState", prompt: dict) -> Optional[str]:
         """Called when a player must select a target (location, player, card).
