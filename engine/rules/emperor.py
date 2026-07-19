@@ -80,6 +80,9 @@ def roll_emperor_dice(state: "GameState", rng: random.Random) -> list[dict]:
     state.emperor.active_tasks = []
 
     for _ in range(dice_count):
+        # Each die roll costs 1 Sima military
+        if state.sima.military > 0:
+            state.sima.military -= 1
         roll = rng.randint(1, 6)
         # Get task type from emperor card, or use default
         if state.emperor.current_emperor:
@@ -213,8 +216,20 @@ def check_emperor_age(state: "GameState", rng: random.Random) -> list[dict]:
 
 
 def _parse_task_type(name: str) -> EmperorTaskType:
-    """Parse a Chinese task name to EmperorTaskType enum."""
-    name = name.strip()
+    """Parse a task name to EmperorTaskType enum. Supports both English and Chinese."""
+    name = name.strip().lower()
+    # English names (from compiled card JSON)
+    if name in ("march", "expansion", "expand"):
+        return EmperorTaskType.EXPANSION
+    if name in ("fortify",):
+        return EmperorTaskType.FORTIFY
+    if name in ("spread_culture", "culture"):
+        return EmperorTaskType.CULTURE
+    if name in ("reform",):
+        return EmperorTaskType.REFORM
+    if name in ("art",):
+        return EmperorTaskType.ART
+    # Chinese names (from formalize_cards or older data)
     if "扩张" in name:
         return EmperorTaskType.EXPANSION
     if "加固" in name:

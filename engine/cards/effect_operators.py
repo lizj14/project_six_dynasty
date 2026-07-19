@@ -215,7 +215,7 @@ class ReshuffleEmperorOperator(EffectOperator):
             result.events.append({"type": "reshuffle_emperor",
                                   "skipped": True, "reason": "no_emperor_deck"})
             return result
-        rng = _random.Random()
+        rng = _random.Random(state.seed)
         rng.shuffle(state.emperor.emperor_deck)
         new_emperor = state.emperor.emperor_deck[0]
         old_emperor_name = getattr(state.emperor.current_emperor, 'name', '?')

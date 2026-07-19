@@ -422,8 +422,9 @@ class SearchAction(GameAction):
 
         # Shuffle forced event cards back into deck
         if forced_events_set_aside:
-            import random
-            random.shuffle(forced_events_set_aside)
+            import random as _random
+            rng = _random.Random(state.seed + state.round)
+            rng.shuffle(forced_events_set_aside)
             state.main_deck = forced_events_set_aside + state.main_deck
             events.append({"type": "search_forced_events_returned",
                            "count": len(forced_events_set_aside)})

@@ -410,9 +410,11 @@ def _build_game_state(library: CardLibrary,
     # Emperor
     emperor_cards = library.by_type(CardType.EMPEROR)
     if emperor_cards:
+        # Copy list — emperor_deck will be shuffled by check_emperor_age(),
+        # and we must not mutate the library's internal list
         state.emperor = EmperorState(
             current_emperor=emperor_cards[0],
-            emperor_deck=emperor_cards,
+            emperor_deck=list(emperor_cards),
             age=1,
             prestige_initial=emperor_cards[0].initial_prestige,
         )
