@@ -377,7 +377,11 @@ class _RegionCondition(ConditionOperator):
 
 @register_condition
 class ControlRegionCondition(_RegionCondition):
-    """Check if player fully controls a region."""
+    """Check if player controls a region (partial control, rulebook §3.2).
+
+    "控制" = partial control: player occupies more than threshold locations.
+    This is distinct from "完全控制" (full control = all locations).
+    """
     condition_type = "control_region"
 
     def check(self, condition, state, player_id, context, resolver) -> bool:
@@ -386,7 +390,8 @@ class ControlRegionCondition(_RegionCondition):
             return False
         from rules.area_control import check_region_control
         result = check_region_control(state, region)
-        return result.full_controller == player_id
+        # Partial control: player has > threshold locations (rulebook §3.2)
+        return result.partial_controller == player_id
 
 
 @register_condition
