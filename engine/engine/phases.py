@@ -375,6 +375,30 @@ def _build_game_state(library: CardLibrary,
 
     # Map setup
     state.locations = _create_initial_locations()
+
+    # Rulebook §4.1 step 1: Place initial culture markers
+    # 江南→玄学, 山东→儒学, 西凉→佛学
+    from rules.area_control import REGION_CONFIG
+    from models.enums import CultureType as _CT
+    _culture_name_to_enum = {"confucianism": _CT.CONFUCIANISM,
+                              "taoism": _CT.TAOISM,
+                              "buddhism": _CT.BUDDHISM}
+    for _reg, _cfg in REGION_CONFIG.items():
+        _init_cult = _cfg.get("initial_culture")
+        if _init_cult and _cfg.get("locations"):
+            _first_loc = _cfg["locations"][0]
+            if _first_loc in state.locations:
+                _ct_enum = _culture_name_to_enum.get(_init_cult)
+                if _ct_enum:
+                    state.locations[_first_loc].culture_marker = _ct_enum
+
+    # Update culture track map_count from placed initial markers
+    for _ct in [_CT.CONFUCIANISM, _CT.TAOISM, _CT.BUDDHISM]:
+        _count = sum(1 for _loc in state.locations.values()
+                     if _loc.culture_marker == _ct)
+        if _ct in state.culture_tracks:
+            state.culture_tracks[_ct].map_count = _count
+
     state.main_discard.extend(setup_discard_pile)
 
     # Load map adjacencies
@@ -392,6 +416,9 @@ def _build_game_state(library: CardLibrary,
             age=1,
             prestige_initial=emperor_cards[0].initial_prestige,
         )
+        # Rulebook §4.1 step 8: Sima prestige starts from emperor card's initial_prestige
+        if hasattr(emperor_cards[0], 'initial_prestige'):
+            state.sima.prestige = emperor_cards[0].initial_prestige
 
     # EffectResolver (created once, with log callback if logger available)
     state.effect_resolver = EffectResolver(action_system)

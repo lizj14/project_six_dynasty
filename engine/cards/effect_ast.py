@@ -134,6 +134,7 @@ class EffectType:
     # Meta-effects
     EXTRA_ACTION = "extra_action"
     TARGETED_EFFECT = "targeted_effect"
+    RESHUFFLE_EMPEROR = "reshuffle_emperor"  # 重洗君主牌堆
 
     # Map actions (variants)
     CONVERT_OWN_TO_NEUTRAL = "convert_own_to_neutral"

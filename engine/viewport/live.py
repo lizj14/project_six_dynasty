@@ -258,11 +258,20 @@ class LiveViewport(Viewport):
 
     def get_emperor(self) -> dict:
         emp = self._state.emperor
+        emperor_name = ""
+        if emp.current_emperor:
+            emperor_name = getattr(emp.current_emperor, 'name', '')
+        tasks = []
+        for t in (emp.active_tasks or []):
+            tasks.append({
+                "type": t.task_type.value if hasattr(t.task_type, 'value') else str(t.task_type),
+                "completed": t.completed,
+            })
         return {
             "age": emp.age,
-            "emperor_name": emp.emperor_name if hasattr(emp, 'emperor_name') else "",
-            "prestige": emp.prestige if hasattr(emp, 'prestige') else 0,
-            "tasks": list(emp.emperor_tasks) if hasattr(emp, 'emperor_tasks') else [],
+            "emperor_name": emperor_name,
+            "prestige": emp.prestige_initial if hasattr(emp, 'prestige_initial') else 0,
+            "tasks": tasks,
         }
 
     def get_sima(self) -> dict:

@@ -340,11 +340,28 @@ class QueryEngine:
     # ================================================================
 
     def _summary(self) -> str:
-        """One-line summary per player — all players, including staff names and history."""
+        """Multi-line summary: emperor, Sima, round/phase, all players with hero/staff/history."""
         lines = []
         lines.append(f"=== 第{self._vp.round}回合 {self._vp.phase}阶段 ===")
 
-        # Get all players
+        # --- Emperor & Sima ---
+        try:
+            emp = self._vp.get_emperor()
+            sima = self._vp.get_sima()
+            emp_name = emp.get("emperor_name", "?") or "?"
+            emp_age = emp.get("age", "?")
+            emp_tasks = emp.get("tasks", [])
+            task_strs = []
+            for t in emp_tasks:
+                mark = "✓" if t.get("completed") else "○"
+                task_strs.append(f"{mark}{t.get('type', '?')}")
+            tasks_part = " ".join(task_strs) if task_strs else "无任务"
+            lines.append(f"【皇帝】{emp_name} (年龄{emp_age})  任务: {tasks_part}")
+            lines.append(f"【司马家】VP:{sima.get('vp', 0)}  军力:{sima.get('military', 0)}  威望:{sima.get('prestige', 0)}")
+        except Exception:
+            pass
+
+        # --- Players ---
         my_id = self._vp.viewer_id
         my_player = self._vp.get_my_player()
         all_public = self._vp.get_all_players_public()
@@ -364,6 +381,8 @@ class QueryEngine:
             military = p.get("military", 0)
             hand_count = p.get("hand_count", 0)
             army = p.get("army_placed_count", 0)
+            hero_data = p.get("hero") or {}
+            hero_name = hero_data.get("name", "") if isinstance(hero_data, dict) else ""
             staff_names = p.get("staff_names", [])
             history_names = p.get("history_names", [])
 
@@ -374,6 +393,9 @@ class QueryEngine:
                 f"手牌:{hand_count}",
                 f"部队:{army}",
             ]
+
+            if hero_name:
+                parts.append(f"英雄:{hero_name}")
 
             if p.get("faction") == "jin":
                 prestige = p.get("prestige", 0)

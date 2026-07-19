@@ -628,12 +628,27 @@ class HumanPlayer(GameAgent):
                 target = evt.get("target", "?")
                 if not evt.get("skipped"):
                     print(f"     ↳ 转化→{target}")
+            elif t == "march":
+                target = evt.get("target", "?")
+                free = "免费" if evt.get("cost", 1) == 0 else ""
+                print(f"     ↳ 进军→{target} {free}".strip())
+            elif t == "occupy":
+                target = evt.get("target", "?")
+                free = "免费" if evt.get("cost", 1) == 0 else ""
+                print(f"     ↳ 占据→{target} {free}".strip())
             elif t == "march_requested":
                 if evt.get("skipped"):
                     print(f"     ↳ 进军 (跳过: {evt.get('reason', '')})")
+                else:
+                    target = evt.get("target", "?")
+                    free = "免费" if evt.get("free") else ""
+                    print(f"     ↳ 进军→{target} {free}".strip())
             elif t == "occupy_requested":
                 if evt.get("skipped"):
                     print(f"     ↳ 占据 (跳过: {evt.get('reason', '')})")
+                else:
+                    target = evt.get("target", "?")
+                    print(f"     ↳ 占据→{target}")
             elif t == "spread_culture_requested":
                 if evt.get("skipped"):
                     print(f"     ↳ 传播文化 (跳过: {evt.get('reason', '')})")

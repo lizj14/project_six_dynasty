@@ -203,6 +203,35 @@ class ArchiveThisOperator(EffectOperator):
 
 
 @register
+class ReshuffleEmperorOperator(EffectOperator):
+    """重洗君主牌堆：shuffle emperor deck and reset Sima prestige from new top card."""
+    effect_type = EffectType.RESHUFFLE_EMPEROR
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        import random as _random
+        result = ResolveResult()
+        if not state.emperor or not state.emperor.emperor_deck:
+            result.events.append({"type": "reshuffle_emperor",
+                                  "skipped": True, "reason": "no_emperor_deck"})
+            return result
+        rng = _random.Random()
+        rng.shuffle(state.emperor.emperor_deck)
+        new_emperor = state.emperor.emperor_deck[0]
+        old_emperor_name = getattr(state.emperor.current_emperor, 'name', '?')
+        state.emperor.current_emperor = new_emperor
+        state.emperor.age = 1
+        state.emperor.active_tasks = []
+        if hasattr(new_emperor, 'initial_prestige'):
+            state.sima.prestige = new_emperor.initial_prestige
+        result.events.append({"type": "reshuffle_emperor",
+                              "old_emperor": old_emperor_name,
+                              "new_emperor": new_emperor.name,
+                              "sima_prestige": state.sima.prestige})
+        return result
+
+
+@register
 class ArchiveCardOperator(EffectOperator):
     effect_type = EffectType.ARCHIVE_CARD
 
@@ -426,6 +455,14 @@ class DraftOperator(EffectOperator):
                                   if "cannot_be_drafted" not in (
                                       c.definition.parsed_effect.restrictions
                                       if c.definition.parsed_effect else [])]
+
+                    # Exclude cards whose play_condition is not met
+                    candidates = [c for c in candidates
+                                  if not (c.definition.parsed_effect
+                                          and c.definition.parsed_effect.play_condition)
+                                  or resolver.check_condition(
+                                      c.definition.parsed_effect.play_condition,
+                                      state, player_id)]
 
                     if not candidates:
                         result.events.append({

@@ -148,6 +148,33 @@ def build_public_snapshot(state: "GameState") -> dict:
     public_actions = [carddef_to_summary(c.definition)
                       for c in state.public_action_pool]
 
+    # Emperor state
+    emp = state.emperor
+    emperor_name = ""
+    if emp.current_emperor:
+        emperor_name = getattr(emp.current_emperor, 'name', '')
+    emperor_tasks = []
+    for t in (emp.active_tasks or []):
+        emperor_tasks.append({
+            "type": t.task_type.value if hasattr(t.task_type, 'value') else str(t.task_type),
+            "completed": t.completed,
+        })
+    emperor_data = {
+        "age": emp.age,
+        "emperor_name": emperor_name,
+        "prestige": getattr(emp, 'prestige_initial', 0),
+        "tasks": emperor_tasks,
+    }
+
+    # Sima state
+    sima = state.sima
+    sima_data = {
+        "military": sima.military if hasattr(sima, 'military') else 0,
+        "vp": sima.vp if hasattr(sima, 'vp') else 0,
+        "prestige": sima.prestige if hasattr(sima, 'prestige') else 0,
+        "army_placed_count": sima.army_placed_count if hasattr(sima, 'army_placed_count') else 0,
+    }
+
     return {
         "round": state.round,
         "phase": state.phase.value if hasattr(state.phase, 'value') else str(state.phase),
@@ -165,6 +192,8 @@ def build_public_snapshot(state: "GameState") -> dict:
         },
         "decks": decks,
         "public_actions": public_actions,
+        "emperor": emperor_data,
+        "sima": sima_data,
         "game_end_marker": state.game_end_marker,
         "game_end_reason": state.game_end_reason,
     }

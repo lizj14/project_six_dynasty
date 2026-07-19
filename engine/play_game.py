@@ -168,6 +168,102 @@ def select_faction() -> str:
             sys.exit(0)
 
 
+def _print_final_scoring_breakdown(state, scoring_result, winner: str, human_pid: str):
+    """Print detailed final scoring breakdown per player.
+
+    Shows each scoring step's contribution and hidden goal details.
+    """
+    faction_labels = {"north": "北方", "jin_1": "东晋1", "jin_2": "东晋2", "jin_3": "东晋3"}
+
+    # Pre-scoring state: we need to estimate pre-scoring VP by subtracting
+    # scoring gains. Use the scoring result detail to reconstruct.
+    players = {p.player_id: p for p in state.get_all_players()}
+
+    # Gather per-player scoring details from result steps
+    player_details = {pid: {"culture": 0, "region": 0, "sima": 0, "goal": 0, "goals": {}}
+                      for pid in players}
+
+    for step in scoring_result.steps:
+        detail = step.get("detail", {})
+        if step["name"] == "文化分数":
+            for culture_name, cd in detail.items():
+                if isinstance(cd, dict):
+                    for pid, vp in cd.get("vp_awarded", {}).items():
+                        player_details[pid]["culture"] += vp
+
+        elif step["name"] == "区控与部队储备":
+            region_detail = detail.get("region_control", {})
+            if isinstance(region_detail, dict):
+                for region_name, rd in region_detail.items():
+                    if isinstance(rd, dict):
+                        for pid, vp in rd.get("vp_awarded", {}).items():
+                            player_details[pid]["region"] += vp
+            # Army reserve
+            for pid in players:
+                p = players[pid]
+                reserve_vp = getattr(p, 'army_reserve_revealed_vp', 0)
+                if reserve_vp:
+                    player_details[pid]["region"] += reserve_vp
+
+        elif step["name"] == "司马家分数分配":
+            if isinstance(detail, dict):
+                for pid, vp in detail.get("vp_awarded", {}).items():
+                    player_details[pid]["sima"] += vp
+
+        elif step["name"] == "目标牌":
+            if isinstance(detail, dict):
+                for pid, gd in detail.items():
+                    if isinstance(gd, dict):
+                        player_details[pid]["goal"] = gd.get("total", 0)
+                        player_details[pid]["goals"] = gd.get("goals", {})
+
+    # Print each player's breakdown
+    for pid in ["north", "jin_1", "jin_2", "jin_3"]:
+        if pid not in players:
+            continue
+        p = players[pid]
+        pd = player_details[pid]
+        label = faction_labels.get(pid, pid)
+        marker = " ★胜者" if pid == winner else ""
+        is_you = " (你)" if pid == human_pid else ""
+
+        # Calculate pre-scoring VP (final VP minus scoring gains)
+        scoring_gain = pd["culture"] + pd["region"] + pd["sima"] + pd["goal"]
+        pre_vp = p.vp - scoring_gain
+
+        print(f"\n  ┌─ {label}{is_you}{marker}")
+        print(f"  │  终局VP: {p.vp}  (基础: {pre_vp} + 终局计分: {scoring_gain})")
+        if pd["culture"]:
+            print(f"  │  文化分数: +{pd['culture']}")
+        if pd["region"]:
+            print(f"  │  区控与部队储备: +{pd['region']}")
+        if pd["sima"]:
+            print(f"  │  司马家分配: +{pd['sima']}")
+        if pd["goal"]:
+            print(f"  │  目标牌: +{pd['goal']}")
+
+        # Goal details
+        if pd["goals"] and p.faction.value == "jin":
+            for gname, ginfo in pd["goals"].items():
+                level = ginfo.get("level", "?")
+                earned = ginfo.get("earned_vp", 0)
+                if level == "full":
+                    status = f"✓完成(完全) +{earned}"
+                elif level == "simple":
+                    status = f"✓完成(简易) +{earned}"
+                elif level == "none":
+                    status = "✗未完成"
+                else:
+                    status = f"? +{earned}"
+                print(f"  │    · {gname}: {status}")
+        print(f"  └{'─'*45}")
+
+    # Sima state
+    sima = getattr(state, 'sima', None)
+    if sima:
+        print(f"\n  司马家: VP={sima.vp}, 军力={sima.military}, 威望={sima.prestige}")
+
+
 def main():
     # Select faction
     chosen_faction = select_faction()
@@ -251,11 +347,18 @@ def main():
         print(f"  耗时: {elapsed:.1f}s")
         print(f"  回合数: {final_state.round}")
         print(f"  结束原因: {final_state.game_end_reason or 'round_10'}")
-        print()
-        for pid, score in scores.items():
-            marker = " ★胜者" if pid == winner else ""
-            is_you = " (你)" if pid == human_pid else ""
-            print(f"  {pid}{is_you}: {score} VP{marker}")
+        print(f"{'='*50}")
+
+        # Detailed scoring breakdown
+        scoring_result = getattr(final_state, '_final_scoring_result', None)
+        if scoring_result:
+            _print_final_scoring_breakdown(final_state, scoring_result, winner, human_pid)
+        else:
+            print()
+            for pid, score in scores.items():
+                marker = " ★胜者" if pid == winner else ""
+                is_you = " (你)" if pid == human_pid else ""
+                print(f"  {pid}{is_you}: {score} VP{marker}")
 
     # Save logs
     log_dir = os.path.join(os.path.dirname(__file__), "logs")

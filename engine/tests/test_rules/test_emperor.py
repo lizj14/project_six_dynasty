@@ -76,8 +76,9 @@ class TestTaskCompletion:
         state = make_emperor_state()
         state.emperor.active_tasks = [EmperorTask(task_type=EmperorTaskType.REFORM)]
         events = check_task_completion(state, "jin_1", "archive")
-        assert len(events) == 1
+        assert len(events) == 2  # task_completed + all_tasks_complete
         assert events[0]["type"] == "emperor_task_completed"
+        assert events[1]["type"] == "emperor_all_tasks_complete"
         assert state.emperor.active_tasks[0].completed
         assert state.jin_players[0].vp == 2
 
@@ -87,7 +88,7 @@ class TestTaskCompletion:
         state.emperor.active_tasks = [EmperorTask(task_type=EmperorTaskType.FORTIFY)]
         events = check_task_completion(state, "jin_1", "fortify",
                                         context={"target_is_sima": True})
-        assert len(events) == 1
+        assert len(events) == 2  # task_completed + all_tasks_complete
 
     def test_fortify_non_sima_no_complete(self):
         """加固非司马家地点 → 不完成."""
@@ -117,18 +118,20 @@ class TestEmperorAge:
     """Tests for emperor age check."""
 
     def test_age_increase(self):
-        """Roll > age → age increases, Sima prestige +1."""
+        """Roll > age → age increases (prestige no longer grows on age)."""
         # Use a seed that gives a high roll (>2) for age=1
         rng = random.Random(123)
         state = make_emperor_state()
         state.emperor.age = 2
         old_prestige = state.sima.prestige
+        old_age = state.emperor.age
         events = check_emperor_age(state, rng)
         assert len(events) >= 1
         # Either aged or died depending on roll
         event = events[0]
         if event.get("result") == "aged":
-            assert state.sima.prestige > old_prestige
+            assert state.emperor.age > old_age
+            # Prestige no longer changes on age increase
 
     def test_emperor_death_event_exists(self):
         """Emperor death produces correct event type."""

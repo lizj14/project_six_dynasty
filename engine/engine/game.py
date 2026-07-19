@@ -72,6 +72,7 @@ class GameEngine:
         # Run final scoring
         from rules.scoring import run_final_scoring
         scoring_result = run_final_scoring(self.state)
+        self.state._final_scoring_result = scoring_result  # Expose for UI
 
         if self.logger:
             scores = {p.player_id: p.vp for p in self.state.get_all_players()}
@@ -148,6 +149,63 @@ class GameEngine:
                 return True
         return False
 
+    def _build_emperor_context(self, state: GameState, player_id: str,
+                               action, atype: str, result) -> dict:
+        """Build context dict for emperor task completion checks.
+
+        Populates the fields needed by check_task_completion() in rules/emperor.py
+        based on the action type and game state.
+        """
+        context = {}
+        player = state.get_player(player_id)
+
+        if atype == "fortify":
+            target_loc = getattr(action, 'target_location', None)
+            if target_loc:
+                loc = state.locations.get(target_loc)
+                if loc and loc.controller.value == "sima":
+                    context["target_is_sima"] = True
+
+        elif atype in ("march", "convert"):
+            # Check events for sima_army_used signal from card effects
+            for evt in (result.events or []):
+                if evt.get("type") == "sima_army_used":
+                    context["used_sima_army"] = True
+                    break
+
+        elif atype == "play_card":
+            card_index = getattr(action, 'card_index', None)
+            if card_index is not None and player:
+                try:
+                    card = player.hand[card_index]
+                    if card.definition.has_marker("culture"):
+                        context["has_culture_marker"] = True
+                    if card.definition.card_type.value == "strategy":
+                        context["is_strategy"] = True
+                except (IndexError, AttributeError):
+                    pass
+
+        elif atype == "court_action":
+            card_id = getattr(action, 'card_id', None)
+            if card_id:
+                court = state.get_court_cards(player_id)
+                for c in court:
+                    if c.definition.card_id == card_id:
+                        if c.definition.has_marker("culture"):
+                            context["has_culture_marker"] = True
+                        break
+
+        elif atype == "activate_effect":
+            card_id = getattr(action, 'card_id', None)
+            if card_id and player:
+                for card in [player.hero] + (player.staff_area or []):
+                    if card and card.definition.card_id == card_id:
+                        if card.definition.has_marker("culture"):
+                            context["has_culture_marker"] = True
+                        break
+
+        return context
+
     def _print_round_public_info(self, state: GameState):
         """Print public information visible to all players at round start.
 
@@ -174,14 +232,15 @@ class GameEngine:
 
         # Player stats table
         print(f"\n【玩家状态】")
-        print(f"  {'玩家':<8} {'阵营':<6} {'VP':>4} {'军力':>4} {'功绩':>4} {'威望':>4} {'顺位':>4} {'手牌':>4}")
-        print(f"  {'-'*48}")
+        print(f"  {'玩家':<8} {'阵营':<6} {'英雄':<8} {'VP':>4} {'军力':>4} {'功绩':>4} {'威望':>4} {'顺位':>4} {'手牌':>4}")
+        print(f"  {'-'*58}")
         for p in state.get_all_players():
             f = faction_labels.get(p.faction.value if hasattr(p.faction, 'value') else str(p.faction), '?')
+            hero_name = p.hero.name if p.hero else "-"
             contrib = str(p.contribution) if p.faction.value == "jin" else "-"
             prestige = str(p.prestige) if p.faction.value == "jin" else "-"
             order = str(p.order) if p.faction.value == "jin" else "-"
-            print(f"  {p.player_id:<8} {f:<6} {p.vp:>4} {p.military:>4} {contrib:>4} {prestige:>4} {order:>4} {len(p.hand):>4}")
+            print(f"  {p.player_id:<8} {f:<6} {hero_name:<8} {p.vp:>4} {p.military:>4} {contrib:>4} {prestige:>4} {order:>4} {len(p.hand):>4}")
 
         # Deck sizes and court cards (per faction, not per player)
         print(f"\n【牌库信息】")
@@ -414,7 +473,7 @@ class GameEngine:
         if emperor_age_events and self._has_human_player():
             for evt in emperor_age_events:
                 if evt.get("type") == "emperor_age":
-                    print(f"  👑 皇帝年龄增长: 年龄{evt.get('age','?')} → 司马家威望+1")
+                    print(f"  👑 皇帝年龄增长: 年龄{evt.get('age','?')}")
                 elif evt.get("type") == "emperor_death":
                     print(f"  💀 皇帝驾崩! 年龄{evt.get('old_age','?')} → "
                           f"新皇帝: {evt.get('new_emperor','?')}")
@@ -538,7 +597,7 @@ class GameEngine:
             if result.success:
                 from rules.emperor import check_task_completion
                 atype = getattr(action, 'action_type', '')
-                context = {}
+                context = self._build_emperor_context(state, player_id, action, atype, result)
                 emperor_task_events = check_task_completion(
                     state, player_id, atype, context)
                 if emperor_task_events:
@@ -548,6 +607,9 @@ class GameEngine:
                             if evt.get("type") == "emperor_task_completed":
                                 print(f"  👑 皇帝任务完成! {evt.get('task', '?')} "
                                       f"— {evt.get('player', '?')} +2VP")
+                            elif evt.get("type") == "emperor_all_tasks_complete":
+                                print(f"  👑 全部皇帝任务完成! "
+                                      f"司马家威望+1 → {evt.get('sima_prestige', '?')}")
 
             # Notify observer (e.g. human player UI) about the action result
             if self.on_action_executed:

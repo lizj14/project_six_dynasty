@@ -76,6 +76,9 @@ def roll_emperor_dice(state: "GameState", rng: random.Random) -> list[dict]:
     dice_count = min(5, state.sima.military // 3)
     events = []
 
+    # Clear tasks from previous round (tasks are per-round only)
+    state.emperor.active_tasks = []
+
     for _ in range(dice_count):
         roll = rng.randint(1, 6)
         # Get task type from emperor card, or use default
@@ -113,6 +116,7 @@ def check_task_completion(state: "GameState", player_id: str,
     context: additional info like card markers, location, etc.
     """
     events = []
+    any_newly_completed = False
     player = state.get_player(player_id)
     if not player or player.faction.value != "jin":
         return events
@@ -158,10 +162,20 @@ def check_task_completion(state: "GameState", player_id: str,
             task.completed = True
             task.completed_by = player_id
             player.vp += 2
+            any_newly_completed = True
             events.append({"type": "emperor_task_completed",
                            "player": player_id,
                            "task": task.task_type.value,
                            "vp_reward": 2})
+
+    # Check if ALL active tasks are now complete → Sima prestige +1
+    # Only fire if at least one task was newly completed in this call
+    if any_newly_completed and state.emperor.active_tasks and all(
+        t.completed for t in state.emperor.active_tasks
+    ):
+        state.sima.prestige = min(9, state.sima.prestige + 1)
+        events.append({"type": "emperor_all_tasks_complete",
+                       "sima_prestige": state.sima.prestige})
 
     return events
 
@@ -179,9 +193,9 @@ def check_emperor_age(state: "GameState", rng: random.Random) -> list[dict]:
     roll = rng.randint(1, 6)
     if roll > state.emperor.age:
         state.emperor.age += 1
-        state.sima.prestige = min(9, state.sima.prestige + 1)
+        # Prestige no longer grows from emperor age — only from all-tasks completion
         events.append({"type": "emperor_age", "roll": roll, "age": state.emperor.age,
-                       "result": "aged", "sima_prestige": state.sima.prestige})
+                       "result": "aged"})
     else:
         # Emperor dies
         old_age = state.emperor.age

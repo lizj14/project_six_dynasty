@@ -488,6 +488,7 @@ def _check_archive_this(events: list[dict], card, player,
     Handles cards from main_discard (EVENT/MECHANISM) or staff_area (FRIEND).
     The caller must have already appended the effect_result.events to `events`.
     """
+    resolver = getattr(state, 'effect_resolver', None)
     for evt in events:
         if evt.get("type") == "archive_this":
             # Find and remove the card from its current zone
@@ -505,6 +506,10 @@ def _check_archive_this(events: list[dict], card, player,
                     # Jin players gain 1 contribution for archiving
                     if player.faction == FactionType.JIN:
                         events.extend(state.add_contribution(player_id, 1))
+                    # Fire on_archive trigger (e.g. 桓温 passive: gain 2 VP)
+                    if resolver:
+                        resolver._fire_trigger("on_archive", player_id,
+                                               {"card": card})
                     return
             # 2. Check staff_area (FRIEND cards)
             for i, c in enumerate(player.staff_area):
@@ -519,5 +524,9 @@ def _check_archive_this(events: list[dict], card, player,
                                    "from": "staff_area"})
                     if player.faction == FactionType.JIN:
                         events.extend(state.add_contribution(player_id, 1))
+                    # Fire on_archive trigger (e.g. 桓温 passive: gain 2 VP)
+                    if resolver:
+                        resolver._fire_trigger("on_archive", player_id,
+                                               {"card": card})
                     return
             break

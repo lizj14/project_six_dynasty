@@ -305,6 +305,7 @@ class SpreadCultureAction(GameAction):
             loc = state.locations.get(chosen_loc)
             if loc:
                 was_empty = (loc.culture_marker is None)
+                old_culture = loc.culture_marker  # Track for map_count adjustment
                 loc.culture_marker = culture
                 loc.culture_locked = True
                 events.append({"type": "culture_placed",
@@ -312,6 +313,19 @@ class SpreadCultureAction(GameAction):
                                "location": chosen_loc,
                                "culture": self.culture_type,
                                "was_empty": was_empty})
+                # Update CultureTrackState.map_count
+                try:
+                    ct_enum = CultureType(self.culture_type)
+                    track = state.culture_tracks.get(ct_enum)
+                    if track:
+                        track.map_count += 1
+                        if old_culture and old_culture != self.culture_type:
+                            old_ct = CultureType(old_culture)
+                            old_track = state.culture_tracks.get(old_ct)
+                            if old_track and old_track.map_count > 0:
+                                old_track.map_count -= 1
+                except (ValueError, KeyError):
+                    pass
                 # Also populate the region's culture_slots for viewport display
                 try:
                     region_enum = Region(self.target_region)
@@ -465,8 +479,23 @@ class LevyAction(GameAction):
 
     def validate(self, state: "GameState") -> ActionResult:
         court = state.get_court_cards(self.player_id)
-        if not any(c.definition.card_id == self.card_id for c in court):
+        target_card = None
+        for c in court:
+            if c.definition.card_id == self.card_id:
+                target_card = c
+                break
+        if not target_card:
             return ActionResult.fail(f"Card {self.card_id} not in court")
+
+        # Check play_condition — same as CourtAction
+        parsed = target_card.definition.parsed_effect
+        if parsed and parsed.play_condition:
+            resolver = getattr(state, 'effect_resolver', None)
+            if resolver and not resolver.check_condition(
+                parsed.play_condition, state, self.player_id):
+                return ActionResult.fail(
+                    f"Cannot levy {target_card.name} — condition not met")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
