@@ -272,12 +272,6 @@
             "ability_type": "enter",
             "steps": [
               {
-                "effect_type": "raise_contribution",
-                "params": {
-                  "amount": 1
-                }
-              },
-              {
                 "effect_type": "convert",
                 "params": {
                   "count": 2,
@@ -5447,6 +5441,13 @@
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": null,
+        "play_condition": {
+          "condition_type": "culture_contribution_gt",
+          "params": {
+            "culture": "confucianism",
+            "threshold": 0
+          }
+        },
         "restrictions": [],
         "blocks": [
           {
@@ -5473,19 +5474,6 @@
                 }
               }
             ]
-          },
-          {
-            "ability_type": "passive",
-            "steps": [
-              {
-                "effect_type": "play_requirement",
-                "params": {
-                  "culture": "confucianism",
-                  "threshold": 0
-                }
-              }
-            ],
-            "trigger": "always"
           }
         ]
       },

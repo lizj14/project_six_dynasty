@@ -90,11 +90,12 @@ class GameAgent(ABC):
         ...
 
     def choose_discards(self, state: "GameState", hand_cards: list[str],
-                        count: int) -> list[int]:
-        """Choose which cards to discard for hand limit enforcement.
+                        count: int, reason: str = "hand_limit") -> list[int]:
+        """Choose which cards to discard for hand limit enforcement or cost payment.
 
-        Called at end of turn when hand exceeds the limit. Returns a list
-        of indices (0-based) to discard. Default: discard from the end.
+        Called at end of turn when hand exceeds the limit, or when paying
+        discard_cards costs. Returns a list of indices (0-based) to discard.
+        Default: discard from the end.
         Override for smarter selection.
         """
         return list(range(len(hand_cards) - count, len(hand_cards)))

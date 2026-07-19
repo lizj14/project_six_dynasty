@@ -129,6 +129,19 @@ class CardDef:
     def total_markers(self) -> int:
         return self.marker_military + self.marker_culture + self.marker_affair + self.marker_power
 
+    def has_marker(self, marker_name: str) -> bool:
+        """Check if this card has a marker of the given type.
+
+        marker_name: "military" | "culture" | "affair" | "power"
+        """
+        marker_map = {
+            "military": self.marker_military,
+            "culture": self.marker_culture,
+            "affair": self.marker_affair,
+            "power": self.marker_power,
+        }
+        return marker_map.get(marker_name, 0) > 0
+
     def is_playable_by(self, faction: FactionType) -> bool:
         """Check if this card can be played by the given faction."""
         if self.faction_restriction is None:

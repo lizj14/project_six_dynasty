@@ -222,6 +222,13 @@ class ArchiveCardOperator(EffectOperator):
                 court = state.get_court_cards(player_id)
                 if not court:
                     continue
+                # Exclude cards with cannot_be_archived restriction
+                eligible = [c for c in court
+                            if "cannot_be_archived" not in (
+                                c.definition.parsed_effect.restrictions
+                                if c.definition.parsed_effect else [])]
+                if not eligible:
+                    continue
                 if resolver.select_target_callback:
                     prompt = {
                         "type": "archive_card",
@@ -229,7 +236,7 @@ class ArchiveCardOperator(EffectOperator):
                         "options": [
                             {"id": c.definition.card_id,
                              "label": f"{c.name} (费用{c.cost}, 史书{c.definition.history_vp}vp)"}
-                            for c in court
+                            for c in eligible
                         ],
                     }
                     chosen_id = resolver.select_target_callback(player_id, prompt)
@@ -413,6 +420,12 @@ class DraftOperator(EffectOperator):
                         if card_type_filter:
                             ct = CardType(card_type_filter) if isinstance(card_type_filter, str) else card_type_filter
                             candidates = [c for c in candidates if c.card_type == ct]
+
+                    # Exclude cards with cannot_be_drafted restriction
+                    candidates = [c for c in candidates
+                                  if "cannot_be_drafted" not in (
+                                      c.definition.parsed_effect.restrictions
+                                      if c.definition.parsed_effect else [])]
 
                     if not candidates:
                         result.events.append({
@@ -893,14 +906,15 @@ class ConvertOperator(EffectOperator):
           - not_controller: str → exclude a controller
         """
         valid = []
-        friendly = state.get_friendly_locations(player_id)
+        adjacency_sources = state.get_adjacency_source_locations(player_id)
         player_cs = state._player_control_state(player_id)
 
         for loc_id, loc in state.locations.items():
-            # Adjacent filter
+            # Adjacent filter — requires adjacency to own forces
+            # (or all friendly forces if expedition marker is active)
             if filter_spec.get("adjacent"):
                 neighbors = state.get_adjacent_locations(loc_id)
-                if not any(n in friendly for n in neighbors):
+                if not any(n in adjacency_sources for n in neighbors):
                     continue
 
             # Controller filter
@@ -1203,8 +1217,7 @@ class RaiseContributionOperator(EffectOperator):
         if player:
             events = state.add_contribution(player_id, amount)
             result.events.extend(events)
-            resolver._fire_trigger("on_gain_contribution", player_id,
-                                   {"amount": amount})
+            # on_gain_contribution trigger is now fired inside add_contribution()
         return result
 
 
@@ -1363,13 +1376,25 @@ class ChooseOperator(EffectOperator):
                             cnt = int(cnt)
                         except (ValueError, TypeError):
                             cnt = 1
+                        # Include culture type in label for culture-related effects
+                        culture = p.get("culture", "")
+                        culture_label = ""
+                        if culture:
+                            culture_map = {
+                                "confucianism": "儒学", "taoism": "玄学",
+                                "buddhism": "佛学",
+                            }
+                            culture_label = f"[{culture_map.get(culture, culture)}]"
                         label_map = {
                             "draw_cards": f"摸{cnt}张牌",
                             "draft": f"征发{cnt}张候选策略牌" if cnt > 1 else "征发1张候选策略牌",
                             "play_card": f"打出{cnt}张牌" if cnt > 1 else "打出1张牌",
                             "gain_military": f"+{cnt}军力",
                             "gain_vp": f"+{cnt}VP",
-                            "spread_culture": "传播文化",
+                            "spread_culture": f"传播{culture_label}文化" if culture_label else "传播文化",
+                            "raise_culture_contribution": f"提高{culture_label}贡献度" if culture_label else f"提高文化贡献度",
+                            "raise_culture_level": f"提高{culture_label}等级" if culture_label else "提高文化等级",
+                            "remove_culture_marker": f"移除{culture_label}标记" if culture_label else "移除文化标记",
                             "archive_card": "存档",
                             "search": "检索",
                         }
@@ -1394,9 +1419,15 @@ class ChooseOperator(EffectOperator):
             chosen_option = options[choice_idx]
             for sub_step_dict in chosen_option:
                 if isinstance(sub_step_dict, dict):
+                    # Build params from the dict, moving step-level keys into params
+                    # (mirrors _dict_to_step logic for filter/target/choice_options)
+                    sub_params = dict(sub_step_dict.get("params", {}))
+                    for key in ("filter", "choice_options", "target"):
+                        if key in sub_step_dict and sub_step_dict[key] is not None:
+                            sub_params[key] = sub_step_dict[key]
                     nested = ES(
                         effect_type=sub_step_dict.get("effect_type", ""),
-                        params=sub_step_dict.get("params", {}),
+                        params=sub_params,
                         source_text=sub_step_dict.get("source_text", ""),
                         condition=sub_step_dict.get("condition"),
                     )

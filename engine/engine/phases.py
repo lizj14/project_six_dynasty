@@ -10,7 +10,7 @@ from models.enums import PhaseType, FactionType, ControlState, CardType, CardCat
 from models.card import Card, CardDef, CardLibrary
 from models.player import PlayerState
 from models.location import LocationState, AdjacencyDef
-from models.game_state import GameState, SimaState, EmperorState
+from models.game_state import GameState, SimaState, EmperorState, CultureTrackState
 from .actions.card_actions import PlayCardAction
 from cards.effect_resolver import EffectResolver
 
@@ -30,23 +30,45 @@ def _get_jin_setup_order(state: GameState) -> list[PlayerState]:
 
 
 def _get_jin_turn_order(state: GameState) -> list[PlayerState]:
-    """Jin players sorted for the action phase.
+    """Jin players sorted for the action phase (all rounds, same logic).
 
-    Round 1 (初设后的第一回合): sorted by 先动値 (start_order) descending.
-      start_order is the only criterion — higher = earlier in turn.
-
-    Round 2+: sorted by 顺位 (order) descending, then 到达顺序 (order_seq) descending.
+    Sorted by 顺位 (order) descending, then 到达顺序 (order_seq) descending.
       Primary: higher order = earlier in turn.
       Tiebreaker: higher order_seq = arrived at this order later = 后到者优先.
+
+    Round 1 needs no special case: all Jin players share the same initial order
+    value (set from hero.initial_order), and order_seq already encodes the setup
+    stacking (§4.1 step 7: low→high 先动値 bottom→top).  Highest 先动値 = top
+    of stack = highest order_seq = first in turn.
 
     During gameplay, order_seq is updated from the global counter on each
     RaiseOrderAction/LowerOrderAction.
     """
-    if state.round <= 1:
-        # Round 1: 先动值决定行动顺序（越大越先，与顺位方向一致）
-        return sorted(state.jin_players, key=lambda p: -p.start_order)
-    # Round 2+: 顺位决定行动顺序（越高越先，同顺位则后到者优先）
     return sorted(state.jin_players, key=lambda p: (-p.order, -p.order_seq))
+
+
+def _allocate_initial_order_seq(state: GameState):
+    """Allocate initial order_seq based on setup stacking order.
+
+    Rulebook §4.1 step 7: during setup, all markers are placed on the starting
+    space of the action order track, stacked from low to high 先动値 (bottom to
+    top). The player on top (highest 先動値) goes first when tied (§4.2).
+
+    This stacking is encoded into order_seq: the first-placed marker (lowest
+    先动値, bottom of stack) gets the lowest order_seq; the last-placed marker
+    (highest 先动値, top of stack) gets the highest order_seq.
+
+    When a player later uses raise_order/lower_order, they move to a new space
+    and get a new (higher) order_seq from the global counter, placing them on
+    top of existing markers at the target space — this is "后到者优先" (§5.1.3).
+
+    When no one changes order between rounds, the stack — and therefore the
+    turn order — remains unchanged from Round 1.
+    """
+    # Ascending: lowest start_order first → lowest order_seq (bottom of stack)
+    jin_sorted = sorted(state.jin_players, key=lambda p: p.start_order)
+    for p in jin_sorted:
+        p.order_seq = state.allocate_order_seq()
 
 
 # ================================================================
@@ -334,6 +356,11 @@ def _build_game_state(library: CardLibrary,
     state.jin_players = [jin1, jin2, jin3]
     state.turn_order = ["north", "jin_1", "jin_2", "jin_3"]
 
+    # Initialize culture tracks (儒学/玄学/佛学)
+    from models.enums import CultureType
+    for ct in [CultureType.CONFUCIANISM, CultureType.TAOISM, CultureType.BUDDHISM]:
+        state.culture_tracks[ct] = CultureTrackState(culture=ct)
+
     # Public action card pool (5 shared cards, rulebook §2.1)
     state.public_action_pool = public_pool_cards
 
@@ -395,6 +422,15 @@ def _execute_setup_effects(state: GameState, agents: list,
     _execute_hero_enter(state, state.north_player, agents[0])
     for jin_player in _get_jin_setup_order(state):
         _execute_hero_enter(state, jin_player, agent_map.get(jin_player.player_id))
+
+    # --- Allocate initial order_seq from setup stacking order ---
+    # Rulebook §4.1 step 7: markers stacked on starting space low→high 先动値
+    # (bottom→top). This stacking is encoded as order_seq so that §4.2 "靠上的
+    # 玩家优先行动" works correctly: highest 先动値_get_jin_turn_order = top of stack = highest
+    # order_seq = first in turn when order values are tied.
+    # When no one uses raise_order/lower_order, the stacking — and turn order —
+    # persists unchanged from Round 1.
+    _allocate_initial_order_seq(state)
 
     # --- Execute initial face-down cards (rulebook §4.1 step 7) ---
     state._setup_cards_played = _execute_setup_face_down_cards(
@@ -657,7 +693,7 @@ def run_settlement_phase(state: GameState, rng: random.Random):
 
     # Emperor age check — use real emperor module
     from rules.emperor import check_emperor_age
-    check_emperor_age(state, rng)
+    emperor_age_events = check_emperor_age(state, rng)
 
     # Check end conditions
     if state.game_end_marker or state.round >= 10:
@@ -668,6 +704,7 @@ def run_settlement_phase(state: GameState, rng: random.Random):
 
     # Forced event reshuffle is now done per-player in _run_round
     # (rulebook: "任意玩家行动结束时" check and reshuffle)
+    return emperor_age_events
 
 
 def _refresh_court(state: GameState, faction: str, rng: random.Random):
@@ -741,7 +778,7 @@ def _execute_hero_enter(state: GameState, player: PlayerState, agent):
     player.contribution = min(9, defn.initial_contribution)
     player.prestige = min(9, defn.initial_prestige)
     player.order = defn.initial_order
-    player.order_seq = 0  # 初始到达顺序均为0，先动值仅在初设阶段决定登场顺序
+    player.order_seq = 0  # Placeholder; _allocate_initial_order_seq() sets the real value
 
     # Delegate enter effects to EffectResolver
     parsed = defn.parsed_effect

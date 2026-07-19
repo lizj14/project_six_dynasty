@@ -312,6 +312,14 @@ class SpreadCultureAction(GameAction):
                                "location": chosen_loc,
                                "culture": self.culture_type,
                                "was_empty": was_empty})
+                # Also populate the region's culture_slots for viewport display
+                try:
+                    region_enum = Region(self.target_region)
+                    rs = state.regions.get(region_enum)
+                    if rs and culture not in rs.culture_slots:
+                        rs.culture_slots.append(culture)
+                except (ValueError, KeyError):
+                    pass
 
         # Placement bonus (only if slot was empty)
         if was_empty:
@@ -690,6 +698,10 @@ class ActivateEffectAction(GameAction):
             if effect_result.errors:
                 events.append({"type": "effect_errors",
                               "errors": effect_result.errors})
+
+            # Check for archive_this event
+            from .card_actions import _check_archive_this
+            _check_archive_this(events, card, player, state, self.player_id)
 
         # Mark card as activated this turn
         player.activated_card_ids.add(self.card_id)

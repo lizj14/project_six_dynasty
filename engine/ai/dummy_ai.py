@@ -296,7 +296,7 @@ class DummyAI(GameAgent):
         return self.rng.choice(options)
 
     def choose_discards(self, state: "GameState", hand_cards: list[str],
-                        count: int) -> list[int]:
+                        count: int, reason: str = "hand_limit") -> list[int]:
         """Randomly pick cards to discard."""
         indices = list(range(len(hand_cards)))
         self.rng.shuffle(indices)

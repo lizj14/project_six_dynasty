@@ -120,8 +120,8 @@ class LoggingAgentWrapper:
     def make_choice(self, state, prompt):
         return self._agent.make_choice(state, prompt)
 
-    def choose_discards(self, state, hand_cards, count):
-        return self._agent.choose_discards(state, hand_cards, count)
+    def choose_discards(self, state, hand_cards, count, reason="hand_limit"):
+        return self._agent.choose_discards(state, hand_cards, count, reason=reason)
 
     def select_target(self, state, prompt):
         return self._agent.select_target(state, prompt)
@@ -207,9 +207,9 @@ def main():
     # Enable setup buffer: AI setup decisions are buffered during the
     # sequential _deal_and_select_cards loop so the human player doesn't
     # see opposing choices before making their own (simultaneous selection).
-    # HumanPlayer.setup_decision() flushes the buffer when it's the human's turn.
+    # HumanPlayer.setup_decision() flushes the buffer AFTER the human finishes.
     LoggingAgentWrapper.enable_setup_buffer()
-    human_player._on_setup_begin = lambda: LoggingAgentWrapper.flush_setup_buffer()
+    human_player._on_setup_end = lambda: LoggingAgentWrapper.flush_setup_buffer()
 
     # Create logger and engine
     logger = GameLogger()
@@ -217,8 +217,8 @@ def main():
 
     # Wire callbacks for human player
     def on_action(state, pid, action, result):
-        """Print action results to terminal when it's the human player's action."""
-        HumanPlayer.print_action_result(state, pid, action, result)
+        """Print action results to terminal — enforce viewport visibility rules."""
+        HumanPlayer.print_action_result(state, pid, action, result, human_pid=human_pid)
 
     def check_quit():
         """Check if human player requested early quit."""

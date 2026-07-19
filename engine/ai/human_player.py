@@ -41,12 +41,6 @@ class HumanPlayer(GameAgent):
 
         Order: show hand → show hero options → pick hero → pick goals → pick face-down card + payment.
         """
-        # Flush buffered AI setup decisions (if any) before showing our own.
-        # This ensures simultaneous selection: the human doesn't see AI choices first.
-        on_setup = getattr(self, '_on_setup_begin', None)
-        if on_setup:
-            on_setup()
-
         d = SetupDecision()
         faction_label = "北方" if ctx.faction == "north" else "东晋"
 
@@ -110,6 +104,12 @@ class HumanPlayer(GameAgent):
         else:
             d.face_down_card_index = 0
             d.payment_indices = []
+
+        # Flush buffered AI setup decisions AFTER human has made all choices.
+        # This ensures simultaneous selection: the human doesn't see AI choices first.
+        on_setup_end = getattr(self, '_on_setup_end', None)
+        if on_setup_end:
+            on_setup_end()
 
         print(f"\n  初设完成。等待其他玩家...\n")
         return d
@@ -222,6 +222,7 @@ class HumanPlayer(GameAgent):
                 cat_map[cat_idx] = name
                 cat_idx += 1
             print(f"  │ 0. 结束行动（空过）")
+            print(f"  │ v. 视窗查询")
             print(f"  │ q. 提前终止游戏（保存日志）")
             print(f"  └──────────────────────────────────────────────")
 
@@ -234,6 +235,10 @@ class HumanPlayer(GameAgent):
                 self._request_early_quit = True
                 self._action_count = 0
                 return None
+            if raw_choice == -2:
+                # v = viewport query
+                self._do_viewport_query(state)
+                continue
 
             cat_name = cat_map[raw_choice]
             cat_actions = groups[cat_name]
@@ -278,13 +283,16 @@ class HumanPlayer(GameAgent):
         return self._input_index("选择", len(options))
 
     def choose_discards(self, state: "GameState", hand_cards: list[str],
-                        count: int) -> list[int]:
-        """Choose cards to discard for hand limit.
+                        count: int, reason: str = "hand_limit") -> list[int]:
+        """Choose cards to discard — for hand limit or cost payment.
 
         Shows hand cards, accepts numbered selections. Enter 0 to auto-select
         (discards from end of hand).
         """
-        print(f"\n  手牌超出上限，需要弃 {count} 张:")
+        if reason == "cost":
+            print(f"\n  需要弃 {count} 张手牌作为费用:")
+        else:
+            print(f"\n  手牌超出上限，需要弃 {count} 张:")
         for i, name in enumerate(hand_cards):
             print(f"    {i+1}. {name}")
         print(f"    (输入 0 自动选择末尾 {count} 张丢弃)")
@@ -480,120 +488,67 @@ class HumanPlayer(GameAgent):
 
         print(f"{'━'*60}")
 
-    @staticmethod
-    def _brief_effect(definition) -> str:
-        """Extract a one-line summary from a card's parsed effect."""
-        parsed = definition.parsed_effect
-        if not parsed:
-            return ""
-        parts = []
-        for block in parsed.blocks:
-            for step in block.steps:
-                et = step.effect_type or ""
-                p = step.params
-                if et == EffectType.GAIN_MILITARY:
-                    amount = p.get("amount", "?")
-                    parts.append(f"+{amount}军力")
-                elif et == EffectType.GAIN_VP:
-                    amount = p.get("amount", "?")
-                    parts.append(f"+{amount}VP")
-                elif et == EffectType.LOSE_MILITARY:
-                    amount = p.get("amount", "?")
-                    parts.append(f"-{amount}军力")
-                elif et == EffectType.LOSE_VP:
-                    amount = p.get("amount", "?")
-                    parts.append(f"-{amount}VP")
-                elif et == EffectType.PAY_MILITARY:
-                    amount = p.get("amount", "?")
-                    parts.append(f"支付{amount}军力")
-                elif et == EffectType.DRAW_CARDS:
-                    amount = p.get("amount", 1)
-                    parts.append(f"摸{amount}牌" if amount > 1 else "摸牌")
-                elif et == EffectType.DISCARD_CARDS:
-                    parts.append("弃牌")
-                elif et == EffectType.MARCH:
-                    parts.append("进军")
-                elif et == EffectType.OCCUPY:
-                    parts.append("占据")
-                elif et == EffectType.CONVERT:
-                    parts.append("转化")
-                elif et == EffectType.FORTIFY:
-                    parts.append("加固")
-                elif et == EffectType.DRAFT:
-                    parts.append("征发")
-                elif et == EffectType.ARCHIVE_THIS:
-                    parts.append("存档此牌")
-                elif et == EffectType.ARCHIVE_CARD:
-                    parts.append("存档")
-                elif et == EffectType.ARCHIVE_COURT:
-                    parts.append("存档朝堂牌")
-                elif et == EffectType.SEARCH:
-                    parts.append("检索")
-                elif et == EffectType.SPREAD_CULTURE:
-                    c = p.get("culture", "")
-                    culture_map = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
-                    culture = culture_map.get(c, c)
-                    parts.append(f"传播{culture}" if culture else "传播文化")
-                elif et == EffectType.RAISE_ORDER:
-                    amount = p.get("amount", "?")
-                    parts.append(f"+{amount}顺位")
-                elif et == EffectType.LOWER_ORDER:
-                    amount = p.get("amount", "?")
-                    parts.append(f"-{amount}顺位")
-                elif et == EffectType.RAISE_PRESTIGE:
-                    amount = p.get("amount", "?")
-                    parts.append(f"+{amount}威望")
-                elif et == EffectType.LOWER_PRESTIGE:
-                    amount = p.get("amount", "?")
-                    parts.append(f"-{amount}威望")
-                elif et == EffectType.RAISE_CONTRIBUTION:
-                    amount = p.get("amount", "?")
-                    parts.append(f"+{amount}功绩")
-                elif et == EffectType.LOWER_CONTRIBUTION:
-                    amount = p.get("amount", "?")
-                    parts.append(f"-{amount}功绩")
-                elif et == EffectType.PLACE_ARMY:
-                    parts.append("放置部队")
-                elif et == EffectType.REMOVE_ARMY:
-                    parts.append("移除部队")
-                elif et == EffectType.GET_EXPEDITION:
-                    parts.append("远征标记")
-                elif et == EffectType.ADD_REFUGEE:
-                    parts.append("增加流民")
-                elif et == EffectType.SUPPLY_COURT:
-                    parts.append("补充朝堂")
-                elif et == EffectType.PLAY_CARD:
-                    parts.append("打出卡牌")
-                elif et == EffectType.RAISE_CULTURE_LEVEL:
-                    parts.append("提升文化")
-                elif et == EffectType.REMOVE_FROM_GAME:
-                    parts.append("移出游戏")
-                elif et == EffectType.CHOOSE:
-                    parts.append("[选择效果]")
-                if len(parts) >= 3:
+    def _do_viewport_query(self, state: "GameState"):
+        """Interactive viewport query during gameplay.
+
+        Creates a LiveViewport for the human player and accepts
+        path-based queries (e.g. 'my.hand', 'player.north.vp', 'map.all').
+        """
+        from viewport import create_viewport, QueryEngine
+
+        try:
+            vp = create_viewport(state, self.player_id, [], mode="live")
+        except Exception as e:
+            print(f"\n  [!] 无法创建视窗: {e}")
+            return
+
+        qe = QueryEngine(vp)
+
+        print(f"\n  ┌─ 视窗查询 [{self.player_id}] ─────────────────")
+        print(f"  │ basic           — 基本情况检查（全员概要）")
+        print(f"  │ my              — 我的完整信息（手牌/幕僚/史书仅显示牌名）")
+        print(f"  │ my.hand / my.staff / my.history")
+        print(f"  │   └ 只显示牌名；加 .detail 看详情；加 .0 .1 看具体牌")
+        print(f"  │ player.<id>     — 查看某玩家公开信息（含 staff_names/history_names）")
+        print(f"  │ map.all / map.<地名> / map.regions / map.region.<区域名>")
+        print(f"  │ tracks.vp / tracks.prestige / tracks.culture")
+        print(f"  │ deck.main.count / deck.main.discard")
+        print(f"  │ court / court.north / court.jin")
+        print(f"  │   └ 只显示牌名；加 .detail 看详情；加 .0 .1 看具体牌")
+        print(f"  │ summary  /  full  /  round  /  phase  /  turn_order")
+        print(f"  │ 输入 0 或空行返回")
+        print(f"  └──────────────────────────────────────────────")
+
+        while True:
+            try:
+                raw = input(f"\n  视窗 > ").strip()
+                if not raw or raw == '0':
                     break
-            if len(parts) >= 3:
+                result = qe.query(raw)
+                if isinstance(result, dict):
+                    if "error" in result:
+                        print(f"  [!] {result['error']}")
+                    else:
+                        import json
+                        print(json.dumps(result, ensure_ascii=False, indent=2))
+                elif isinstance(result, list):
+                    import json
+                    print(json.dumps(result, ensure_ascii=False, indent=2))
+                else:
+                    print(f"  {result}")
+            except (EOFError, KeyboardInterrupt):
                 break
 
-        # Fallback: show ability_type if no steps matched
-        if not parts:
-            for block in parsed.blocks:
-                ab = block.ability_type or ""
-                if ab == AbilityType.ACTIVE:
-                    parts.append("[主动]")
-                elif ab == AbilityType.PASSIVE:
-                    trigger = block.trigger or ""
-                    parts.append(f"[被动:{trigger}]" if trigger else "[被动]")
-                elif ab == AbilityType.ENTER:
-                    parts.append("[登场]")
-                elif ab == AbilityType.FORCED:
-                    parts.append("[强制]")
-                elif ab == AbilityType.STRATEGY_ACTION:
-                    parts.append("[牌组行动]")
-                if len(parts) >= 2:
-                    break
+    @staticmethod
+    @staticmethod
+    def _brief_effect(definition) -> str:
+        """Extract a one-line summary from a card's parsed effect.
 
-        return " | ".join(parts[:3])
+        Delegates to the shared viewport utility so the same logic is
+        used by LiveViewport, SnapshotViewport, and HumanPlayer.
+        """
+        from viewport.utils import card_effect_summary
+        return card_effect_summary(definition)
 
     # ================================================================
     # Action result display (called via engine callback)
@@ -602,12 +557,17 @@ class HumanPlayer(GameAgent):
     @staticmethod
     def print_action_result(state: "GameState", player_id: str,
                             action: "GameAction",
-                            result: "ActionResult"):
+                            result: "ActionResult",
+                            human_pid: str = None):
         """Print the result of an executed action to the terminal.
 
         Designed to be used as the engine's on_action_executed callback.
         Shows what happened after each action: VP changes, military changes,
         card draws, etc.
+
+        Visibility rules are enforced:
+        - Draw card names are only shown for the human player's own draws.
+        - AI draws show only the fact that a draw occurred.
         """
         atype = getattr(action, 'action_type', '?')
         player = state.get_player(player_id)
@@ -623,13 +583,19 @@ class HumanPlayer(GameAgent):
                 print(f"     ↳ -{evt.get('amount', '?')} VP")
             elif t == "gain_military":
                 print(f"     ↳ +{evt.get('amount', '?')} 军力")
+            elif t == "pay_vp":
+                print(f"     ↳ 支付 {evt.get('amount', '?')} VP")
             elif t == "pay_military":
                 print(f"     ↳ 支付 {evt.get('amount', '?')} 军力")
             elif t == "recruit":
                 card_name = evt.get("discarded", "?")
                 print(f"     ↳ 弃「{card_name}」→ +1 军力")
             elif t == "draw":
-                print(f"     ↳ 摸牌: 「{evt.get('card', '?')}」")
+                # Draw is private — only show card name for the human player's own draws
+                if player_id == human_pid:
+                    print(f"     ↳ 摸牌: 「{evt.get('card', '?')}」")
+                else:
+                    print(f"     ↳ {player_id} 摸牌")
             elif t == "friend_played":
                 print(f"     ↳ 幕僚入场: 「{evt.get('card', '?')}」")
             elif t == "strategy_played":
@@ -1088,26 +1054,9 @@ class HumanPlayer(GameAgent):
                     print("\n  输入中断，退出")
                     sys.exit(0)
 
-        # --- March/Occupy/Fortify: confirm target ---
+        # --- March/Occupy/Fortify: execute directly (no confirmation needed) ---
         elif atype in ("march", "occupy", "fortify"):
-            target = getattr(action, 'target_location', '?')
-            print(f"\n  ┌─ 确认目标 ───────────────────────────────────")
-            cost = action.cost_description(state)
-            cost_str = f" — 费用: {cost}" if cost and cost not in ("?", "") else ""
-            action_label = {"march": "进军", "occupy": "占据", "fortify": "加固"}.get(atype, atype)
-            print(f"  │ {action_label} → {target}{cost_str}")
-            while True:
-                try:
-                    raw = input(f"  │ 确认? (y/n, 默认y): ").strip().lower()
-                    if raw in ("", "y", "yes"):
-                        return action
-                    elif raw in ("n", "no"):
-                        return None
-                    else:
-                        print(f"  │ 请输入 y 或 n")
-                except (EOFError, KeyboardInterrupt):
-                    print("\n  输入中断，退出")
-                    sys.exit(0)
+            return action
 
         return action
 
@@ -1163,7 +1112,7 @@ class HumanPlayer(GameAgent):
 
     @staticmethod
     def _input_choice_raw(max_val: int) -> Optional[int]:
-        """Get a choice from user. Returns int for valid choice, None for 0, -1 for 'q'."""
+        """Get a choice from user. Returns int for valid choice, None for 0, -1 for 'q', -2 for 'v'."""
         while True:
             try:
                 raw = input(f"\n  选择 > ").strip()
@@ -1171,6 +1120,8 @@ class HumanPlayer(GameAgent):
                     continue
                 if raw.lower() == 'q':
                     return -1
+                if raw.lower() == 'v':
+                    return -2
                 val = int(raw)
                 if val == 0:
                     return None  # 0 = pass/back

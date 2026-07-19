@@ -204,6 +204,9 @@ class PlayCardAction(GameAction):
                 if effect_result.errors:
                     events.append({"type": "effect_errors", "errors": effect_result.errors})
 
+                # Check for archive_this event — move card from appropriate zone to history_area
+                _check_archive_this(events, card, player, state, self.player_id)
+
         # Clear extra hand action filter on use (consumed by this play)
         extra_filter = getattr(player, 'extra_hand_action_filter', None)
         if extra_filter and player.hand_action_taken_count >= 1:
@@ -472,3 +475,49 @@ class CourtAction(GameAction):
 
     def cost_description(self, state: "GameState") -> str:
         return "牌组行动（每回合1次）"
+
+
+# ================================================================
+# Shared helpers
+# ================================================================
+
+def _check_archive_this(events: list[dict], card, player,
+                        state, player_id: str):
+    """Check for archive_this event and move card to history_area.
+
+    Handles cards from main_discard (EVENT/MECHANISM) or staff_area (FRIEND).
+    The caller must have already appended the effect_result.events to `events`.
+    """
+    for evt in events:
+        if evt.get("type") == "archive_this":
+            # Find and remove the card from its current zone
+            # 1. Check main_discard (EVENT/MECHANISM cards land here)
+            for i, c in enumerate(state.main_discard):
+                if c.definition.card_id == card.definition.card_id:
+                    state.main_discard.pop(i)
+                    player.history_area.append(card)
+                    defn = card.definition
+                    vp_gain = defn.history_vp if defn else 0
+                    player.vp += vp_gain
+                    events.append({"type": "archive_card", "card": card.name,
+                                   "history_vp": vp_gain,
+                                   "from": "main_discard"})
+                    # Jin players gain 1 contribution for archiving
+                    if player.faction == FactionType.JIN:
+                        events.extend(state.add_contribution(player_id, 1))
+                    return
+            # 2. Check staff_area (FRIEND cards)
+            for i, c in enumerate(player.staff_area):
+                if c.definition.card_id == card.definition.card_id:
+                    player.staff_area.pop(i)
+                    player.history_area.append(card)
+                    defn = card.definition
+                    vp_gain = defn.history_vp if defn else 0
+                    player.vp += vp_gain
+                    events.append({"type": "archive_card", "card": card.name,
+                                   "history_vp": vp_gain,
+                                   "from": "staff_area"})
+                    if player.faction == FactionType.JIN:
+                        events.extend(state.add_contribution(player_id, 1))
+                    return
+            break

@@ -1072,13 +1072,16 @@ def log_action_result(logger, action, result, state):
     """
     desc, params, costs, _ = describe_action(action, state, result)
 
+    atype = getattr(action, 'action_type', '')
+    skip_military_result = (atype == "recruit")  # Description already says "换1军力"
+
     results = {}
     for evt in (result.events or []):
         if evt.get("type") == "court_action" and "card" in evt:
             params["card"] = evt["card"]
         if "vp_gained" in evt:
             results["vp"] = evt.get("vp_gained", 0)
-        if "military_gained" in evt:
+        if "military_gained" in evt and not skip_military_result:
             results["military"] = evt.get("military_gained", 0)
         if evt.get("type") == "card_discarded":
             results["discard_reason"] = evt.get("reason", "")

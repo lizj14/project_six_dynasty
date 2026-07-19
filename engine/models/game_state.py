@@ -271,6 +271,8 @@ class GameState:
             player.contribution = new_val
             events.append({"type": "contribution_gained", "player": player_id,
                            "amount": amount})
+            # Fire on_gain_contribution trigger for passive effects (e.g. 谢安)
+            self._fire_contribution_trigger(player_id, amount)
             return events
 
         # Overflow
@@ -280,6 +282,7 @@ class GameState:
         if taken > 0:
             events.append({"type": "contribution_gained", "player": player_id,
                            "amount": taken})
+            self._fire_contribution_trigger(player_id, taken)
 
         # Get callback from effect resolver
         callback = None
@@ -326,6 +329,13 @@ class GameState:
                                "reason": "no_choice"})
 
         return events
+
+    def _fire_contribution_trigger(self, player_id: str, amount: int):
+        """Fire on_gain_contribution trigger for passive effects (e.g. 谢安)."""
+        resolver = getattr(self, 'effect_resolver', None)
+        if resolver and hasattr(resolver, '_fire_trigger'):
+            resolver._fire_trigger("on_gain_contribution", player_id,
+                                  {"amount": amount})
 
     def add_prestige(self, player_id: str, amount: int) -> list[dict]:
         """Add prestige with overflow mechanic.
@@ -472,16 +482,15 @@ class GameState:
         return friendly
 
     def get_adjacency_source_locations(self, player_id: str) -> list[str]:
-        """Get locations that can serve as adjacency sources for march/occupy.
+        """Get locations that can serve as adjacency sources for march/occupy/convert.
 
-        Rulebook §3.2: 进军/占据的相邻计算起点:
+        Rulebook §3.2: 进军/占据/转化的相邻计算起点:
           - 北方玩家: 仅自己占据的地点
           - 东晋玩家 (正常): 仅自己占据的地点
-          - 东晋玩家 (有北伐标记): 自己占据 + 司马家占据的地点
+          - 东晋玩家 (有北伐标记): 自己占据 + 所有友方(含其他东晋+司马家)占据的地点
 
-        This is DIFFERENT from get_friendly_locations() — other Jin players'
-        locations are friendly but are NEVER adjacency sources, even with
-        the expedition marker.
+        Without expedition marker: only own forces. With expedition marker:
+        all friendly forces (other Jin players + Sima) count as adjacency sources.
         """
         player = self.get_player(player_id)
         if not player:
@@ -492,12 +501,11 @@ class GameState:
             if loc.controller == cs:
                 sources.append(loc_id)
 
-        # Expedition marker (北伐): Jin players can also use Sima locations
-        # as adjacency sources. Rulebook: "可以将东晋占据地点视为你占据的地点"
-        # Here "东晋占据地点" refers to Sima (司马家) locations.
+        # Expedition marker (北伐): use ALL friendly locations as sources
+        # (other Jin players + Sima), not just own + Sima.
         if player.has_expedition_marker and player.faction == FactionType.JIN:
             for loc_id, loc in self.locations.items():
-                if loc.controller == ControlState.SIMA and loc_id not in sources:
+                if loc.is_friendly_to(cs) and loc_id not in sources:
                     sources.append(loc_id)
 
         return sources

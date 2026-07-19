@@ -183,13 +183,20 @@ class GameEngine:
             order = str(p.order) if p.faction.value == "jin" else "-"
             print(f"  {p.player_id:<8} {f:<6} {p.vp:>4} {p.military:>4} {contrib:>4} {prestige:>4} {order:>4} {len(p.hand):>4}")
 
-        # Deck sizes
+        # Deck sizes and court cards (per faction, not per player)
         print(f"\n【牌库信息】")
-        for p in state.get_all_players():
-            deck = state.get_national_deck(p.player_id)
-            discard = state.get_national_discard(p.player_id)
-            court = state.get_court_cards(p.player_id)
-            print(f"  {p.player_id}: 抽牌区={len(deck)}张  弃牌区={len(discard)}张  朝堂区={len(court)}张")
+        faction_labels = {"north": "北方", "jin": "东晋"}
+        for faction_key in ("north", "jin"):
+            if faction_key == "north":
+                deck = state.north_deck
+                discard = state.north_discard
+                court = state.north_court
+            else:
+                deck = state.jin_deck
+                discard = state.jin_discard
+                court = state.jin_court
+            label = faction_labels.get(faction_key, faction_key)
+            print(f"  {label}: 抽牌区={len(deck)}张  弃牌区={len(discard)}张  朝堂区={len(court)}张")
             if court:
                 court_str = ", ".join(
                     f"{c.name}(+{c.definition.resource_option_army}军/+{c.definition.resource_option_vp}vp)"
@@ -218,12 +225,25 @@ class GameEngine:
                 status = " (已用)" if cid in exhausted else ""
                 print(f"  {card.name} (费用{card.cost}){status}")
 
+        # Emperor / Sima state
+        emperor = getattr(state, 'emperor', None)
+        sima = getattr(state, 'sima', None)
+        if emperor or sima:
+            print(f"\n【皇帝与司马家】")
+            if emperor and emperor.current_emperor:
+                emp_name = getattr(emperor.current_emperor, 'name', '?')
+                print(f"  当前皇帝: {emp_name} (年龄{emperor.age})")
+                if emperor.active_tasks:
+                    task_labels = []
+                    for t in emperor.active_tasks:
+                        status = "✓" if t.completed else "○"
+                        task_labels.append(f"{status}{t.task_type.value}")
+                    print(f"  激活任务: {' '.join(task_labels)}")
+            if sima:
+                print(f"  司马家: VP={sima.vp}, 军力={sima.military}, "
+                      f"威望={sima.prestige}")
+
         print(f"{'='*60}\n")
-        """Check if any agent is a HumanPlayer (interactive)."""
-        for agent in self.agents:
-            if agent.__class__.__name__ == 'HumanPlayer':
-                return True
-        return False
 
     def _print_setup_for_human(self, initial_hands: dict[str, list[str]]):
         """Print setup summary for the human player, matching test log format.
@@ -258,10 +278,19 @@ class GameEngine:
 
         # --- Face-down cards ---
         print(f"\n【初始暗置打出的牌（已弃置）】")
+        # Find human player to avoid leaking AI hand contents
+        human_pid = None
+        for agent in self.agents:
+            if agent.__class__.__name__ == 'HumanPlayer':
+                human_pid = agent.player_id
+                break
         for pid, card_info in setup_cards.items():
             hand_str = ""
             if pid in initial_hands:
-                hand_str = f"（手牌: {' '.join(initial_hands[pid])}）"
+                if pid == human_pid:
+                    hand_str = f"（手牌: {' '.join(initial_hands[pid])}）"
+                else:
+                    hand_str = f"（手牌: {len(initial_hands[pid])}张）"
             print(f"  {pid}: {card_info} {hand_str}")
 
         # --- Face-down card effects (round 0) ---
@@ -342,11 +371,23 @@ class GameEngine:
             self.logger.log_round_start(state.round)
             self.logger.log_jin_round_status(state)
 
-        # Print public info for human players at round start
-        self._print_round_public_info(state)
-
         # === Preparation Phase ===
         emperor_events = run_preparation_phase(state, self.rng)
+
+        # Print emperor dice results
+        if emperor_events and self._has_human_player():
+            for evt in emperor_events:
+                if evt.get("type") == "emperor_dice":
+                    roll = evt.get("roll", "?")
+                    result = evt.get("result", "?")
+                    if result == "art":
+                        print(f"  🎲 皇帝骰子: 掷出{roll} → 艺术面 → 司马家+2VP")
+                    else:
+                        task = evt.get("task", "?")
+                        print(f"  🎲 皇帝骰子: 掷出{roll} → {task}任务")
+
+        # Print public info for human players at round start (AFTER prep clears exhausted)
+        self._print_round_public_info(state)
 
         # Rulebook §4.2: 准备阶段结算区控奖励
         from rules.scoring import award_region_control_phase
@@ -367,11 +408,21 @@ class GameEngine:
                 return
 
         # === Settlement Phase ===
-        run_settlement_phase(state, self.rng)
+        emperor_age_events = run_settlement_phase(state, self.rng)
+
+        # Print emperor age events
+        if emperor_age_events and self._has_human_player():
+            for evt in emperor_age_events:
+                if evt.get("type") == "emperor_age":
+                    print(f"  👑 皇帝年龄增长: 年龄{evt.get('age','?')} → 司马家威望+1")
+                elif evt.get("type") == "emperor_death":
+                    print(f"  💀 皇帝驾崩! 年龄{evt.get('old_age','?')} → "
+                          f"新皇帝: {evt.get('new_emperor','?')}")
 
         if self.logger:
             self.logger.log_settlement(
-                court_vp={}, military_gain={}, emperor_age=[],
+                court_vp={}, military_gain={},
+                emperor_age=emperor_age_events or [],
             )
             self.logger.log_round_end_decks(state)
             self.logger.log_round_end_locations(state)
@@ -398,6 +449,10 @@ class GameEngine:
         # Reset action flags (but keep military from settlement)
         player.reset_action_flags()
 
+        # Snapshot pre-turn resources for change tracking
+        pre_turn_vp = player.vp
+        pre_turn_mil = player.military
+
         # Rulebook §4.2: 玩家行动开始时结算区控奖励
         award_region_control_phase(state, player_id=player_id)
         self._check_triggers("on_region_reward",
@@ -405,6 +460,23 @@ class GameEngine:
 
         # Fire turn_start triggers
         self._check_triggers("on_turn_start", {"player_id": player_id})
+
+        # Print resource changes from region award + turn-start triggers
+        # (so human players can see where VP/military came from)
+        vp_delta = player.vp - pre_turn_vp
+        mil_delta = player.military - pre_turn_mil
+        if vp_delta != 0 or mil_delta != 0:
+            changes = []
+            if vp_delta > 0:
+                changes.append(f"+{vp_delta} VP")
+            elif vp_delta < 0:
+                changes.append(f"{vp_delta} VP")
+            if mil_delta > 0:
+                changes.append(f"+{mil_delta} 军力")
+            elif mil_delta < 0:
+                changes.append(f"{mil_delta} 军力")
+            print(f"\n  🏛️ [回合开始阶段] {player_id}: {'，'.join(changes)} "
+                  f"(区控奖励/触发效果)")
 
         # Draw 2 cards
         draw_events = run_player_draw(state, player_id)
@@ -461,6 +533,21 @@ class GameEngine:
             if self.logger:
                 from .game_logger import log_action_result
                 log_action_result(self.logger, action, result, state)
+
+            # Check emperor task completion
+            if result.success:
+                from rules.emperor import check_task_completion
+                atype = getattr(action, 'action_type', '')
+                context = {}
+                emperor_task_events = check_task_completion(
+                    state, player_id, atype, context)
+                if emperor_task_events:
+                    result.events.extend(emperor_task_events)
+                    if self._has_human_player():
+                        for evt in emperor_task_events:
+                            if evt.get("type") == "emperor_task_completed":
+                                print(f"  👑 皇帝任务完成! {evt.get('task', '?')} "
+                                      f"— {evt.get('player', '?')} +2VP")
 
             # Notify observer (e.g. human player UI) about the action result
             if self.on_action_executed:
@@ -615,7 +702,7 @@ class GameEngine:
         agent = self._get_agent(player_id)
         if not agent:
             return list(range(max(0, len(hand_cards) - count), len(hand_cards)))
-        return agent.choose_discards(self.state, hand_cards, count)
+        return agent.choose_discards(self.state, hand_cards, count, reason="cost")
 
     def _choose_court_for_cost(self, player_id: str, court_cards: list[str],
                                 count: int) -> list[int]:

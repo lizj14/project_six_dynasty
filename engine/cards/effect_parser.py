@@ -83,6 +83,22 @@ class EffectParser:
                     if block_restrictions:
                         effect.restrictions.extend(block_restrictions)
                         delattr(ability, '_restrictions')
+                    # Convert play_requirement steps to card-level play_condition
+                    if ability.steps and all(
+                        s.effect_type == "play_requirement" for s in ability.steps
+                    ):
+                        for s in ability.steps:
+                            culture_map = {"儒学": "confucianism", "玄学": "taoism", "佛学": "buddhism"}
+                            culture = culture_map.get(
+                                s.params.get("culture", ""),
+                                s.params.get("culture", ""),
+                            )
+                            threshold = s.params.get("threshold", 0)
+                            effect.play_condition = Condition(
+                                condition_type="culture_contribution_gt",
+                                params={"culture": culture, "threshold": threshold},
+                            )
+                        continue  # Skip adding this block
                     # Skip empty blocks (e.g. restriction-only passives)
                     if ability.steps or ability.choice_options:
                         effect.blocks.append(ability)

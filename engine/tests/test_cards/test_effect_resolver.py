@@ -263,6 +263,8 @@ class TestRaiseContribution:
 
     def test_fires_trigger(self, minimal_state, resolver):
         fired = []
+        # Wire resolver to state so add_contribution() can fire triggers
+        minimal_state.effect_resolver = resolver
         resolver.trigger_callback = lambda tt, ctx: fired.append(tt)
         step = _mk_step("raise_contribution", {"amount": 1})
         resolver._execute_step(step, minimal_state, "jin_1")
