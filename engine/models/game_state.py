@@ -484,13 +484,14 @@ class GameState:
     def get_adjacency_source_locations(self, player_id: str) -> list[str]:
         """Get locations that can serve as adjacency sources for march/occupy/convert.
 
-        Rulebook §3.2: 进军/占据/转化的相邻计算起点:
+        Rulebook §"相邻地点":
           - 北方玩家: 仅自己占据的地点
           - 东晋玩家 (正常): 仅自己占据的地点
-          - 东晋玩家 (有北伐标记): 自己占据 + 所有友方(含其他东晋+司马家)占据的地点
+          - 东晋玩家 (有北伐标记): 自己占据 + 所有友方(含其他东晋+司马家)占据
 
-        Without expedition marker: only own forces. With expedition marker:
-        all friendly forces (other Jin players + Sima) count as adjacency sources.
+        Fallback (无地点兜底):
+          - 东晋玩家占据0个地点: 视为拥有北伐标记（所有友方地点）
+          - 北方玩家占据0个地点: 河北/幽燕/关外 视为相邻地点
         """
         player = self.get_player(player_id)
         if not player:
@@ -502,11 +503,32 @@ class GameState:
                 sources.append(loc_id)
 
         # Expedition marker (北伐): use ALL friendly locations as sources
-        # (other Jin players + Sima), not just own + Sima.
-        if player.has_expedition_marker and player.faction == FactionType.JIN:
+        has_expedition = (
+            player.has_expedition_marker and player.faction == FactionType.JIN
+        )
+
+        # Fallback: Jin player with 0 own locations → treated as having expedition marker
+        jin_no_locations = (
+            player.faction == FactionType.JIN
+            and len(sources) == 0
+        )
+
+        if has_expedition or jin_no_locations:
             for loc_id, loc in self.locations.items():
                 if loc.is_friendly_to(cs) and loc_id not in sources:
                     sources.append(loc_id)
+
+        # Fallback: North player with 0 own locations → 河北/幽燕/关外
+        if player.faction == FactionType.NORTH and len(sources) == 0:
+            _north_fallback_regions = {
+                "河北": ["中山", "襄国", "邺城", "信都"],
+                "幽燕": ["蓟城", "龙城"],
+                "关外": ["盛乐", "平城"],
+            }
+            for _locs in _north_fallback_regions.values():
+                for _lid in _locs:
+                    if _lid in self.locations and _lid not in sources:
+                        sources.append(_lid)
 
         return sources
 

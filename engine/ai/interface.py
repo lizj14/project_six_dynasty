@@ -102,7 +102,8 @@ class GameAgent(ABC):
 
     def request_card_play(self, state: "GameState",
                           eligible_indices: list[int],
-                          filter_spec: dict = None) -> Optional["GameAction"]:
+                          filter_spec: dict = None,
+                          free: bool = False) -> Optional["GameAction"]:
         """Called when an effect requests the player to play a card immediately.
 
         e.g. 桓石虔 active → play 1 card with [军事] marker.
@@ -110,6 +111,16 @@ class GameAgent(ABC):
         PlayCardAction, or return None to decline.
 
         Default: return None (AI agents that don't support this).
+        """
+        return None
+
+    def request_court_play(self, state: "GameState") -> Optional["GameAction"]:
+        """Called when an effect grants an extra court action with may=True.
+
+        The agent should select a card from the court and return a
+        CourtAction, or return None to decline.
+
+        Default: return None (AI agents handle this in decide_action).
         """
         return None
 

@@ -2902,7 +2902,16 @@
                       }
                     ],
                     "type": "player"
-                  }
+                  },
+                  "sub_effects": [
+                    {
+                      "effect_type": "archive_card",
+                      "params": {
+                        "from": "staff",
+                        "count": 1
+                      }
+                    }
+                  ]
                 }
               },
               {

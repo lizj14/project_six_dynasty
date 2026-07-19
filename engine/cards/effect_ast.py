@@ -50,6 +50,7 @@ class AbilityBlock:
     trigger: Optional[str] = None   # For passives: "on_march", "on_archive", etc.
     trigger_scope: str = "self"     # "self" (owner only) or "any" (any player)
     trigger_filter: Optional[dict] = None  # e.g. {"marker": "power"}
+    condition: Optional["Condition"] = None  # Block-level condition (e.g. 袁乔: hand_count==0)
     costs: list["Cost"] = field(default_factory=list)  # Block-level costs
     steps: list[EffectStep] = field(default_factory=list)
     usurp_steps: list[EffectStep] = field(default_factory=list)  # 僭越 extra effects

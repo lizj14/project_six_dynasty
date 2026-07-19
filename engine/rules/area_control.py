@@ -187,19 +187,19 @@ def award_region_vp(state: "GameState", results: dict[Region, ControlResult],
         return
 
     for region, result in results.items():
-        # Check if this player is the partial controller
-        if result.partial_controller == player_id:
-            player.vp += result.partial_vp
-            state.log_event("area_control_vp", player=player_id,
-                            region=region.value, vp=result.partial_vp,
-                            control_type="partial")
-
-        # Full control gives both partial and full VP
+        # Full control gives full_vp (NOT partial_vp + full_vp).
+        # Rulebook §3.2: 完全控制 = 占据该区域全部地点，获得完全控制VP。
+        # Partial control VP is only awarded when the player does NOT have full control.
         if result.full_controller == player_id:
             player.vp += result.full_vp
             state.log_event("area_control_vp", player=player_id,
                             region=region.value, vp=result.full_vp,
                             control_type="full")
+        elif result.partial_controller == player_id:
+            player.vp += result.partial_vp
+            state.log_event("area_control_vp", player=player_id,
+                            region=region.value, vp=result.partial_vp,
+                            control_type="partial")
 
         # Check 150 VP trigger
         state.check_vp_game_end(player_id)

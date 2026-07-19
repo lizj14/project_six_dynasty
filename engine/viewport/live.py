@@ -73,16 +73,16 @@ class LiveViewport(Viewport):
         player = self._state.get_player(self.viewer_id)
         if not player:
             return {}
-        return full_player_summary(player)
+        return full_player_summary(player, self._state)
 
     def get_other_player(self, player_id: str) -> dict:
         player = self._state.get_player(player_id)
         if not player:
             return {}
-        return public_player_summary(player)
+        return public_player_summary(player, self._state)
 
     def get_all_players_public(self) -> list[dict]:
-        return [public_player_summary(p) for p in self._state.get_all_players()]
+        return [public_player_summary(p, self._state) for p in self._state.get_all_players()]
 
     # ================================================================
     # Map / location queries
@@ -356,7 +356,7 @@ class LiveViewport(Viewport):
         # Players
         players = {}
         for p in self._state.get_all_players():
-            players[p.player_id] = public_player_summary(p)
+            players[p.player_id] = public_player_summary(p, self._state)
 
         # Court
         court = {

@@ -345,7 +345,12 @@ class HumanPlayer(GameAgent):
             print(f"\n  {title}:")
         for i, opt in enumerate(options):
             if isinstance(opt, dict):
-                print(f"    {i+1}. {opt.get('label', opt.get('id', str(opt)))}")
+                label = opt.get('label', opt.get('id', str(opt)))
+                reason = opt.get('reason', '')
+                if reason:
+                    print(f"    {i+1}. {label} ({reason})")
+                else:
+                    print(f"    {i+1}. {label}")
             else:
                 print(f"    {i+1}. {opt}")
         if not options:
@@ -359,11 +364,12 @@ class HumanPlayer(GameAgent):
 
     def request_card_play(self, state: "GameState",
                           eligible_indices: list[int],
-                          filter_spec: dict = None) -> Optional["GameAction"]:
+                          filter_spec: dict = None,
+                          free: bool = False) -> Optional["GameAction"]:
         """Called when an effect requests immediate card play (e.g. 桓石虔).
 
         Shows eligible cards and lets the player choose one to play immediately.
-        Payment cards are auto-selected from the end of hand.
+        Payment cards are auto-selected unless free=True.
         """
         player = state.get_player(self.player_id)
         if not player or not eligible_indices:
@@ -373,6 +379,7 @@ class HumanPlayer(GameAgent):
 
         # Build filter description
         filter_desc = ""
+        free_desc = " (免费)" if free else ""
         if filter_spec:
             marker = filter_spec.get("marker", "")
             if marker:
@@ -380,7 +387,7 @@ class HumanPlayer(GameAgent):
                                  "affair": "内政", "power": "权谋"}
                 filter_desc = f" (需[{marker_labels.get(marker, marker)}]标记)"
 
-        print(f"  选择要打出的牌{filter_desc}:")
+        print(f"  选择要打出的牌{filter_desc}{free_desc}:")
         for i, idx in enumerate(eligible_indices):
             card = player.hand[idx]
             cost = card.cost
@@ -402,26 +409,123 @@ class HumanPlayer(GameAgent):
                 if 0 <= n < len(eligible_indices):
                     card_idx = eligible_indices[n]
                     card = player.hand[card_idx]
-                    cost = card.cost
-
-                    # Auto-select payment: last N cards from hand (excluding the target)
-                    payment_indices = []
-                    if cost > 0:
-                        for idx in range(len(player.hand) - 1, -1, -1):
-                            if idx != card_idx:
-                                payment_indices.append(idx)
-                            if len(payment_indices) >= cost:
-                                break
+                    cost = 0 if free else card.cost
 
                     from engine.actions.card_actions import PlayCardAction
+
+                    # Prompt for payment cards (skip if free)
+                    if free:
+                        payment_indices = []
+                    elif cost > 0:
+                        payment_indices = self._select_payment_cards(
+                            player, card_idx, cost)
+                        if payment_indices is None:
+                            # Player cancelled
+                            return None
+                    else:
+                        payment_indices = []
+
                     return PlayCardAction(
                         player_id=self.player_id,
                         card_index=card_idx,
                         payment_indices=payment_indices,
+                        free=free,
                     )
             except ValueError:
                 pass
             print("  无效选择，重新输入")
+
+    def request_court_play(self, state: "GameState") -> Optional["GameAction"]:
+        """Called when an effect grants an extra court action (e.g. 刘裕 with 4 markers).
+
+        Shows available court cards and lets the player choose one to execute
+        immediately.
+        """
+        player = state.get_player(self.player_id)
+        if not player:
+            return None
+
+        court = state.get_court_cards(self.player_id)
+        if not court:
+            print("\n  ⚡ 获得额外朝堂行动，但朝堂区为空!")
+            return None
+
+        print(f"\n  ⚡ 获得额外朝堂行动!")
+        print(f"  选择要执行的朝堂牌:")
+        for i, card in enumerate(court):
+            print(f"    {i+1}. {card.name}")
+        print(f"    0. 取消 (稍后选择)")
+
+        while True:
+            choice = input("  > ").strip()
+            if choice.lower() == 'q':
+                from engine.engine.game import GameQuitException
+                raise GameQuitException("quit")
+            if choice == '0':
+                return None
+            try:
+                n = int(choice) - 1
+                if 0 <= n < len(court):
+                    from engine.actions.card_actions import CourtAction
+                    return CourtAction(
+                        player_id=self.player_id,
+                        card_id=court[n].definition.card_id,
+                    )
+            except ValueError:
+                pass
+            print("  无效选择，重新输入")
+
+    def _select_payment_cards(self, player, card_index: int, cost: int) -> list[int] | None:
+        """Prompt player to select payment cards from hand (excluding the target)."""
+        print(f"\n  ┌─ 选择支付牌 ──────────────────────")
+        print(f"  │ 要打出「{player.hand[card_index].name}」(费用: {cost})")
+        print(f"  │")
+        print(f"  │ 手牌 (不可选择要打出的牌本身):")
+        for i, c in enumerate(player.hand):
+            if i == card_index:
+                print(f"  │   {i+1}. {c.name} ← 要打出的牌")
+            else:
+                print(f"  │   {i+1}. {c.name}")
+        print(f"  │")
+        print(f"  │ 请输入 {cost} 张牌作为支付 (输入编号，空格分隔)，0=取消")
+
+        while True:
+            raw = input(f"  │ 支付牌 > ").strip()
+            if raw == '0':
+                return None
+            if raw.lower() == 'q':
+                from engine.engine.game import GameQuitException
+                raise GameQuitException("quit")
+            try:
+                parts = raw.split()
+                indices = []
+                seen = set()
+                valid = True
+                for p in parts:
+                    val = int(p)
+                    if val < 1 or val > len(player.hand):
+                        print(f"  │ [!] 编号 {p} 超出范围 (1-{len(player.hand)})")
+                        valid = False
+                        break
+                    idx = val - 1
+                    if idx == card_index:
+                        print(f"  │ [!] 不能选择要打出的牌本身 (编号{val})")
+                        valid = False
+                        break
+                    if idx in seen:
+                        print(f"  │ [!] 重复选择编号{val}")
+                        valid = False
+                        break
+                    indices.append(idx)
+                    seen.add(idx)
+                if not valid:
+                    continue
+                if len(indices) != cost:
+                    print(f"  │ [!] 需要 {cost} 张支付牌，你选了 {len(indices)} 张")
+                    continue
+                return indices
+            except ValueError:
+                print(f"  │ [!] 输入格式错误，请输入数字编号，空格分隔")
 
     # ================================================================
     # State summary display
@@ -619,36 +723,35 @@ class HumanPlayer(GameAgent):
             elif t == "raise_contribution":
                 print(f"     ↳ +{evt.get('amount', '?')} 功绩")
             elif t == "fortify_requested":
-                target = evt.get("target", "?")
                 if evt.get("skipped"):
+                    target = evt.get("target", "?")
                     print(f"     ↳ 加固→{target} (跳过: {evt.get('reason', '')})")
-                else:
-                    print(f"     ↳ 加固→{target}")
+                # else: action log already shows fortify details
             elif t == "convert_requested":
-                target = evt.get("target", "?")
-                if not evt.get("skipped"):
-                    print(f"     ↳ 转化→{target}")
+                if evt.get("skipped"):
+                    target = evt.get("target", "?")
+                    print(f"     ↳ 转化→{target} (跳过: {evt.get('reason', '')})")
+                # else: action log already shows convert details
             elif t == "march":
-                target = evt.get("target", "?")
-                free = "免费" if evt.get("cost", 1) == 0 else ""
-                print(f"     ↳ 进军→{target} {free}".strip())
+                pass  # Output suppressed — action log already shows march details
             elif t == "occupy":
-                target = evt.get("target", "?")
-                free = "免费" if evt.get("cost", 1) == 0 else ""
-                print(f"     ↳ 占据→{target} {free}".strip())
+                pass  # Output suppressed — action log already shows occupy details
             elif t == "march_requested":
                 if evt.get("skipped"):
-                    print(f"     ↳ 进军 (跳过: {evt.get('reason', '')})")
-                else:
-                    target = evt.get("target", "?")
-                    free = "免费" if evt.get("free") else ""
-                    print(f"     ↳ 进军→{target} {free}".strip())
+                    reason = evt.get("reason", "")
+                    detail = evt.get("detail", "")
+                    reason_cn = {"no_target": "无有效进军目标",
+                                 "no_own_locations": "没有控制任何地点",
+                                 "no_target_spec": "未指定进军目标"}.get(reason, reason)
+                    if detail:
+                        print(f"     ↳ 进军 (跳过: {reason_cn} — {detail})")
+                    else:
+                        print(f"     ↳ 进军 (跳过: {reason_cn})")
+                # else: action log already shows march details
             elif t == "occupy_requested":
                 if evt.get("skipped"):
                     print(f"     ↳ 占据 (跳过: {evt.get('reason', '')})")
-                else:
-                    target = evt.get("target", "?")
-                    print(f"     ↳ 占据→{target}")
+                # else: action log already shows occupy details
             elif t == "spread_culture_requested":
                 if evt.get("skipped"):
                     print(f"     ↳ 传播文化 (跳过: {evt.get('reason', '')})")
@@ -671,10 +774,40 @@ class HumanPlayer(GameAgent):
             elif t == "extra_action_granted":
                 action_type = evt.get("action_type", "?")
                 card_type = evt.get("card_type", "")
+                free = evt.get("free", False)
+                free_label = "免费" if free else ""
                 if card_type:
-                    print(f"     ↳ 获得额外行动: {action_type} (仅{card_type})")
+                    print(f"     ↳ 获得额外行动: {free_label}{action_type} (仅{card_type})")
                 else:
-                    print(f"     ↳ 获得额外行动: {action_type}")
+                    print(f"     ↳ 获得额外行动: {free_label}{action_type}")
+            elif t == "play_card_requested":
+                filter_spec = evt.get("filter", {})
+                free = evt.get("free", False)
+                free_label = " (免费)" if free else ""
+                fil = filter_spec.get("type", filter_spec.get("keyword", ""))
+                if fil:
+                    fil = f" [筛选: {fil}]"
+                elif isinstance(filter_spec, dict):
+                    parts = []
+                    for k, v in filter_spec.items():
+                        if v:
+                            parts.append(f"{k}={v}")
+                    if parts:
+                        fil = f" [筛选: {', '.join(parts)}]"
+                    else:
+                        fil = ""
+                else:
+                    fil = ""
+                print(f"     ↳ 请求打出卡牌{free_label}{fil}")
+            elif t == "targeted_effect":
+                targets = evt.get("targets", [])
+                if evt.get("skipped"):
+                    print(f"     ↳ 目标化效果 (跳过: {evt.get('reason', '')})")
+                elif targets:
+                    target_str = ", ".join(targets)
+                    print(f"     ↳ 影响玩家: {target_str}")
+                else:
+                    print(f"     ↳ 目标化效果")
             elif t == "discard":
                 card_name = evt.get("card", "?")
                 target = evt.get("target", "main")

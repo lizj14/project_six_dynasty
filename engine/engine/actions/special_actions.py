@@ -522,6 +522,7 @@ class LevyAction(GameAction):
         player.vp += defn.resource_option_vp
 
         # Move to played area for this round
+        card._court_played_by = self.player_id
         if self.player_id == "north":
             state.north_played_this_round.append(card)
         else:

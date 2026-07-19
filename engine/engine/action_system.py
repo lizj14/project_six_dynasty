@@ -61,13 +61,26 @@ class ActionSystem:
         # Use adjacency source locations (own; own + Sima with expedition marker).
         # Rulebook: 正常只有自己地点; 北伐标记使司马家地点也作为相邻起点。
         source_locs = state.get_adjacency_source_locations(player_id)
+        sima_available = False
+        from rules.sima import can_place_sima_army
+        from models.enums import FactionType
+        if player.faction == FactionType.JIN and can_place_sima_army(state):
+            sima_available = True
+
         for loc_id, loc in state.locations.items():
             if loc.controller != ControlState.EMPTY:
                 continue
             if any(n in source_locs for n in state.get_adjacent_locations(loc_id)):
+                # Regular occupy (own army)
                 action = OccupyAction(player_id=player_id, target_location=loc_id)
                 if action.validate(state).success:
                     available.append(action)
+                # Sima army occupy (Jin only, uses Sima's military/reserves)
+                if sima_available:
+                    sima_action = OccupyAction(player_id=player_id, target_location=loc_id,
+                                               use_sima_army=True)
+                    if sima_action.validate(state).success:
+                        available.append(sima_action)
 
         # March — check for adjacent non-friendly, non-empty locations
         # (NEUTRAL = neutral forces present; EMPTY = unoccupied → use Occupy instead)

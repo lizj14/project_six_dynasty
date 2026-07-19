@@ -224,14 +224,32 @@ def card_effect_summary(definition: "CardDef") -> str:
 # Player summaries (public vs private)
 # ================================================================
 
-def public_player_summary(player: "PlayerState") -> dict:
+def public_player_summary(player: "PlayerState", state=None) -> dict:
     """Extract only publicly-visible fields from a PlayerState.
 
     All players can see: faction, hero, staff/history counts, VP, military,
     prestige/contribution/order (Jin), army counts, marker counts, expedition
     marker, hand COUNT (not contents).
+
+    Marker counts use get_marker_total() (dynamic sum from hero + staff +
+    history + court cards) when state is provided; falls back to static
+    counts otherwise.
     """
+    from models.enums import MarkerType
+
     faction_val = player.faction.value if hasattr(player.faction, 'value') else str(player.faction)
+
+    # Compute dynamic marker totals when state is available
+    if state:
+        marker_mil = player.get_marker_total(MarkerType.MILITARY, state)
+        marker_cul = player.get_marker_total(MarkerType.CULTURE, state)
+        marker_aff = player.get_marker_total(MarkerType.AFFAIR, state)
+        marker_pow = player.get_marker_total(MarkerType.POWER, state)
+    else:
+        marker_mil = player.marker_military
+        marker_cul = player.marker_culture
+        marker_aff = player.marker_affair
+        marker_pow = player.marker_power
 
     summary = {
         "player_id": player.player_id,
@@ -248,10 +266,10 @@ def public_player_summary(player: "PlayerState") -> dict:
         "army_reserve_revealed_vp": player.army_reserve_revealed_vp,
         "army_reserve_revealed_military": player.army_reserve_revealed_military,
         "hand_count": len(player.hand),
-        "marker_military": player.marker_military,
-        "marker_culture": player.marker_culture,
-        "marker_affair": player.marker_affair,
-        "marker_power": player.marker_power,
+        "marker_military": marker_mil,
+        "marker_culture": marker_cul,
+        "marker_affair": marker_aff,
+        "marker_power": marker_pow,
         "has_expedition_marker": player.has_expedition_marker,
         "game_end_marker": player.game_end_marker,
         "start_order": player.start_order,
@@ -303,9 +321,9 @@ def private_player_summary(player: "PlayerState") -> dict:
     }
 
 
-def full_player_summary(player: "PlayerState") -> dict:
+def full_player_summary(player: "PlayerState", state=None) -> dict:
     """Combined public + private summary (for the owning player's view)."""
-    pub = public_player_summary(player)
+    pub = public_player_summary(player, state)
     priv = private_player_summary(player)
     pub.update(priv)
     return pub

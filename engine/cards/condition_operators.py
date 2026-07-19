@@ -417,26 +417,30 @@ class FriendlyControlRegionCondition(_RegionCondition):
 
 @register_condition
 class OccupyLocationCondition(ConditionOperator):
-    """Check if player occupies a specific location."""
+    """Check if player personally occupies a specific location.
+
+    Uses get_own_locations() — only locations where the controller IS
+    this player's ControlState, not faction-friendly allies like Sima.
+    """
     condition_type = "occupy_location"
 
     def check(self, condition, state, player_id, context, resolver) -> bool:
         loc = condition.params.get("location", "")
-        return loc in state.get_friendly_locations(player_id)
+        return loc in state.get_own_locations(player_id)
 
 
 @register_condition
 class OccupyLocationInRegionCondition(ConditionOperator):
-    """Check if player occupies any location in a region."""
+    """Check if player personally occupies any location in a region."""
     condition_type = "occupy_location_in_region"
 
     def check(self, condition, state, player_id, context, resolver) -> bool:
         region_name = condition.params.get("region", "")
-        friendly = state.get_friendly_locations(player_id)
+        own = state.get_own_locations(player_id)
         from rules.area_control import REGION_CONFIG
         for reg, cfg in REGION_CONFIG.items():
             if reg.value == region_name or region_name in cfg.get("locations", []):
-                return any(loc in cfg.get("locations", []) for loc in friendly)
+                return any(loc in cfg.get("locations", []) for loc in own)
         return False
 
 

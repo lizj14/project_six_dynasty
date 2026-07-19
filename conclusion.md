@@ -476,3 +476,79 @@ v0.5太垃圾了，北方没法玩，直接干掉。
     征发增加征发后在朝堂区补1张牌的效果。
 6 顺位的额外获取方法
     北伐：有北伐标记时，改为获得2次威望即可提高1级顺位。
+
+### 0720 v1.0 第二轮Bug修复 + HeuristicAI军事倾向调整
+
+本次修改分为三个批次：
+
+#### 第一批：上轮游戏测试Bug修复 (8项)
+
+**#1 郗超弃流民不触发郗鉴被动**
+- `effect_resolver.py`: `_resolve_block` 的 `discard_cards` 和 `abandon_court_card` 费用处理中增加 `_fire_trigger("on_discard", ...)` 调用
+- `game.py`: `_match_trigger_filter` 修复 — card filter 存在但 context 无 card 时返回 False（之前静默通过）
+- `effect_ast.py`: `AbilityBlock` 增加 `condition` 字段
+- `version.py`: `_dict_to_block` 读取 `condition`
+- `effect_resolver.py`: `_resolve_block` 开头检查 block.condition
+
+**#2 区域控制VP叠加错误（if-if→if-elif）**
+- `area_control.py`: `award_region_vp()` 完全控制时只给 full_vp，不再同时给 partial_vp
+- `scoring.py`: `score_region_and_reserve()` 和 `award_region_control_phase()` 同样修复
+
+**#3 东晋玩家缺少放置司马家部队的快速行动**
+- `quick_actions.py`: `OccupyAction` 增加 `use_sima_army` 字段，含完整 validate/execute 支持
+- 调用 `rules/sima.py` 的 `place_sima_army()`
+
+**#4 袁乔激活条件(hand_count==0)未检查**
+- `effect_ast.py`: `AbilityBlock` dataclass 增加 `condition` 字段
+- `version.py`: `_dict_to_block()` 读取编译JSON中的 `condition`
+- `effect_resolver.py`: `_resolve_block()` 在费用处理前先检查 block.condition
+
+**#5 加固姑臧未获得皇帝奖励VP**
+- 经营 姑臧 为 jin_3 控制，非 Sima 地点，皇帝 FORTIFY 任务要求 `target_is_sima`，非Bug
+
+**#6 视窗增加地盘控制显示**
+- `query.py`: `_summary()` 增加 `【地盘控制】` 区段，按控制者分组展示所有地点（含加固标记★和司马家）
+
+**#7 卫夫人免费打幕僚仍扣费**
+- `effect_operators.py`: `PlayCardOperator.execute()` 提取并传递 `free` 标记
+- `card_actions.py`: `PlayCardAction` 增加 `free` 字段，免费时跳过费用验证和支付
+- `game.py`: `play_card_requested` 和 `extra_action_granted` 处理中传递 `free`
+- `interface.py`/`human_player.py`: `request_card_play` 增加 `free` 参数
+
+**#8 Sima军力分配结果打印到终端和日志**
+- `phases.py`: `run_preparation_phase` 返回 `(emperor_events, sima_events)` 元组
+- `game.py`: 终端打印 `🏛️ 司马家军力分配: 每名东晋玩家+N军力` 并传入 `log_preparation`
+
+#### 第二批：HeuristicAI东晋军事倾向调优
+
+- 新增 `_is_jin()` 辅助方法
+- `_score_recruit`: 东晋军力上限 5→8，征兵基础分 1.5→3.0，有可占据目标+低军力时 4.0→6.0
+- `_score_occupy`: 东晋基础分 3.0→4.0，邻接加分 2.0→2.5，区域VP倍率 ×1.5→×2.0，可用司马军+1.0
+- `_score_march`: 东晋成本惩罚 0.3→0.15
+- `_step_value`: GAIN_MILITARY 全局权重 1.5→1.8
+- `_score_draw`: 东晋新增军力保护逻辑（军力<5且手牌≥4时仅1.0分）
+
+#### 第三批：本日游戏测试Bug修复 (6项)
+
+**#1 暗置阶段AI支付费用硬编码为2**
+- `heuristic_ai.py`/`dummy_ai.py`: `payment_indices = other[:2]` → 改用 `ctx.hand_card_costs` 读取实际费用
+- HeuristicAI 还优化为优先选最低费卡牌作暗置打出
+- 注：`phases.py` 有执行端 auto-fill/`[:cost]` slice 纠错层，实际执行时费用会被纠正
+
+**#2 秘密目标未去重**
+- `phases.py`: 发牌后从 `goal_pool` 中 `remove()` 已分配的目标卡，保证每张目标牌只给一个东晋玩家
+
+**#3 进军后无法使用司马家军力占据**
+- `action_system.py`: `get_available_quick_actions()` 中为东晋玩家额外生成 `use_sima_army=True` 的 `OccupyAction` 变体
+
+**#4 人何以堪修复 + 增加受影响玩家打印**
+- `effect_operators.py`: filter 匹配同时接受 `fewest_staff_slots` 和 `fewest_empty_staff_slots`
+- `cards_compiled.json`: targeted_effect 补上缺失的 `sub_effects`（archive_card from=staff count=1）
+- `human_player.py`: `targeted_effect` 事件新增打印 `影响玩家: ...`
+
+**#5 皇帝任务结算时机确认**
+- 每回合**准备阶段**掷骰创建任务 → 行动阶段**每次行动后**检查完成 → 非回合末统一结算
+
+**#6 附赠行动打印增强**
+- `human_player.py`: 新增 `play_card_requested`、`targeted_effect` 事件打印；`extra_action_granted` 增加 `免费` 标签
+- `play_game.py`: `LoggingAgentWrapper` 补充 `request_card_play`/`request_court_play` 代理方法（之前缺少导致 AttributeError）

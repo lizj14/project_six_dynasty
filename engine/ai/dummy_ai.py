@@ -123,9 +123,12 @@ class DummyAI(GameAgent):
 
         if ctx.hand_cards:
             d.face_down_card_index = self.rng.randint(0, len(ctx.hand_cards) - 1)
+            card_cost = ctx.hand_card_costs[d.face_down_card_index] if (
+                ctx.hand_card_costs and d.face_down_card_index < len(ctx.hand_card_costs)
+            ) else 0
             other = [i for i in range(len(ctx.hand_cards)) if i != d.face_down_card_index]
             self.rng.shuffle(other)
-            d.payment_indices = other[:2]
+            d.payment_indices = other[:card_cost]
 
         return d
 

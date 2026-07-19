@@ -346,6 +346,7 @@ class PlayCardOperator(EffectOperator):
         player = state.get_player(player_id)
         count = step.params.get("count", 1)
         may = step.params.get("may", False)
+        free = step.params.get("free", False)
         card_type_filter = step.params.get("card_type")  # e.g. "friend" for 刘裕 active
         filter_spec = step.params.get("filter")  # e.g. {"marker": "military"} or {"exclude_marker": "military"}
         for i in range(count):
@@ -360,6 +361,11 @@ class PlayCardOperator(EffectOperator):
                         if resolver.action_system:
                             from engine.actions.card_actions import PlayCardAction
                             action = PlayCardAction(player_id=player_id, card=played)
+                            # Handle free: temporarily grant military to cover cost
+                            if free:
+                                card_cost = played.definition.cost if played.definition else 0
+                                if card_cost > 0 and player:
+                                    player.military += card_cost
                             r = resolver.action_system.execute(state, action)
                             result.events.extend(r.events if r.success else [])
                             if not r.success:
@@ -373,14 +379,14 @@ class PlayCardOperator(EffectOperator):
                     player.extra_hand_action_filter = card_type_filter
                 result.events.append({
                     "type": "extra_action_granted", "action_type": "hand_action",
-                    "count": 1, "may": True,
+                    "count": 1, "may": True, "free": free,
                     "card_type": card_type_filter, "filter": filter_spec,
                     "source": "play_card_effect",
                 })
             else:
                 result.events.append({
                     "type": "play_card_requested", "count": count,
-                    "filter": filter_spec, "index": i,
+                    "filter": filter_spec, "index": i, "free": free,
                 })
         return result
 
@@ -675,15 +681,21 @@ class MarchOperator(_TargetedMapOperator):
     context_key = "march_targets"
 
     def _get_valid_targets(self, state, player_id, step):
-        """Enemy or neutral locations adjacent to own locations (not allies/Sima)."""
-        own_locs = state.get_own_locations(player_id)
+        """Enemy or neutral locations adjacent to own locations (not allies/Sima).
+
+        Uses get_adjacency_source_locations() which implements:
+          - Normal: own locations only
+          - Expedition marker: all friendly locations
+          - Fallback (0 own locations): Jin→all friendly, North→河北/幽燕/关外
+        """
+        sources = state.get_adjacency_source_locations(player_id)
         player_cs = state._player_control_state(player_id)
         valid = []
         for loc_id, loc in state.locations.items():
             if loc.is_friendly_to(player_cs):
                 continue
             neighbors = state.get_adjacent_locations(loc_id)
-            if any(n in own_locs for n in neighbors):
+            if any(n in sources for n in neighbors):
                 valid.append(loc_id)
         return valid
 
@@ -745,14 +757,18 @@ class OccupyOperator(_TargetedMapOperator):
     context_key = "occupy_targets"
 
     def _get_valid_targets(self, state, player_id, step):
-        """Empty/neutral locations adjacent to own locations (not allies/Sima)."""
-        own_locs = state.get_own_locations(player_id)
+        """Empty/neutral locations adjacent to own locations (not allies/Sima).
+
+        Uses get_adjacency_source_locations() which implements the fallback rule
+        for players with 0 own locations (Jin→all friendly, North→河北/幽燕/关外).
+        """
+        sources = state.get_adjacency_source_locations(player_id)
         valid = []
         for loc_id, loc in state.locations.items():
             if loc.controller != ControlState.EMPTY:
                 continue
             neighbors = state.get_adjacent_locations(loc_id)
-            if any(n in own_locs for n in neighbors):
+            if any(n in sources for n in neighbors):
                 valid.append(loc_id)
         return valid
 
@@ -1119,7 +1135,7 @@ class SpreadCultureOperator(EffectOperator):
             action = SpreadCultureAction(
                 player_id=player_id,
                 culture_type=culture,
-                target_region=valid_regions[0],
+                target_region=valid_regions[0]["id"],
             )
             r = resolver.action_system.execute(state, action)
             result.events.extend(r.events if r.success else [])
@@ -1134,17 +1150,22 @@ class SpreadCultureOperator(EffectOperator):
         return result
 
     @staticmethod
-    def _get_valid_regions(state, player_id, culture) -> list[str]:
+    def _get_valid_regions(state, player_id, culture) -> list[dict]:
         """Enumerate regions where the player can spread this culture.
 
-        Valid if: player controls at least one location in the region, OR
-        region is adjacent to a region that already has this culture marker, OR
-        region has this culture as its initial_culture.
+        Rulebook §5.1.6: valid if ANY of:
+        - 己方控制该区域 (region has a friendly control marker —
+          partial or full control per §"区域控制", not merely a
+          single friendly location)
+        - 该区域与该文化已存在的区域相邻 (adjacent to a region that
+          already has this culture marker)
+        - 初始文化 (region has this culture as its initial_culture)
+
+        Returns list of dicts: {"id": region_value, "label": region_value, "reason": str}
         """
         from rules.area_control import REGION_CONFIG, get_adjacent_regions
-        from models.enums import CultureType
+        from models.enums import CultureType, ControlState
 
-        friendly = state.get_friendly_locations(player_id)
         culture_ct = CultureType(culture) if culture else None
 
         # Regions that already have culture markers of this type on the map
@@ -1157,9 +1178,16 @@ class SpreadCultureOperator(EffectOperator):
 
         valid = []
         for reg, cfg in REGION_CONFIG.items():
-            reg_locs = cfg.get("locations", [])
-            # Player controls at least one location in this region
-            controls = any(loc in friendly for loc in reg_locs)
+            # Rulebook §"区域控制": region is controlled only if a
+            # control marker is present (partial: > threshold; full: all).
+            rs = state.regions.get(reg)
+            if rs and rs.control_marker is not None:
+                if player_id == "north":
+                    controls = (rs.control_marker == ControlState.NORTH)
+                else:
+                    controls = (rs.control_marker != ControlState.NORTH)
+            else:
+                controls = False
             # Adjacent to a region that already has this culture marker on the map
             adjacent_regions = get_adjacent_regions(reg)
             adjacent = bool(adjacent_regions & regions_with_culture)
@@ -1168,7 +1196,19 @@ class SpreadCultureOperator(EffectOperator):
             has_initial = (initial_culture == culture)
 
             if controls or adjacent or has_initial:
-                valid.append(reg.value)
+                reasons = []
+                if controls:
+                    reasons.append("已控制")
+                if adjacent:
+                    adj_names = ", ".join(r.value for r in (adjacent_regions & regions_with_culture))
+                    reasons.append(f"与[{adj_names}]相邻")
+                if has_initial:
+                    reasons.append("初始文化")
+                valid.append({
+                    "id": reg.value,
+                    "label": reg.value,
+                    "reason": "、".join(reasons),
+                })
 
         return valid
 
@@ -1889,7 +1929,7 @@ class TargetedEffectOperator(EffectOperator):
             elif ft == "highest_prestige":
                 candidates = TargetedEffectOperator._filter_highest(
                     candidates, state, "prestige")
-            elif ft == "fewest_staff_slots":
+            elif ft in ("fewest_staff_slots", "fewest_empty_staff_slots"):
                 candidates = TargetedEffectOperator._filter_highest(
                     candidates, state, "staff_free_slots", reverse=True)
             elif ft == "highest_military":

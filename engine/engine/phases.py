@@ -189,7 +189,11 @@ def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
         # --- Goal candidates (Jin only) ---
         goal_choices = []
         if player.faction == FactionType.JIN:
-            goal_choices = rng.sample(goal_pool, min(3, len(goal_pool)))
+            sample_size = min(3, len(goal_pool))
+            goal_choices = rng.sample(goal_pool, sample_size)
+            # Remove dealt goals from pool so each goal goes to at most one player
+            for gc in goal_choices:
+                goal_pool.remove(gc)
         _goal_choices_by_player[player.player_id] = goal_choices
 
         # --- Build hand: hero candidate faction cards ---
@@ -644,10 +648,10 @@ def _create_initial_locations() -> dict[str, LocationState]:
     return locations
 
 
-def run_preparation_phase(state: GameState, rng: random.Random) -> list[dict]:
+def run_preparation_phase(state: GameState, rng: random.Random) -> tuple[list[dict], list[dict]]:
     """Execute the preparation phase for the current round.
 
-    Returns emperor dice events for logging.
+    Returns (emperor_events, sima_events) for logging.
     """
     state.phase = PhaseType.PREPARATION
 
@@ -661,7 +665,12 @@ def run_preparation_phase(state: GameState, rng: random.Random) -> list[dict]:
 
     # Sima military distribution (after emperor dice)
     from rules.sima import distribute_sima_military
-    distribute_sima_military(state)
+    sima_events = distribute_sima_military(state)
+    if sima_events:
+        for evt in sima_events:
+            state.log_event("sima_military_distribution",
+                           sima_remaining=evt.get("sima_remaining", 0),
+                           each_jin_received=evt.get("each_jin_received", 1))
 
     # Set action order: north first, then Jin by order track (higher = earlier)
     jin_sorted = _get_jin_turn_order(state)
@@ -670,7 +679,7 @@ def run_preparation_phase(state: GameState, rng: random.Random) -> list[dict]:
 
     state.phase = PhaseType.ACTION
 
-    return emperor_events
+    return emperor_events, sima_events
 
 
 def run_player_draw(state: GameState, player_id: str):

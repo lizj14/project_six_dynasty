@@ -25,6 +25,7 @@ class PlayCardAction(GameAction):
     card_index: int = -1                      # Index in hand
     payment_indices: list[int] = None         # Indices of cards to discard as payment
     replace_staff_index: int = 0              # Which staff card to replace if staff full
+    free: bool = False                        # If True, no cost payment required
 
     def __post_init__(self):
         if self.payment_indices is None:
@@ -43,11 +44,12 @@ class PlayCardAction(GameAction):
 
         card = player.hand[self.card_index]
 
-        # Check payment
-        cost = card.cost
-        if len(self.payment_indices) != cost:
-            return ActionResult.fail(f"Need to pay {cost} cards as cost, "
-                                     f"provided {len(self.payment_indices)}")
+        # Check payment (skip cost check if free)
+        if not self.free:
+            cost = card.cost
+            if len(self.payment_indices) != cost:
+                return ActionResult.fail(f"Need to pay {cost} cards as cost, "
+                                         f"provided {len(self.payment_indices)}")
 
         # Validate payment indices
         used_indices = {self.card_index}
@@ -74,10 +76,13 @@ class PlayCardAction(GameAction):
 
         player = state.get_player(self.player_id)
 
-        # Pay cost first — discard payment cards (in reverse index order)
-        payment_cards = []
-        for pi in sorted(self.payment_indices, reverse=True):
-            payment_cards.append(player.hand.pop(pi))
+        # Pay cost first (skip if free)
+        if not self.free:
+            payment_cards = []
+            for pi in sorted(self.payment_indices, reverse=True):
+                payment_cards.append(player.hand.pop(pi))
+        else:
+            payment_cards = []
 
         # Get the played card (index may have shifted due to payments)
         # Recalculate: find the card by original index accounting for removals
@@ -458,6 +463,7 @@ class CourtAction(GameAction):
                 archived = True
                 break
         if not archived:
+            card._court_played_by = self.player_id
             if self.player_id == "north":
                 state.north_played_this_round.append(card)
             else:

@@ -99,6 +99,14 @@ class EffectResolver:
         """Resolve a single ability block."""
         result = ResolveResult()
 
+        # Check block-level condition first (e.g. 袁乔: hand_count == 0)
+        if block.condition:
+            if not self._check_condition(block.condition, state, player_id,
+                                         context or {}):
+                result.events.append({"type": "block_condition_not_met",
+                                      "reason": str(block.condition)})
+                return result
+
         # Pay block-level costs first
         player = state.get_player(player_id)
         for cost in block.costs:
@@ -125,6 +133,9 @@ class EffectResolver:
                         player_id, discarded, target=target, source="hand",
                         reason="cost")
                     result.events.extend(events)
+                    for card in discarded:
+                        self._fire_trigger("on_discard", player_id,
+                                          {"card": card})
             elif cost.cost_type == "pay_military":
                 amount = cost.params.get("amount", 0)
                 if player:
@@ -167,6 +178,9 @@ class EffectResolver:
                         player_id, abandoned, target="national", source="court",
                         reason="abandon_court_card")
                     result.events.extend(events)
+                    for card in abandoned:
+                        self._fire_trigger("on_discard", player_id,
+                                          {"card": card})
 
         # Cost handling done — proceed to execute the block.
         # NOTE: passive blocks are NOT skipped here. Callers that should not

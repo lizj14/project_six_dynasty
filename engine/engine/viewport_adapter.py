@@ -111,7 +111,7 @@ def build_public_snapshot(state: "GameState") -> dict:
     # Players
     players = {}
     for p in state.get_all_players():
-        players[p.player_id] = public_player_summary(p)
+        players[p.player_id] = public_player_summary(p, state)
 
     # Court
     court = {

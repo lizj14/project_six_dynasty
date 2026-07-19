@@ -212,6 +212,7 @@ def _dict_to_block(bd: dict) -> "AbilityBlock":
         ability_type=bd["ability_type"], trigger=bd.get("trigger"),
         trigger_scope=bd.get("trigger_scope", "self"),
         trigger_filter=bd.get("trigger_filter"),
+        condition=_dict_to_condition(bd.get("condition")),
         costs=costs, steps=steps, choice_options=choices,
         resource_option=bd.get("resource_option"),
         modifier=bd.get("modifier"),

@@ -264,7 +264,7 @@ def _build_snapshot(state: "GameState", viewer_id: str,
     # --- Players (public only) ---
     players = {}
     for p in state.get_all_players():
-        players[p.player_id] = public_player_summary(p)
+        players[p.player_id] = public_player_summary(p, state)
 
     # --- Court ---
     court = {

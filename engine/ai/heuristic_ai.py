@@ -35,6 +35,10 @@ class HeuristicAI(GameAgent):
         self._chain_occupy: bool = False       # Chain occupy after successful march
         self._last_march_target: str = ""
 
+    def _is_jin(self, player) -> bool:
+        """Check if a player is 东晋 faction."""
+        return hasattr(player, 'faction') and player.faction.value == "jin"
+
     # === Setup ===
 
     def setup_decision(self, ctx: SetupContext) -> SetupDecision:
@@ -69,11 +73,21 @@ class HeuristicAI(GameAgent):
 
         # Pick face-down card: prefer low-cost cards with strong effects
         if ctx.hand_cards:
-            # Simple heuristic: use first non-event card, or first card
-            d.face_down_card_index = 0
+            # Prefer lowest-cost card as face-down (less payment needed)
+            if ctx.hand_card_costs and len(ctx.hand_card_costs) == len(ctx.hand_cards):
+                # Sort by cost ascending, then by index for stability
+                indexed = [(ctx.hand_card_costs[i], i) for i in range(len(ctx.hand_cards))]
+                indexed.sort(key=lambda x: x[0])
+                d.face_down_card_index = indexed[0][1]
+            else:
+                d.face_down_card_index = 0
+            # Pay exactly the required cost (use card's actual cost from hand_card_costs)
+            card_cost = ctx.hand_card_costs[d.face_down_card_index] if (
+                ctx.hand_card_costs and d.face_down_card_index < len(ctx.hand_card_costs)
+            ) else 0
             other = [i for i in range(len(ctx.hand_cards)) if i != d.face_down_card_index]
             self.rng.shuffle(other)
-            d.payment_indices = other[:2]
+            d.payment_indices = other[:card_cost]
         else:
             d.face_down_card_index = 0
             d.payment_indices = []
@@ -324,7 +338,7 @@ class HeuristicAI(GameAgent):
 
         values = {
             EffectType.GAIN_VP: amt * 2.0,
-            EffectType.GAIN_MILITARY: amt * 1.5,
+            EffectType.GAIN_MILITARY: amt * 1.8,  # Increased: military is key for expansion
             EffectType.DRAW_CARDS: amt * 1.2,
             EffectType.SPREAD_CULTURE: amt * 2.5,
             EffectType.RAISE_PRESTIGE: amt * 1.5,
@@ -344,10 +358,13 @@ class HeuristicAI(GameAgent):
         return values.get(et, amt * 0.3)
 
     def _score_march(self, action, state) -> float:
-        """Score a march action based on target value."""
+        """Score a march action based on target value.
+        Jin players are more aggressive about marching (key military action)."""
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
+
+        is_jin = self._is_jin(player)
 
         target = getattr(action, 'target_location', '')
         if not target or target not in state.locations:
@@ -394,8 +411,9 @@ class HeuristicAI(GameAgent):
                 score += vp_value * 1.0
                 break
 
-        # Cost efficiency
-        score -= cost * 0.3
+        # Cost efficiency: Jin players are more willing to spend military
+        cost_penalty = 0.15 if is_jin else 0.3
+        score -= cost * cost_penalty
 
         return max(0.0, min(score, 10.0))
 
@@ -404,6 +422,7 @@ class HeuristicAI(GameAgent):
 
         High priority for adjacent empty locations — these are free real estate
         that give VP from region control without combat.
+        Jin players get extra incentive since region control is a key VP source.
         """
         player = state.get_player(self.player_id)
         if not player:
@@ -412,20 +431,27 @@ class HeuristicAI(GameAgent):
         if player.military < 1:
             return 0.0
 
+        is_jin = self._is_jin(player)
         target = getattr(action, 'target_location', '')
-        score = 3.0  # Base: high priority — occupying is a key action
+        score = 4.0 if is_jin else 3.0  # Base: Jin values expansion more
 
         # Adjacent empty location: extra value (closer to our territory)
         friendly = state.get_friendly_locations(self.player_id)
         neighbors = state.get_adjacent_locations(target)
         if any(nb in friendly for nb in neighbors):
-            score += 2.0  # Adjacent to our territory — even better
+            score += 2.5 if is_jin else 2.0  # Adjacent — even better for Jin
 
         # Region VP value
         for reg, cfg in REGION_CONFIG.items():
             if target in cfg.get("locations", []):
-                score += cfg.get("vp_per_location", 1) * 1.5
+                vp_bonus = cfg.get("vp_per_location", 1) * (2.0 if is_jin else 1.5)
+                score += vp_bonus
                 break
+
+        # Jin extra: use_sima_army option makes occupying even more attractive
+        # (expands reach without depleting own reserves)
+        if is_jin and getattr(action, 'use_sima_army', False):
+            score += 1.0
 
         return max(0.0, min(score, 10.0))
 
@@ -477,10 +503,13 @@ class HeuristicAI(GameAgent):
         """Score recruiting (discard 1 card → 1 military).
 
         High priority when empty occupiable locations exist but no military.
+        Jin players are more aggressive about building military reserves.
         """
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
+
+        is_jin = self._is_jin(player)
 
         # Check: are there empty occupiable adjacent locations?
         friendly = state.get_friendly_locations(self.player_id)
@@ -492,35 +521,59 @@ class HeuristicAI(GameAgent):
                     has_occupy_targets = True
                     break
 
+        # Military ceiling: Jin players aim higher (need military for march/occupy)
+        mil_ceiling = 8 if is_jin else 5
+
         # If empty occupiable locations exist AND no military, recruit is top priority
         if has_occupy_targets and player.military == 0:
-            return 8.0  # High priority: need military to occupy
+            return 9.0  # High priority: need military to occupy
 
         # Only recruit if hand has expendable cards and military is low
         if len(player.hand) <= 2:
             return 0.0  # Keep cards
-        if player.military >= 5:
+        if player.military >= mil_ceiling:
             return 0.5  # Don't need it
 
         # If occupy targets exist with low military, higher priority
-        if has_occupy_targets and player.military < 2:
-            return 4.0
+        if has_occupy_targets and player.military < (3 if is_jin else 2):
+            return 6.0 if is_jin else 4.0
 
-        return 1.5  # Worth considering
+        # Base: Jin players value military more
+        return 3.0 if is_jin else 1.5
 
     def _score_draw(self, action, state) -> float:
-        """Score drawing cards (quick action)."""
+        """Score drawing cards (quick action). Costs 2 military."""
         player = state.get_player(self.player_id)
         if not player:
             return 0.0
 
-        # Draw when hand is low
-        if len(player.hand) <= 3:
-            return 3.0
-        elif len(player.hand) <= 5:
-            return 2.0
+        # Drawing costs 2 military — must be able to afford
+        if player.military < 2:
+            return 0.0
+
+        is_jin = self._is_jin(player)
+
+        # Jin players should be more conservative about spending military on draws
+        # Only draw when hand is truly low or military is abundant
+        if is_jin:
+            if player.military < 5 and len(player.hand) >= 4:
+                return 1.0  # Prefer saving military for occupy/march
+            if len(player.hand) <= 2:
+                return 4.0  # Desperate for cards
+            elif len(player.hand) <= 3:
+                return 3.0
+            elif len(player.hand) <= 5:
+                return 2.0
+            else:
+                return 1.0
         else:
-            return 1.0  # Still worth it when nothing else to do
+            # Original logic for North
+            if len(player.hand) <= 3:
+                return 3.0
+            elif len(player.hand) <= 5:
+                return 2.0
+            else:
+                return 1.0
 
     def _score_archive(self, action, state) -> float:
         """Score archiving a card."""

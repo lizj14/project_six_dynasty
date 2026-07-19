@@ -187,18 +187,19 @@ def score_region_and_reserve(state: "GameState") -> dict:
     results = check_all_regions(state)
     for region, cr in results.items():
         region_vp = {}
-        if cr.partial_controller:
-            pid = cr.partial_controller
-            player = state.get_player(pid)
-            if player:
-                player.vp += cr.partial_vp
-                region_vp[pid] = cr.partial_vp
+        # Full control gives only full_vp, not partial_vp + full_vp
         if cr.full_controller:
             pid = cr.full_controller
             player = state.get_player(pid)
             if player:
                 player.vp += cr.full_vp
-                region_vp[pid] = region_vp.get(pid, 0) + cr.full_vp
+                region_vp[pid] = cr.full_vp
+        elif cr.partial_controller:
+            pid = cr.partial_controller
+            player = state.get_player(pid)
+            if player:
+                player.vp += cr.partial_vp
+                region_vp[pid] = cr.partial_vp
 
         if region_vp:
             details["regions"][region.value] = region_vp
@@ -361,9 +362,11 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
                 target = player_id
 
         if target:
-            vp = cr.partial_vp
+            # Full control gives full_vp (not partial_vp + full_vp)
             if cr.full_controller == target:
-                vp += cr.full_vp
+                vp = cr.full_vp
+            else:
+                vp = cr.partial_vp
 
             if target == "sima":
                 state.sima.vp += vp

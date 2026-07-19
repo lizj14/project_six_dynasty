@@ -431,7 +431,7 @@ class GameEngine:
             self.logger.log_jin_round_status(state)
 
         # === Preparation Phase ===
-        emperor_events = run_preparation_phase(state, self.rng)
+        emperor_events, sima_events = run_preparation_phase(state, self.rng)
 
         # Print emperor dice results
         if emperor_events and self._has_human_player():
@@ -445,6 +445,15 @@ class GameEngine:
                         task = evt.get("task", "?")
                         print(f"  🎲 皇帝骰子: 掷出{roll} → {task}任务")
 
+        # Print Sima military distribution results
+        if sima_events and self._has_human_player():
+            for evt in sima_events:
+                if evt.get("type") == "sima_military_distribution":
+                    remaining = evt.get("sima_remaining", 0)
+                    received = evt.get("each_jin_received", 1)
+                    print(f"  🏛️ 司马家军力分配: 每名东晋玩家+{received}军力 "
+                          f"(司马家剩余{remaining}军力)")
+
         # Print public info for human players at round start (AFTER prep clears exhausted)
         self._print_round_public_info(state)
 
@@ -454,7 +463,7 @@ class GameEngine:
 
         if self.logger:
             self.logger.log_preparation(
-                emperor_events=emperor_events, sima_dist=[], region_vp=[],
+                emperor_events=emperor_events, sima_dist=sima_events, region_vp=[],
             )
 
         # === Action Phase ===
@@ -622,6 +631,7 @@ class GameEngine:
             if result.success:
                 for evt in result.events:
                     if evt.get("type") == "play_card_requested":
+                        free = evt.get("free", False)
                         filter_spec = evt.get("filter", {})
                         eligible = []
                         for i, c in enumerate(player.hand):
@@ -633,8 +643,12 @@ class GameEngine:
                             player.extra_hand_actions += 1
                             try:
                                 play_action = agent.request_card_play(
-                                    state, eligible, filter_spec)
+                                    state, eligible, filter_spec, free=free)
                                 if play_action is not None:
+                                    # Tag the action as free if the effect grants it
+                                    if free:
+                                        play_action.free = True
+                                        play_action.payment_indices = []
                                     r2 = self.action_system.execute(state, play_action)
                                     if self.logger:
                                         log_action_result(self.logger, play_action, r2, state)
@@ -648,6 +662,71 @@ class GameEngine:
                                 raise
                             # else: player declined — continue
                         break  # Only handle one play_card_requested per action
+
+            # Handle extra_action_granted events with card_type filter (e.g. 刘裕,
+            # 谢玄, 谢道蕴, 招抚 — effects that grant a "may play" extra action).
+            # These should immediately prompt the player rather than returning to
+            # the action menu and waiting for manual selection.
+            if result.success:
+                for evt in result.events:
+                    if evt.get("type") == "extra_action_granted":
+                        action_type = evt.get("action_type", "")
+                        may = evt.get("may", False)
+                        free = evt.get("free", False)
+                        card_type_filter = evt.get("card_type", "")
+                        filter_spec = evt.get("filter") or {}
+                        if may and action_type == "hand_action" and card_type_filter:
+                            # Build eligibility filter: card_type ("friend"),
+                            # plus any additional filter from the effect
+                            combined_filter = dict(filter_spec)
+                            if card_type_filter:
+                                combined_filter["card_type"] = card_type_filter
+                            eligible = []
+                            for i, c in enumerate(player.hand):
+                                if self._card_matches_filter(c, combined_filter):
+                                    eligible.append(i)
+                            if eligible:
+                                # Extra action already granted by effect;
+                                # redirect to immediate prompt
+                                try:
+                                    play_action = agent.request_card_play(
+                                        state, eligible, combined_filter, free=free)
+                                    if play_action is not None:
+                                        if free:
+                                            play_action.free = True
+                                            play_action.payment_indices = []
+                                        r2 = self.action_system.execute(state, play_action)
+                                        if self.logger:
+                                            log_action_result(self.logger, play_action, r2, state)
+                                        if self.on_action_executed:
+                                            self.on_action_executed(
+                                                state, player_id, play_action, r2)
+                                        # Note: do NOT decrement extra_hand_actions here.
+                                        # The effect already set extra_hand_actions += 1, and
+                                        # PlayCardAction.execute() increments hand_action_taken_count.
+                                        # can_take_hand_action() checks: taken < 1 + extra,
+                                        # so the extra slot is consumed naturally by the play.
+                                    # else: player declined — extra action remains
+                                    # for manual use (or logged as skipped)
+                                except Exception:
+                                    raise
+                        elif may and action_type == "court_action":
+                            # Extra court action (e.g. 刘裕 with 4 markers).
+                            # Immediately prompt the player to choose a court card.
+                            court = state.get_court_cards(player_id)
+                            if court:
+                                try:
+                                    court_action = agent.request_court_play(state)
+                                    if court_action is not None:
+                                        r2 = self.action_system.execute(state, court_action)
+                                        if self.logger:
+                                            log_action_result(self.logger, court_action, r2, state)
+                                        if self.on_action_executed:
+                                            self.on_action_executed(
+                                                state, player_id, court_action, r2)
+                                except Exception:
+                                    raise
+                        break  # Only handle one extra_action_granted per action
 
         # Log skipped extra actions (may=True actions not used)
         if self.logger and player.extra_hand_actions > 0:
@@ -902,7 +981,9 @@ class GameEngine:
         if "card" in filter_dict:
             card_name = filter_dict["card"]
             card = context.get("card")
-            if card and card_name not in (card.name if hasattr(card, 'name') else str(card)):
+            if not card:
+                return False  # filter requires a card match but none provided
+            if card_name not in (card.name if hasattr(card, 'name') else str(card)):
                 return False
         return True
 
@@ -913,7 +994,7 @@ class GameEngine:
         Supported filter keys:
           - marker: card must have the specified marker type
           - exclude_marker: card must NOT have the specified marker type
-          - card_type: card type must match (e.g. "friend", "event")
+          - card_type: card type must match (e.g. "friend", "event", "strategy")
         """
         if not filter_spec:
             return True
@@ -935,7 +1016,9 @@ class GameEngine:
 
         if "card_type" in filter_spec:
             ct = filter_spec["card_type"]
-            if str(card.card_type) != ct:
+            # Card.card_type returns a CardType enum; use .value for comparison
+            ctv = card.card_type.value if hasattr(card.card_type, 'value') else str(card.card_type)
+            if ctv != ct:
                 return False
 
         return True

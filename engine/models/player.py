@@ -90,7 +90,11 @@ class PlayerState:
         - Hero card definition
         - Staff area cards
         - History area cards
-        - Court cards played this turn (if state provided)
+        - Court cards played this turn (rulebook §"卡牌标记")
+
+        Rulebook §"数值归属": markers default to only counting the
+        player's own. jin_played_this_round / north_played_this_round
+        are shared lists — each card is tagged with _court_played_by.
         """
         total = self.get_marker(marker)
 
@@ -119,13 +123,17 @@ class PlayerState:
             if card.definition:
                 total += getattr(card.definition, attr, 0)
 
-        # Court cards played this turn
+        # Court cards played this turn — rulebook §"卡牌标记":
+        # "计算标记数时，包含朝堂行动选择的牌的标记。"
+        # Filter by _court_played_by (rulebook §"数值归属":
+        # "默认只计算玩家自己的") — jin_played_this_round is shared.
         if state:
-            played = (state.north_played_this_round
-                      if self.player_id == "north"
-                      else state.jin_played_this_round)
-            for card in played:
-                if card.definition:
+            all_played = (state.north_played_this_round
+                          if self.player_id == "north"
+                          else state.jin_played_this_round)
+            for card in all_played:
+                if (getattr(card, '_court_played_by', None) == self.player_id
+                        and card.definition):
                     total += getattr(card.definition, attr, 0)
 
         return total

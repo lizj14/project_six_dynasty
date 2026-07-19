@@ -126,6 +126,12 @@ class LoggingAgentWrapper:
     def select_target(self, state, prompt):
         return self._agent.select_target(state, prompt)
 
+    def request_card_play(self, state, eligible_indices, filter_spec=None, free=False):
+        return self._agent.request_card_play(state, eligible_indices, filter_spec=filter_spec, free=free)
+
+    def request_court_play(self, state, eligible_cards, filter_spec=None):
+        return self._agent.request_court_play(state, eligible_cards, filter_spec=filter_spec)
+
 
 def select_faction() -> str:
     """Let the user choose which faction to play. Returns player_id.

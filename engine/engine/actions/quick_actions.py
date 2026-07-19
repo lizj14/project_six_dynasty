@@ -19,10 +19,15 @@ class OccupyAction(GameAction):
 
     Cost: 1 military
     Restrictions: target must be adjacent, unoccupied, and not enemy-controlled
+
+    Jin players may use Sima army (use_sima_army=True) if Sima has military > 0
+    (rulebook §3.4). This places a Sima control marker instead of the Jin
+    player's own army and deducts 1 Sima military.
     """
     action_type: str = "occupy"
     player_id: str = ""
     target_location: str = ""
+    use_sima_army: bool = False
 
     def validate(self, state: "GameState") -> ActionResult:
         player = state.get_player(self.player_id)
@@ -49,6 +54,12 @@ class OccupyAction(GameAction):
         if not any(n in sources for n in neighbors):
             return ActionResult.fail(f"Location {self.target_location} is not adjacent to any of your adjacency sources")
 
+        # Validate use_sima_army
+        if self.use_sima_army:
+            from rules.sima import can_place_sima_army
+            if not can_place_sima_army(state):
+                return ActionResult.fail("Sima army not available (military=0 or no reserves)")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
@@ -57,35 +68,42 @@ class OccupyAction(GameAction):
             return validation
 
         player = state.get_player(self.player_id)
-
-        # Determine control state
-        cs = state._player_control_state(self.player_id)
-
-        # Check if Jin player wants to place Sima army (only if Sima military > 0)
-        # For now, default to placing own army unless specified
-        # (This choice happens via the AI interface in practice)
         loc = state.locations[self.target_location]
-        loc.controller = cs
+
+        if self.use_sima_army:
+            # Place Sima army instead of own army
+            from rules.sima import place_sima_army
+            sima_event = place_sima_army(state, self.target_location, self.player_id)
+            # Pay military cost (Jin player still pays their own military)
+            player.military -= 1
+            events = [{"type": "occupy", "player": self.player_id,
+                       "location": self.target_location, "sima_army": True},
+                      sima_event]
+        else:
+            # Determine control state
+            cs = state._player_control_state(self.player_id)
+            loc.controller = cs
+
+            # Pay cost
+            player.military -= 1
+
+            # Update army counts
+            player.army_placed_count += 1
+            player.army_reserve_count -= 1
+
+            events = [{"type": "occupy", "player": self.player_id,
+                       "location": self.target_location}]
+
+            # Check game end: last army placed
+            if player.army_reserve_count == 0:
+                state.game_end_marker = self.player_id
+                state.game_end_reason = "last_army"
+                events.append({"type": "game_end_trigger", "reason": "last_army",
+                               "player": self.player_id})
 
         # Track region control change
         from rules.area_control import on_location_change
         on_location_change(state, self.target_location)
-
-        # Pay cost
-        player.military -= 1
-
-        # Update army counts
-        player.army_placed_count += 1
-        player.army_reserve_count -= 1
-
-        events = [{"type": "occupy", "player": self.player_id, "location": self.target_location}]
-
-        # Check game end: last army placed
-        if player.army_reserve_count == 0:
-            state.game_end_marker = self.player_id
-            state.game_end_reason = "last_army"
-            events.append({"type": "game_end_trigger", "reason": "last_army",
-                           "player": self.player_id})
 
         state.log_event("occupy", player=self.player_id, location=self.target_location)
         return ActionResult.ok(events)

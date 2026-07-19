@@ -361,6 +361,33 @@ class QueryEngine:
         except Exception:
             pass
 
+        # --- Territory Control ---
+        try:
+            all_locs = self._vp.get_all_locations()
+            # Group by controller
+            territory: dict[str, list[str]] = {}
+            for loc_id, loc_info in all_locs.items():
+                ctrl = loc_info.get("controller", "empty")
+                territory.setdefault(ctrl, []).append(loc_id)
+            lines.append("【地盘控制】")
+            ctrl_labels = {"north": "north", "jin_p1": "jin_1", "jin_p2": "jin_2",
+                          "jin_p3": "jin_3", "sima": "sima"}
+            for ctrl in ["north", "jin_p1", "jin_p2", "jin_p3", "sima"]:
+                locs = territory.get(ctrl, [])
+                label = ctrl_labels.get(ctrl, ctrl)
+                if locs:
+                    # Mark fortified locations with ★
+                    loc_strs = []
+                    for lid in locs:
+                        loc_info = all_locs.get(lid, {})
+                        fortified = loc_info.get("fortified", False)
+                        loc_strs.append(f"{lid}★" if fortified else lid)
+                    lines.append(f"  {label}: 控制 {' '.join(loc_strs)}")
+                else:
+                    lines.append(f"  {label}: 控制 (无)")
+        except Exception:
+            pass
+
         # --- Players ---
         my_id = self._vp.viewer_id
         my_player = self._vp.get_my_player()
@@ -386,12 +413,25 @@ class QueryEngine:
             staff_names = p.get("staff_names", [])
             history_names = p.get("history_names", [])
 
+            # Marker counts (动态计算)
+            marker_mil = p.get("marker_military", 0)
+            marker_cul = p.get("marker_culture", 0)
+            marker_aff = p.get("marker_affair", 0)
+            marker_pow = p.get("marker_power", 0)
+            marker_parts = []
+            if marker_mil: marker_parts.append(f"军{marker_mil}")
+            if marker_cul: marker_parts.append(f"文{marker_cul}")
+            if marker_aff: marker_parts.append(f"政{marker_aff}")
+            if marker_pow: marker_parts.append(f"谋{marker_pow}")
+            marker_str = ",".join(marker_parts) if marker_parts else "标记:无"
+
             parts = [
                 f"[{faction_label}] {pid}",
                 f"VP:{vp}",
                 f"军力:{military}",
                 f"手牌:{hand_count}",
                 f"部队:{army}",
+                f"{marker_str}",
             ]
 
             if hero_name:
