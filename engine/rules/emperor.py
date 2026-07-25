@@ -179,6 +179,7 @@ def check_task_completion(state: "GameState", player_id: str,
                            "player": player_id,
                            "task": task.task_type.value,
                            "vp_reward": 2})
+            break  # One action completes at most one task
 
     # Check if ALL active tasks are now complete → Sima prestige +1
     # Only fire if at least one task was newly completed in this call

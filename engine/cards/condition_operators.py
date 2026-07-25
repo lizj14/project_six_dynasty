@@ -412,7 +412,8 @@ class FriendlyControlRegionCondition(_RegionCondition):
             return False
         if player.faction == FactionType.NORTH:
             return ctrl == "north"
-        return bool(ctrl and ctrl.startswith("jin"))
+        # Jin players: own faction OR Sima (allied) control counts as friendly
+        return bool(ctrl and (ctrl.startswith("jin") or ctrl == "sima"))
 
 
 @register_condition

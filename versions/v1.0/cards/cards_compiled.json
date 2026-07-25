@@ -518,7 +518,8 @@
               {
                 "effect_type": "extra_court_action",
                 "params": {
-                  "action_type": "court_action"
+                  "action_type": "court_action",
+                  "may": true
                 },
                 "condition": {
                   "condition_type": "and",

@@ -1009,6 +1009,21 @@ class GameEngine:
                         and context.get("player_id") != owner_id):
                     continue
 
+                # Scope check: "friendly" → only same-faction events trigger it.
+                # For Jin: other Jin players + Sima are friendly.
+                # For North: only North itself is friendly.
+                if block.trigger_scope == "friendly":
+                    event_pid = context.get("player_id", "")
+                    owner = state.get_player(owner_id)
+                    if owner:
+                        from models.enums import FactionType
+                        if owner.faction == FactionType.NORTH:
+                            if event_pid != "north":
+                                continue
+                        elif owner.faction == FactionType.JIN:
+                            if not (event_pid.startswith("jin_") or event_pid == "sima"):
+                                continue
+
                 # Trigger filter check (e.g. only for [流民] cards)
                 if block.trigger_filter:
                     if not self._match_trigger_filter(

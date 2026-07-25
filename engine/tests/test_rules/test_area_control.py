@@ -129,14 +129,15 @@ class TestFullControl:
         result = check_region_control(state, Region.GUANZHONG)
         assert result.full_controller is None
 
-    def test_sima_cannot_full_control(self):
-        """Sima controlling all locations still doesn't get full control."""
+    def test_sima_combined_full_control(self):
+        """Sima+Jin combined occupying all locations → sima full control."""
         state = make_state_with_region({
             "安定": "sima", "天水": "sima", "长安": "sima",
         })
         result = check_region_control(state, Region.GUANZHONG)
-        assert result.full_controller is None  # Sima is NPC
-        assert result.partial_controller == "sima"  # But gets partial
+        # Sima combined full control: all locations are sima → full_controller="sima"
+        assert result.full_controller == "sima"
+        assert result.partial_controller is None
 
 
 class TestAllRegions:

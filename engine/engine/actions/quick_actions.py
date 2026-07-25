@@ -34,9 +34,16 @@ class OccupyAction(GameAction):
         if not player:
             return ActionResult.fail(f"Player {self.player_id} not found")
 
-        # Check military
-        if player.military < 1:
-            return ActionResult.fail(f"Need 1 military, have {player.military}")
+        # Validate use_sima_army first — when using Sima army, the player
+        # does NOT pay their own military; Sima pays instead (§3.4).
+        if self.use_sima_army:
+            from rules.sima import can_place_sima_army
+            if not can_place_sima_army(state):
+                return ActionResult.fail("Sima army not available (military=0 or no reserves)")
+        else:
+            # Check player's own military (only when NOT using Sima army)
+            if player.military < 1:
+                return ActionResult.fail(f"Need 1 military, have {player.military}")
 
         # Check target exists
         loc = state.locations.get(self.target_location)
@@ -53,12 +60,6 @@ class OccupyAction(GameAction):
         neighbors = state.get_adjacent_locations(self.target_location)
         if not any(n in sources for n in neighbors):
             return ActionResult.fail(f"Location {self.target_location} is not adjacent to any of your adjacency sources")
-
-        # Validate use_sima_army
-        if self.use_sima_army:
-            from rules.sima import can_place_sima_army
-            if not can_place_sima_army(state):
-                return ActionResult.fail("Sima army not available (military=0 or no reserves)")
 
         return ActionResult.ok()
 

@@ -240,6 +240,7 @@ class SpreadCultureAction(GameAction):
     player_id: str = ""
     culture_type: str = ""      # "confucianism" | "taoism" | "buddhism"
     target_region: str = ""     # Region name, e.g. "关中"
+    replace_culture: str = ""   # Which old culture to replace (multi-slot regions only)
 
     def validate(self, state: "GameState") -> ActionResult:
         player = state.get_player(self.player_id)
@@ -261,20 +262,35 @@ class SpreadCultureAction(GameAction):
         cfg = REGION_CONFIG.get(region, {})
         culture_ct = _CT(self.culture_type)
 
-        # Exclude regions that already have this culture marker
+        # Check if region already has this culture AND has no empty slots.
+        # Multi-slot regions with empty slots can still accept the same culture
+        # in the free slot (e.g. 江南 with 2 slots, 1 occupied + 1 empty).
         rs = state.regions.get(region)
-        if rs and rs.has_culture(culture_ct):
-            return ActionResult.fail(
-                f"Cannot spread {self.culture_type} to {self.target_region}: "
-                f"region already has a {self.culture_type} marker")
+        if rs and rs.has_culture(culture_ct) and not self.replace_culture:
+            empty_slots = [s for s in rs.culture_slots if s.culture is None]
+            if not empty_slots:
+                return ActionResult.fail(
+                    f"Cannot spread {self.culture_type} to {self.target_region}: "
+                    f"region already has a {self.culture_type} marker")
+        # If replacing, the old culture must actually exist in the region
+        if self.replace_culture:
+            old_ct = _CT(self.replace_culture) if self.replace_culture else None
+            if not rs or not rs.has_culture(old_ct):
+                return ActionResult.fail(
+                    f"Cannot replace {self.replace_culture} in {self.target_region}: "
+                    f"marker not present")
+            if rs.is_slot_locked(old_ct):
+                return ActionResult.fail(
+                    f"Cannot replace locked culture marker in {self.target_region} "
+                    f"({self.replace_culture}) — 锁定状态下不可覆盖")
 
         # Condition 1: player controls the region
-        if rs and rs.control_marker is not None:
-            controls = (rs.control_marker != ControlState.NORTH
-                       if self.player_id != "north"
-                       else rs.control_marker == ControlState.NORTH)
-        else:
-            controls = False
+        # Control is per-player, not faction-wide.
+        # jin_1 controls only regions with JIN_P1 marker, not JIN_P2/P3.
+        from rules.area_control import _player_id_to_control_state
+        expected = _player_id_to_control_state(self.player_id)
+        controls = (rs is not None and rs.control_marker is not None
+                    and expected is not None and rs.control_marker == expected)
 
         # Condition 2: region adjacent to existing culture region (region-level)
         regions_with_culture = set()
@@ -336,19 +352,30 @@ class SpreadCultureAction(GameAction):
         if rs is None:
             return ActionResult.fail(f"Region state not found: {self.target_region}")
 
-        # Check if a different culture marker exists and is locked
+        # Determine which old culture will be displaced (if any)
         existing = rs.get_cultures()
-        was_empty = (len(existing) == 0)     # True only if region has NO culture at all
-        # Find the existing culture that would be displaced (if any)
-        old_culture = existing[0] if existing else None
+        was_empty = (len(existing) == 0)
 
-        if not was_empty and old_culture != culture:
-            if rs.is_slot_locked(old_culture):
+        if self.replace_culture:
+            # Explicit replace (multi-slot region, player chose which to replace)
+            old_ct = CultureType(self.replace_culture)
+            old_culture_str = self.replace_culture
+            rs.replace_culture(old_ct, culture)
+            was_empty = False
+        else:
+            status = rs.place_culture(culture)
+            if status == "already_exists":
                 return ActionResult.fail(
-                    f"Cannot overwrite locked culture marker in {self.target_region} "
-                    f"({old_culture.value}) — 锁定状态下不可覆盖")
+                    f"Cannot spread {self.culture_type} to {self.target_region}: "
+                    f"region already has a {self.culture_type} marker")
+            elif status == "need_choice":
+                return ActionResult.fail(
+                    f"Region {self.target_region} has no empty culture slots — "
+                    f"caller must specify replace_culture")
+            # "placed" or "replaced" — proceed
+            old_culture_str = (existing[0].value
+                               if status == "replaced" and existing else None)
 
-        rs.place_culture(culture)
         events.append({"type": "culture_placed",
                        "region": self.target_region,
                        "culture": self.culture_type,
@@ -363,8 +390,8 @@ class SpreadCultureAction(GameAction):
             if track:
                 track.map_count += 1
                 track.supply_level += 1
-                if old_culture and old_culture != culture:
-                    old_ct = CultureType(old_culture)
+                if old_culture_str and old_culture_str != self.culture_type:
+                    old_ct = CultureType(old_culture_str)
                     old_track = state.culture_tracks.get(old_ct)
                     if old_track:
                         if old_track.map_count > 0:

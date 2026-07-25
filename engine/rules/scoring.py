@@ -191,16 +191,24 @@ def score_region_and_reserve(state: "GameState") -> dict:
         # Full control gives only full_vp, not partial_vp + full_vp
         if cr.full_controller:
             pid = cr.full_controller
-            player = state.get_player(pid)
-            if player:
-                player.vp += cr.full_vp
-                region_vp[pid] = cr.full_vp
+            if pid == "sima":
+                state.sima.vp += cr.full_vp
+                region_vp["sima"] = cr.full_vp
+            else:
+                player = state.get_player(pid)
+                if player:
+                    player.vp += cr.full_vp
+                    region_vp[pid] = cr.full_vp
         elif cr.partial_controller:
             pid = cr.partial_controller
-            player = state.get_player(pid)
-            if player:
-                player.vp += cr.partial_vp
-                region_vp[pid] = cr.partial_vp
+            if pid == "sima":
+                state.sima.vp += cr.partial_vp
+                region_vp["sima"] = cr.partial_vp
+            else:
+                player = state.get_player(pid)
+                if player:
+                    player.vp += cr.partial_vp
+                    region_vp[pid] = cr.partial_vp
 
         if region_vp:
             details["regions"][region.value] = region_vp
@@ -343,7 +351,13 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
         # Ensure RegionState exists (lazy init)
         if region not in state.regions:
             from models.location import RegionState
-            state.regions[region] = RegionState(region=region)
+            from models.location import CultureSlot
+            from .area_control import REGION_CONFIG as _RC2
+            slot_count = _RC2.get(region, {}).get("culture_slot_count", 1)
+            state.regions[region] = RegionState(
+                region=region,
+                culture_slots=[CultureSlot() for _ in range(slot_count)],
+            )
 
         region_state = state.regions[region]
 
@@ -354,12 +368,12 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
         # Determine who to award
         target = None
         if player_id is None:
-            # Preparation phase: only Sima
-            if cr.partial_controller == "sima":
+            # Preparation phase: only Sima (partial or full)
+            if cr.partial_controller == "sima" or cr.full_controller == "sima":
                 target = "sima"
         else:
             # Player action phase: that specific player
-            if cr.partial_controller == player_id:
+            if cr.partial_controller == player_id or cr.full_controller == player_id:
                 target = player_id
 
         if target:

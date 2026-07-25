@@ -330,6 +330,7 @@ class HumanPlayer(GameAgent):
         # Add context about what kind of selection this is
         type_labels = {
             "spread_culture_requested": "传播文化",
+            "spread_culture_replace": "传播文化-替换",
             "convert_requested": "转化地点",
             "march_requested": "进军",
             "occupy_requested": "占据",

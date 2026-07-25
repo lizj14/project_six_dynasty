@@ -425,13 +425,17 @@ def _build_game_state(library: CardLibrary,
     # Initialize RegionState for each region (lazy-init was broken — done in scoring too late)
     from rules.area_control import REGION_CONFIG
     from models.enums import CultureType as _CT
-    from models.location import RegionState
+    from models.location import RegionState, CultureSlot
     _culture_name_to_enum = {"confucianism": _CT.CONFUCIANISM,
                               "taoism": _CT.TAOISM,
                               "buddhism": _CT.BUDDHISM}
     for _reg in REGION_CONFIG:
         if _reg not in state.regions:
-            state.regions[_reg] = RegionState(region=_reg)
+            slot_count = REGION_CONFIG[_reg].get("culture_slot_count", 1)
+            state.regions[_reg] = RegionState(
+                region=_reg,
+                culture_slots=[CultureSlot() for _ in range(slot_count)],
+            )
 
     # Rulebook §4.1 step 1: Place initial culture markers
     # 江南→玄学, 山东→儒学, 西凉→佛学

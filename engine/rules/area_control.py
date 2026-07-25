@@ -31,7 +31,8 @@ REGION_CONFIG: dict[Region, dict] = {
     Region.JINGXIANG: {"partial_vp": 2, "full_vp": 4, "locations": ["襄阳","南郡","巴东","武昌","宛城","上洛"],
                         "culture_bonus": {"type": "draw_card", "amount": 1}, "initial_culture": None},
     Region.JIANGNAN:  {"partial_vp": 3, "full_vp": 5, "locations": ["浔阳","建康","京口","吴","会稽"],
-                        "culture_bonus": {"type": "vp", "amount": 3}, "initial_culture": "taoism"},
+                        "culture_bonus": {"type": "vp", "amount": 3}, "initial_culture": "taoism",
+                        "culture_slot_count": 2},  # 江南有两个文化空位
     Region.ZHONGYUAN: {"partial_vp": 6, "full_vp": 8, "locations": ["弘农","洛阳","雍丘","彭城","谯","东平"],
                         "culture_bonus": {"type": "vp", "amount": 2}, "initial_culture": None},
     Region.SHANXI:    {"partial_vp": 1, "full_vp": 2, "locations": ["平阳","太原","上党"],
@@ -115,22 +116,13 @@ def check_region_control(state: "GameState", region: Region) -> ControlResult:
     # --- Partial control check ---
     partial_controller = None
 
-    # Check individual players
+    # Check individual players (exclude sima)
     for pid, count in counts.items():
         if pid == "sima":
             continue
         if count > threshold:
             partial_controller = pid
             break
-
-    # Check Sima + Jin combined
-    if not partial_controller:
-        jin_sima_count = sum(
-            count for pid, count in counts.items()
-            if pid == "sima" or pid.startswith("jin_")
-        )
-        if jin_sima_count > threshold:
-            partial_controller = "sima"
 
     # --- Full control check ---
     full_controller = None
@@ -140,7 +132,21 @@ def check_region_control(state: "GameState", region: Region) -> ControlResult:
         if count == total:
             full_controller = pid
             break
-    # Sima can't have full control (it's NPC)
+
+    # --- Sima combined full control (jin+sima = all locations) ---
+    # Only applies when no individual has full or partial control.
+    if not full_controller and not partial_controller:
+        jin_sima_count = sum(
+            count for pid, count in counts.items()
+            if pid == "sima" or pid.startswith("jin_")
+        )
+        if jin_sima_count == total:
+            full_controller = "sima"
+        elif jin_sima_count > threshold:
+            partial_controller = "sima"
+
+    # Priority: individual full > individual partial >
+    #           sima combined full > sima combined partial > none
 
     # Update RegionState control_marker so it can be queried later (e.g. by game logger)
     # Initialize RegionState if missing (lazy init)

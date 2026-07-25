@@ -139,29 +139,54 @@ class LoggingAgentWrapper:
         return self._agent.request_court_play(state, eligible_cards=eligible_cards, filter_spec=filter_spec)
 
 
-def parse_preset_hands(argv: list[str]) -> dict[str, list[str]]:
-    """Parse --preset / -p arguments into preset_hands dict.
+def parse_preset_hands(argv: list[str]) -> tuple[dict[str, list[str]], list[str]]:
+    """Parse --preset / -p arguments into (preset_hands, bare_presets).
 
-    Format: player_id=card1,card2,...
-    Example: --preset jin_1=慧远,尊奉江东
-    Supports multiple -p flags.
+    preset_hands: dict mapping player_id -> card names
+    bare_presets: list of card names without a player_id prefix;
+                  these are auto-assigned to the human player in main().
+
+    Format:
+      --preset jin_1=鸩酒,还都洛阳      → preset_hands["jin_1"] = [...]
+      --preset=鸩酒,还都洛阳            → bare_presets = [...]  (auto → human)
+      -p jin_1=慧远 -p 还都洛阳,道安     → mix of both
     """
     result: dict[str, list[str]] = {}
-    for i, arg in enumerate(argv):
-        if arg in ("--preset", "-p") and i + 1 < len(argv):
-            val = argv[i + 1]
-            if "=" in val:
-                pid, names_str = val.split("=", 1)
-                # Split by comma: supports 中文逗号 and 英文逗号
-                names = [n.strip() for n in names_str.replace("，", ",").split(",") if n.strip()]
-                if pid not in result:
-                    result[pid] = []
-                result[pid].extend(names)
-            else:
-                print(f"[!] --preset 格式错误: 应为 player_id=牌名1,牌名2")
-                print(f"    例如: --preset jin_1=慧远,尊奉江东")
-                sys.exit(1)
-    return result
+    bare: list[str] = []
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        val = None
+        # Support both "--preset value" and "--preset=value" syntax
+        if arg in ("--preset", "-p"):
+            if i + 1 < len(argv):
+                val = argv[i + 1]
+                i += 2
+        elif arg.startswith("--preset="):
+            val = arg.split("=", 1)[1]
+            i += 1
+        elif arg.startswith("-p="):
+            val = arg.split("=", 1)[1]
+            i += 1
+        else:
+            i += 1
+            continue
+
+        if val is None:
+            i += 1
+            continue
+
+        if "=" in val:
+            pid, names_str = val.split("=", 1)
+            names = [n.strip() for n in names_str.replace("，", ",").split(",") if n.strip()]
+            if pid not in result:
+                result[pid] = []
+            result[pid].extend(names)
+        else:
+            # Bare value — auto-assign to human player later
+            names = [n.strip() for n in val.replace("，", ",").split(",") if n.strip()]
+            bare.extend(names)
+    return result, bare
 
 
 def select_faction(argv: list[str]) -> str:
@@ -179,6 +204,8 @@ def select_faction(argv: list[str]) -> str:
             continue
         if a in ("--preset", "-p"):
             skip_next = True
+            continue
+        if a.startswith("--preset=") or a.startswith("-p="):
             continue
         cleaned.append(a)
 
@@ -314,7 +341,7 @@ def _print_final_scoring_breakdown(state, scoring_result, winner: str, human_pid
 
 def main():
     # Parse preset hands from CLI before faction selection
-    preset_hands = parse_preset_hands(sys.argv)
+    preset_hands, bare_presets = parse_preset_hands(sys.argv)
 
     # Select faction
     chosen_faction = select_faction(sys.argv)
@@ -328,6 +355,12 @@ def main():
     else:
         # Backward compat: specific slot name
         human_pid = chosen_faction
+
+    # Auto-assign bare presets (no player_id= prefix) to the human player
+    if bare_presets:
+        if human_pid not in preset_hands:
+            preset_hands[human_pid] = []
+        preset_hands[human_pid].extend(bare_presets)
 
     print(f"\n  你选择了: {faction_label}")
     if chosen_faction == "jin":

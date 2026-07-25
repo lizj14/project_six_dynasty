@@ -1154,17 +1154,62 @@ class SpreadCultureOperator(EffectOperator):
                 })
                 return result
 
-        # 1. Hardcoded target_region in params
-        if step.params.get("target_region"):
-            action = SpreadCultureAction(
+        from models.enums import Region
+
+        def _build_spread_action(target_region: str, replace_culture: str = ""):
+            """Build a SpreadCultureAction, handling multi-slot region choice."""
+            if not replace_culture:
+                # Check if the target region needs a choice (multi-slot, all filled)
+                rs = state.regions.get(Region(target_region))
+                if rs:
+                    empty = [s for s in rs.culture_slots if s.culture is None]
+                    if not empty and len(rs.culture_slots) > 1:
+                        existing = rs.get_cultures()
+                        other = [c for c in existing if c.value != culture]
+                        if other and resolver.select_target_callback:
+                            replace_prompt = {
+                                "type": "spread_culture_replace",
+                                "title": f"[{target_region}] 所有文化空位已满，请选择要替换的文化标记",
+                                "options": [{"id": c.value, "label": c.value}
+                                           for c in other],
+                            }
+                            replace_culture = resolver.select_target_callback(
+                                player_id, replace_prompt)
+                            if not replace_culture:
+                                return None  # Player cancelled
+                        elif other:
+                            # No callback — auto-replace first non-matching culture
+                            replace_culture = other[0].value
+            return SpreadCultureAction(
                 player_id=player_id,
                 culture_type=culture,
-                target_region=step.params["target_region"],
+                target_region=target_region,
+                replace_culture=replace_culture,
             )
-            r = resolver.action_system.execute(state, action)
+
+        # Helper: execute a spread action and fire triggers on success
+        def _do_spread(spread_action) -> bool:
+            r = resolver.action_system.execute(state, spread_action)
             result.events.extend(r.events if r.success else [])
             if not r.success:
-                if not r.success: result.errors.append(r.error or "action failed")
+                result.errors.append(r.error or "action failed")
+                return False
+            # Fire passive triggers: cards like 慧远 gain VP when a friendly
+            # player spreads culture.
+            resolver._fire_trigger("on_spread_culture", player_id,
+                                   {"action": spread_action, "culture": culture})
+            return True
+
+        # 1. Hardcoded target_region in params
+        if step.params.get("target_region"):
+            action = _build_spread_action(step.params["target_region"])
+            if action is None:
+                result.events.append({
+                    "type": "spread_culture_requested",
+                    "culture": culture, "skipped": True, "reason": "replace_cancelled",
+                })
+                return result
+            _do_spread(action)
             return result
 
         # 2. Agent selects region
@@ -1181,15 +1226,14 @@ class SpreadCultureOperator(EffectOperator):
             }
             chosen = resolver.select_target_callback(player_id, prompt)
             if chosen:
-                action = SpreadCultureAction(
-                    player_id=player_id,
-                    culture_type=culture,
-                    target_region=chosen,
-                )
-                r = resolver.action_system.execute(state, action)
-                result.events.extend(r.events if r.success else [])
-                if not r.success:
-                    if not r.success: result.errors.append(r.error or "action failed")
+                action = _build_spread_action(chosen)
+                if action is None:
+                    result.events.append({
+                        "type": "spread_culture_requested",
+                        "culture": culture, "skipped": True, "reason": "replace_cancelled",
+                    })
+                    return result
+                _do_spread(action)
             else:
                 result.events.append({
                     "type": "spread_culture_requested",
@@ -1197,15 +1241,14 @@ class SpreadCultureOperator(EffectOperator):
                 })
         elif valid_regions:
             # No callback — just pick first valid region (deterministic fallback)
-            action = SpreadCultureAction(
-                player_id=player_id,
-                culture_type=culture,
-                target_region=valid_regions[0]["id"],
-            )
-            r = resolver.action_system.execute(state, action)
-            result.events.extend(r.events if r.success else [])
-            if not r.success:
-                if not r.success: result.errors.append(r.error or "action failed")
+            action = _build_spread_action(valid_regions[0]["id"])
+            if action is None:
+                result.events.append({
+                    "type": "spread_culture_requested",
+                    "culture": culture, "skipped": True, "reason": "replace_cancelled",
+                })
+                return result
+            _do_spread(action)
         else:
             result.events.append({
                 "type": "spread_culture_requested",
@@ -1232,8 +1275,8 @@ class SpreadCultureOperator(EffectOperator):
           valid: list of dicts {"id": region_value, "label": region_value, "reason": str}
           locked_out: list of region names excluded due to locked markers
         """
-        from rules.area_control import REGION_CONFIG, get_adjacent_regions
-        from models.enums import CultureType, ControlState
+        from rules.area_control import REGION_CONFIG, get_adjacent_regions, _player_id_to_control_state
+        from models.enums import CultureType
 
         culture_ct = CultureType(culture) if culture else None
 
@@ -1243,27 +1286,35 @@ class SpreadCultureOperator(EffectOperator):
             if rs.has_culture(culture_ct):
                 regions_with_culture.add(reg)
 
+        # Determine the ControlState that corresponds to this player
+        expected_control = _player_id_to_control_state(player_id)
+
         valid = []
         locked_out = []
         for reg, cfg in REGION_CONFIG.items():
             rs = state.regions.get(reg)
-            # Exclude regions that already have this culture marker
-            if rs and culture_ct and rs.has_culture(culture_ct):
-                continue
-            # Exclude regions with locked culture markers (cannot overwrite)
+            # Check culture slot availability for this region.
+            # Multi-slot regions may have the same culture in one slot and still
+            # have empty slots — those remain valid targets.
             if rs:
                 existing = rs.get_cultures()
-                if existing and any(rs.is_slot_locked(c) for c in existing):
-                    locked_names = "、".join(c.value for c in existing if rs.is_slot_locked(c))
+                empty_slots = [s for s in rs.culture_slots if s.culture is None]
+                unlocked_existing = [c for c in existing if not rs.is_slot_locked(c)]
+                # Region is fully locked: no empty slots AND all existing cultures locked
+                if not empty_slots and not unlocked_existing:
+                    locked_names = "、".join(c.value for c in existing)
                     locked_out.append(f"{reg.value}({locked_names}已锁定)")
                     continue
-            # Rulebook §"区域控制": region is controlled only if a
-            # control marker is present (partial: > threshold; full: all).
-            if rs and rs.control_marker is not None:
-                if player_id == "north":
-                    controls = (rs.control_marker == ControlState.NORTH)
-                else:
-                    controls = (rs.control_marker != ControlState.NORTH)
+                # Region has no room for THIS culture: no empty slots AND the
+                # culture already exists (single-slot or all slots filled with
+                # different cultures). A multi-slot region with empty slots
+                # can still accept the same culture again.
+                if not empty_slots and culture_ct and rs.has_culture(culture_ct):
+                    continue
+            # Rulebook §"区域控制": region is controlled only if the
+            # control marker belongs to THIS specific player (not faction-wide).
+            if rs and rs.control_marker is not None and expected_control is not None:
+                controls = (rs.control_marker == expected_control)
             else:
                 controls = False
             # Adjacent to a region that already has this culture marker on the map
@@ -1521,10 +1572,9 @@ class AddRefugeeOperator(EffectOperator):
                                   "target": target,
                                   "card": card.name})
 
-        if resolver:
-            resolver._fire_trigger("on_discard", player_id,
-                                   {"card": card if actual == 1 else None,
-                                    "count": actual, "source": "refugee_supply"})
+        # NOTE: Does NOT fire on_discard. "在弃牌区放置" (placing into
+        # discard from supply) is distinct from "弃置" (discarding from hand).
+        # Cards like 郗鉴 that trigger on "弃置[流民]" should NOT fire here.
 
         return result
 
@@ -2363,14 +2413,26 @@ class FlipCultureMarkerOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
 
-        # Find all regions that have a culture marker (with their culture types)
-        candidates = []  # list of (region_name, culture_type)
+        # Enumerate ALL culture markers on the map (one entry per slot).
+        # Multi-slot regions may have multiple markers of the same culture
+        # in different lock states — each slot is independently selectable.
+        _cl = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
+        candidates = []  # list of {id, region, culture, slot_idx, locked}
         for region, rs in state.regions.items():
-            for slot in rs.culture_slots:
+            rn = region.value if hasattr(region, 'value') else str(region)
+            for i, slot in enumerate(rs.culture_slots):
                 if slot.culture is not None:
-                    rn = region.value if hasattr(region, 'value') else str(region)
-                    candidates.append({"id": rn, "region": rn, "culture": slot.culture})
-                    break  # one entry per region (first non-empty slot)
+                    cname = slot.culture.value if hasattr(slot.culture, 'value') else str(slot.culture)
+                    label_cult = _cl.get(cname, cname)
+                    lock_label = "🔒" if slot.locked else "🔓"
+                    candidates.append({
+                        "id": f"{rn}:{i}",
+                        "region": rn,
+                        "culture": slot.culture,
+                        "slot_idx": i,
+                        "locked": slot.locked,
+                        "label": f"{rn}({label_cult}) {lock_label}",
+                    })
 
         if not candidates:
             result.events.append({"type": "flip_culture_marker",
@@ -2379,22 +2441,19 @@ class FlipCultureMarkerOperator(EffectOperator):
 
         chosen = candidates[0]
         if resolver and resolver.select_target_callback and len(candidates) > 1:
-            # Build options as region identifiers
-            _cl = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
-            options = [{"id": c["region"], "label": f"{c['region']}({_cl.get(c['culture'].value if hasattr(c['culture'], 'value') else str(c['culture']), '?')})"}
-                       for c in candidates]
+            options = [{"id": c["id"], "label": c["label"]} for c in candidates]
             prompt = {
                 "type": "flip_culture",
-                "options": [c["region"] for c in candidates],
+                "options": options,
                 "message": "选择1个版图上的文化标记翻面",
             }
             pick = resolver.select_target_callback(player_id, prompt)
             if pick:
-                matched = [c for c in candidates if c["region"] == pick or c["id"] == pick]
+                matched = [c for c in candidates if c["id"] == pick]
                 if matched:
                     chosen = matched[0]
 
-        # Toggle lock on the region's culture slot
+        # Toggle lock on the specific culture slot
         region_enum = None
         try:
             from models.enums import Region
@@ -2410,13 +2469,15 @@ class FlipCultureMarkerOperator(EffectOperator):
                 culture_type = ct if isinstance(ct, _CT) else _CT(ct) if isinstance(ct, str) else ct
             except (ValueError, KeyError):
                 culture_type = ct
-            old_locked = rs.is_slot_locked(culture_type)
-            rs.flip_culture_lock(culture_type)
+            slot_idx = chosen.get("slot_idx", 0)
+            old_locked = chosen.get("locked", False)
+            rs.flip_culture_lock(culture_type, slot_index=slot_idx)
             culture_name = culture_type.value if hasattr(culture_type, 'value') else str(culture_type)
             result.events.append({
                 "type": "flip_culture_marker",
                 "region": chosen["region"],
                 "culture": culture_name,
+                "slot_index": slot_idx,
                 "from_locked": old_locked,
                 "to_locked": not old_locked,
             })

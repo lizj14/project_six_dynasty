@@ -90,7 +90,7 @@ class RegionState:
     region: Region
     control_marker: Optional[ControlState] = None  # Who holds the control marker
     control_face_up: bool = True                   # Front/back face (背面 = 本回合不结算)
-    culture_slots: list[CultureSlot] = field(default_factory=list)
+    culture_slots: list[CultureSlot] = field(default_factory=lambda: [CultureSlot()])
 
     # ---- culture helpers ----
 
@@ -107,16 +107,51 @@ class RegionState:
                 return s.locked
         return False
 
-    def place_culture(self, ct: CultureType):
-        """Place a marker — fills empty slot or overwrites existing. Always locked."""
-        # Try to fill an empty slot first
+    def place_culture(self, ct: CultureType) -> str:
+        """Place a culture marker on this region.
+
+        Rulebook §5.1.6:
+          - 空位 → 放入
+          - 已有其他文化标记 → 移除并替换（单槽自动替换，多槽需选择）
+          - 已有相同文化 → 不可重复放置（视同锁定）
+
+        Returns status:
+          "placed"         — filled an empty slot
+          "already_exists" — same culture already present, skip
+          "replaced"       — single slot had different culture, auto-replaced
+          "need_choice"    — multiple slots all filled, caller must prompt which to replace
+        """
+        # 1. Check for empty slots first
+        empty_indices = [i for i, s in enumerate(self.culture_slots)
+                         if s.culture is None]
+        if empty_indices:
+            s = self.culture_slots[empty_indices[0]]
+            s.culture = ct
+            s.locked = True
+            return "placed"
+
+        # 2. Same culture already exists — treat as locked, skip
+        if self.has_culture(ct):
+            return "already_exists"
+
+        # 3. All slots filled with different cultures
+        filled = self.get_cultures()
+        if len(self.culture_slots) == 1:
+            # Single slot — auto-replace
+            self.culture_slots[0].culture = ct
+            self.culture_slots[0].locked = True
+            return "replaced"
+        else:
+            # Multiple slots — caller must choose which to replace
+            return "need_choice"
+
+    def replace_culture(self, old_ct: CultureType, new_ct: CultureType):
+        """Replace a specific culture marker with a new one. Always locks the new marker."""
         for s in self.culture_slots:
-            if s.culture is None:
-                s.culture = ct
+            if s.culture == old_ct:
+                s.culture = new_ct
                 s.locked = True
                 return
-        # No empty slot — append
-        self.culture_slots.append(CultureSlot(culture=ct, locked=True))
 
     def remove_culture(self, ct: CultureType):
         """Remove a culture marker from this region."""
@@ -126,8 +161,19 @@ class RegionState:
                 s.locked = False
                 return
 
-    def flip_culture_lock(self, ct: CultureType):
-        """Toggle lock state of a culture marker in this region."""
+    def flip_culture_lock(self, ct: CultureType, slot_index: int = 0):
+        """Toggle lock state of a culture marker in this region.
+
+        If slot_index is provided, flips that specific slot if it matches ct.
+        Otherwise finds the first matching slot.
+        """
+        # Specific slot requested
+        if 0 <= slot_index < len(self.culture_slots):
+            s = self.culture_slots[slot_index]
+            if s.culture == ct:
+                s.locked = not s.locked
+                return s.locked
+        # Fallback: find first matching slot
         for s in self.culture_slots:
             if s.culture == ct:
                 s.locked = not s.locked
