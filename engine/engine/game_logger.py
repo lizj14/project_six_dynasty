@@ -722,9 +722,45 @@ class GameLogger:
         lines.append(f"  结束原因: {self.log.end_reason}")
         lines.append(f"  总回合数: {self.log.total_rounds}")
         lines.append(f"")
+
+        # Detailed scoring steps
+        scoring = self.log.final_scoring or {}
+        steps = scoring.get("steps", [])
+        if steps:
+            for s in steps:
+                lines.append(f"  ▸ {s.get('name', '?')}")
+                detail = s.get("detail", "")
+                if isinstance(detail, dict):
+                    for k, v in detail.items():
+                        if isinstance(v, dict):
+                            lines.append(f"      {k}:")
+                            for sub_k, sub_v in v.items():
+                                if isinstance(sub_v, (int, float)):
+                                    lines.append(f"        {sub_k}: {sub_v} VP")
+                                else:
+                                    lines.append(f"        {sub_k}: {sub_v}")
+                        elif isinstance(v, list):
+                            lines.append(f"      {k}: {', '.join(str(x) for x in v)}")
+                        else:
+                            lines.append(f"      {k}: {v}")
+                elif isinstance(detail, list):
+                    for item in detail:
+                        if isinstance(item, dict):
+                            for dk, dv in item.items():
+                                lines.append(f"      {dk}: {dv}")
+                        else:
+                            lines.append(f"      - {item}")
+                elif detail:
+                    lines.append(f"      {detail}")
+                lines.append(f"")
+
+        # Final scores
+        faction_labels = {"north": "北方", "jin_1": "东晋-顾荣", "jin_2": "东晋-刘裕",
+                         "jin_3": "东晋-谢安", "sima": "司马家"}
         for pid, score in self.log.final_scores.items():
             marker = " ★胜者" if pid == self.log.winner else ""
-            lines.append(f"  {pid}: {score} VP{marker}")
+            label = faction_labels.get(pid, pid)
+            lines.append(f"  {label} ({pid}): {score} VP{marker}")
 
         return "\n".join(lines)
 
@@ -798,7 +834,8 @@ def describe_action(action: "GameAction", state: "GameState",
         target = getattr(action, 'target_location', '?')
         params["target"] = target
         costs["military"] = 1
-        desc = f"占据 → {target}"
+        sima = getattr(action, 'use_sima_army', False)
+        desc = f"占据 → {target}" + (" (司马家)" if sima else "")
 
     elif atype == "play_card":
         # Prefer result.events for card/payment names — they are captured
@@ -1108,6 +1145,12 @@ def log_action_result(logger, action, result, state):
             results["reform_vp"] = evt.get("vp", 0)
         if evt.get("type") == "archive_this":
             results["archived"] = True
+        if evt.get("type") == "capital_relocated":
+            results["capital_relocated"] = {
+                "to": evt.get("to", "?"),
+                "chosen_by": evt.get("chosen_by", "?"),
+                "was_player_location": evt.get("was_player_location", False),
+            }
 
     snap = snapshot_player_state(state, action.player_id)
     logger.log_action(

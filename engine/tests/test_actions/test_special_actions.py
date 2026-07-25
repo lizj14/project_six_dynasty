@@ -136,8 +136,15 @@ class TestSpreadCulture:
 
     def test_spread_culture_basic(self):
         from engine.actions.special_actions import SpreadCultureAction
-        from models.enums import CultureType
+        from models.enums import CultureType, Region, ControlState
+        from models.location import RegionState
+        from models.game_state import CultureTrackState
         state = make_state()
+        # Set up region control for 关中 so validation passes
+        state.regions[Region.GUANZHONG] = RegionState(region=Region.GUANZHONG)
+        state.regions[Region.GUANZHONG].control_marker = ControlState.NORTH
+        state.culture_tracks[CultureType.CONFUCIANISM] = CultureTrackState(
+            culture=CultureType.CONFUCIANISM)
         action = SpreadCultureAction(
             player_id="north", culture_type="confucianism",
             target_region="关中"

@@ -935,11 +935,8 @@ class ViewportMenu:
         ctrl = loc.get("controller", "?")
         print(f"  │ 控制者: {ctrl_labels.get(ctrl, ctrl)}")
         print(f"  │ 已加固: {'是 🏰' if loc.get('is_fortified') else '否'}")
-        culture = loc.get("culture_marker")
-        if culture:
-            print(f"  │ 文化标记: {culture}")
-        if loc.get("culture_locked"):
-            print(f"  │ 文化锁定: 是")
+        if loc.get("is_capital"):
+            print(f"  │ 📍 首都")
         print(f"  └──────────────────────────────────────────────")
         _any_key()
 

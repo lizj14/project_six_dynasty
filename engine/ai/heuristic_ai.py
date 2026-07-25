@@ -491,12 +491,21 @@ class HeuristicAI(GameAgent):
         return score
 
     def _score_convert(self, action, state) -> float:
-        """Score converting a location's culture."""
+        """Score converting a location — bonus if its region has culture."""
         score = 2.0
         target = getattr(action, 'target_location', '')
-        loc = state.locations.get(target)
-        if loc and loc.culture_marker is not None:
-            score += 1.0  # Converting existing marker is more valuable
+        # Check if the location's region has any culture marker (region-level)
+        from viewport.utils import _get_location_region
+        region_name = _get_location_region(target)
+        if region_name:
+            from models.enums import Region
+            try:
+                region = Region(region_name)
+                rs = state.regions.get(region)
+                if rs and rs.get_cultures():
+                    score += 1.0  # Converting in a region with culture is more valuable
+            except ValueError:
+                pass
         return score
 
     def _score_recruit(self, action, state) -> float:

@@ -239,12 +239,75 @@ class EffectResolver:
     # Step dispatch (thin — delegates to operators)
     # ================================================================
 
+    # Maps action names from on_action_this_turn to trigger_type constants
+    _ACTION_TO_TRIGGER: dict[str, str] = {
+        "march": "on_march",
+        "occupy": "on_occupy",
+        "fortify": "on_fortify",
+        "convert": "on_convert",
+    }
+
     def _execute_step(self, step: EffectStep, state: "GameState",
                       player_id: str, context: dict = None) -> ResolveResult:
         """Execute a single effect step by dispatching to its operator."""
+        # Intercept on_action_this_turn conditions — they register turn-level
+        # reactive triggers instead of checking a flag immediately.
+        # Example: 幽州突骑 "本回合执行[进军]时，获得1vp"
+        if (step.condition
+                and step.condition.condition_type == "on_action_this_turn"):
+            action = step.condition.params.get("action", "")
+            trigger_type = self._ACTION_TO_TRIGGER.get(action, "")
+            if trigger_type and hasattr(state, 'turn_triggers'):
+                source_card_id = (
+                    (context or {}).get("passive_card_id", "unknown")
+                    if context else "unknown"
+                )
+                # Strip the condition so the step executes unconditionally
+                # when the trigger fires (prevents re-registration loop).
+                trigger_step = EffectStep(
+                    effect_type=step.effect_type,
+                    params=dict(step.params),
+                    condition=None,
+                    source_text=step.source_text,
+                )
+                state.turn_triggers.append({
+                    "player_id": player_id,
+                    "trigger": trigger_type,
+                    "step": trigger_step,
+                    "source_card_id": source_card_id,
+                })
+                return ResolveResult(success=True, events=[{
+                    "type": "turn_trigger_registered",
+                    "trigger": trigger_type,
+                    "effect": step.effect_type,
+                    "player": player_id,
+                }])
+            # If trigger_type unknown or state has no turn_triggers,
+            # fall through to normal condition check.
+
         # Check condition before executing
         if step.condition and not self._check_condition(step.condition, state, player_id):
             return ResolveResult()
+
+        # Check step-level costs (e.g. 崔宏: 支付2军力转化相邻中立地点).
+        # For may=True steps the operator handles the cost after the agent
+        # decides to proceed (e.g. ConvertOperator after picking a target).
+        # For non-may steps we pay the cost unconditionally here, then strip
+        # it from params so the operator never sees it.
+        step_cost = step.params.get("cost")
+        if step_cost and not step.params.get("may", False):
+            cost_result = self._pay_cost_dict(step_cost, state, player_id)
+            if not cost_result.success:
+                return cost_result
+            # Strip cost from params so operators don't need to handle it
+            clean_params = dict(step.params)
+            clean_params.pop("cost", None)
+            step = EffectStep(
+                effect_type=step.effect_type,
+                params=clean_params,
+                condition=step.condition,
+                source_text=step.source_text,
+            )
 
         operator = OPERATOR_REGISTRY.get(step.effect_type)
         if operator is None:
@@ -492,3 +555,98 @@ class EffectResolver:
         if ct and ct in state.culture_tracks:
             return state.culture_tracks[ct].map_count
         return 0
+
+    def _pay_cost_dict(self, cost_dict: dict, state: "GameState",
+                       player_id: str) -> "ResolveResult":
+        """Pay a cost given as a dict (same structure as Cost dataclass fields).
+
+        Used for both block-level costs and step-level costs embedded in
+        step.params (e.g. 崔宏: 支付2军力转化相邻中立地点).
+
+        Returns ResolveResult with events on success, errors on failure.
+        Mutates state in place (deducts military, VP, discards cards, etc.).
+        """
+        result = ResolveResult()
+        cost_type = cost_dict.get("cost_type", "")
+        cost_params = cost_dict.get("params", {})
+        player = state.get_player(player_id)
+
+        if cost_type == "pay_military":
+            amount = cost_params.get("amount", 0)
+            if player and player.military < amount:
+                result.success = False
+                result.errors.append(
+                    f"Not enough military to pay cost: need {amount}, have {player.military}")
+                return result
+            if player:
+                player.military -= amount
+                result.events.append({"type": "pay_military", "amount": amount})
+
+        elif cost_type == "pay_vp":
+            amount = cost_params.get("amount", 0)
+            if player and player.vp < amount:
+                result.success = False
+                result.errors.append(
+                    f"Not enough VP to pay cost: need {amount}, have {player.vp}")
+                return result
+            if player:
+                player.vp -= amount
+                result.events.append({"type": "pay_vp", "amount": amount})
+
+        elif cost_type == "discard_cards":
+            count = cost_params.get("count", 1)
+            from_hand = cost_params.get("from_hand", True)
+            if from_hand and player and len(player.hand) < count:
+                result.success = False
+                result.errors.append(
+                    f"Not enough hand cards to pay cost: need {count}, have {len(player.hand)}")
+                return result
+            if player and from_hand:
+                discarded = []
+                if self.choose_discard_callback:
+                    hand_names = [c.name for c in player.hand]
+                    chosen = self.choose_discard_callback(player_id, hand_names, count)
+                    for idx in sorted(chosen, reverse=True):
+                        if 0 <= idx < len(player.hand):
+                            discarded.append(player.hand.pop(idx))
+                else:
+                    for _ in range(count):
+                        if player.hand:
+                            discarded.append(player.hand.pop())
+                if discarded:
+                    target = cost_params.get("target", "main")
+                    events = state.discard_cards(
+                        player_id, discarded, target=target, source="hand",
+                        reason="cost")
+                    result.events.extend(events)
+                    for card in discarded:
+                        self._fire_trigger("on_discard", player_id, {"card": card})
+
+        elif cost_type == "abandon_court_card":
+            count = cost_params.get("count", 1)
+            court = state.get_court_cards(player_id)
+            if len(court) < count:
+                result.success = False
+                result.errors.append(
+                    f"Not enough court cards to abandon: need {count}, have {len(court)}")
+                return result
+            abandoned = []
+            if self.choose_court_callback:
+                court_names = [c.name for c in court]
+                chosen = self.choose_court_callback(player_id, court_names, count)
+                for idx in sorted(chosen, reverse=True):
+                    if 0 <= idx < len(court):
+                        abandoned.append(court.pop(idx))
+            else:
+                for _ in range(count):
+                    if court:
+                        abandoned.append(court.pop())
+            if abandoned:
+                events = state.discard_cards(
+                    player_id, abandoned, target="national", source="court",
+                    reason="abandon_court_card")
+                result.events.extend(events)
+                for card in abandoned:
+                    self._fire_trigger("on_discard", player_id, {"card": card})
+
+        return result

@@ -78,7 +78,8 @@ def _allocate_initial_order_seq(state: GameState):
 def setup_game(library: CardLibrary, agents: list,
                seed: int = 0, version=None,
                map_adjacencies: list = None,
-               action_system=None, logger=None) -> GameState:
+               action_system=None, logger=None,
+               preset_hands: dict[str, list[str]] = None) -> GameState:
     """Initialize a complete game state from scratch.
 
     Args:
@@ -87,6 +88,10 @@ def setup_game(library: CardLibrary, agents: list,
         seed: Random seed for reproducibility
         action_system: ActionSystem for executing card actions (optional)
         logger: GameLogger for recording setup actions (optional)
+        preset_hands: Optional dict mapping player_id → list of card names
+            guaranteed to be in that player's initial hand. Useful for testing
+            specific card interactions.
+            Example: {"jin_1": ["慧远", "尊奉江东"]}
     """
     rng = random.Random(seed)
 
@@ -96,7 +101,7 @@ def setup_game(library: CardLibrary, agents: list,
 
     # Phase 2+3: Deal cards + agent setup decisions
     public_pool_cards, main_deck_cards, setup_discard_pile = _deal_and_select_cards(
-        library, players, agents, rng)
+        library, players, agents, rng, preset_hands)
 
     # Phase 4+5: Build national decks + assemble GameState
     state = _build_game_state(
@@ -143,10 +148,17 @@ def _create_setup_players() -> tuple[PlayerState, PlayerState, PlayerState, Play
 
 
 def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
-                           agents: list, rng: random.Random
+                           agents: list, rng: random.Random,
+                           preset_hands: dict[str, list[str]] = None,
                            ) -> tuple[list[Card], list[Card], list[Card]]:
     """Shuffle pools, deal hero/goal candidates, build hands + main deck,
     then run agent setup_decision() to select hero/goal/face-down card.
+
+    Args:
+        preset_hands: Optional dict mapping player_id → list of card names
+            to guarantee in that player's initial hand. Cards are pulled from
+            the main deck before the random draw; remaining slots are filled
+            randomly.  Example: {"jin_1": ["慧远", "尊奉江东"]}
 
     Returns:
         (public_pool_cards, main_deck_cards, setup_discard_pile)
@@ -229,6 +241,29 @@ def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
     for cdef in chosen_north_friends:
         north.hand.append(Card(definition=cdef, owner_player_id="north"))
         allocated_card_ids.add(cdef.card_id)
+
+    # === Preset hands: pre-allocate specified cards before random draw ===
+    if preset_hands:
+        for player in [north, jin1, jin2, jin3]:
+            wanted = preset_hands.get(player.player_id, [])
+            if not wanted:
+                continue
+            for card_name in wanted:
+                found = False
+                for i, card in enumerate(main_deck_cards):
+                    if card.name == card_name:
+                        main_deck_cards.pop(i)
+                        card.owner_player_id = player.player_id
+                        player.hand.append(card)
+                        found = True
+                        break
+                if not found:
+                    available = [c.name for c in main_deck_cards[:20]]
+                    raise ValueError(
+                        f"preset_hands: card '{card_name}' not found in main deck "
+                        f"for player '{player.player_id}'. "
+                        f"First 20 available: {available}"
+                    )
 
     # --- Draw from main deck: North→10, Jin→8 ---
     _setup_discard_pile: list = []
@@ -354,11 +389,18 @@ def _build_game_state(library: CardLibrary,
         north_national.append(Card(definition=jin_start))
     north_national = north_national[:10]
 
+    # --- Refugee supply (流民供应堆, 16 cards) ---
+    refugee_supply_cards = []
+    if refugee_def:
+        for _ in range(16):
+            refugee_supply_cards.append(Card(definition=refugee_def))
+
     # --- Create GameState ---
     state = GameState(round=0, phase=PhaseType.SETUP, seed=seed)
     state.north_player = north
     state.jin_players = [jin1, jin2, jin3]
     state.turn_order = ["north", "jin_1", "jin_2", "jin_3"]
+    state.refugee_supply = refugee_supply_cards
 
     # Initialize culture tracks (儒学/玄学/佛学)
     from models.enums import CultureType
@@ -380,28 +422,37 @@ def _build_game_state(library: CardLibrary,
     # Map setup
     state.locations = _create_initial_locations()
 
-    # Rulebook §4.1 step 1: Place initial culture markers
-    # 江南→玄学, 山东→儒学, 西凉→佛学
+    # Initialize RegionState for each region (lazy-init was broken — done in scoring too late)
     from rules.area_control import REGION_CONFIG
     from models.enums import CultureType as _CT
+    from models.location import RegionState
     _culture_name_to_enum = {"confucianism": _CT.CONFUCIANISM,
                               "taoism": _CT.TAOISM,
                               "buddhism": _CT.BUDDHISM}
+    for _reg in REGION_CONFIG:
+        if _reg not in state.regions:
+            state.regions[_reg] = RegionState(region=_reg)
+
+    # Rulebook §4.1 step 1: Place initial culture markers
+    # 江南→玄学, 山东→儒学, 西凉→佛学
     for _reg, _cfg in REGION_CONFIG.items():
         _init_cult = _cfg.get("initial_culture")
-        if _init_cult and _cfg.get("locations"):
-            _first_loc = _cfg["locations"][0]
-            if _first_loc in state.locations:
-                _ct_enum = _culture_name_to_enum.get(_init_cult)
-                if _ct_enum:
-                    state.locations[_first_loc].culture_marker = _ct_enum
+        if _init_cult:
+            _ct_enum = _culture_name_to_enum.get(_init_cult)
+            if _ct_enum:
+                state.regions[_reg].place_culture(_ct_enum)
+                # Unlock initial markers (placed during setup, should be face-up)
+                state.regions[_reg].unlock_all()
 
-    # Update culture track map_count from placed initial markers
+    # Update culture track map_count + supply_level from region-level markers
+    # §5.1.6: 文化等级 = 供应轨露出的格子数 (supply_level)
+    # Initial markers also come from supply, so both trackers start equal
     for _ct in [_CT.CONFUCIANISM, _CT.TAOISM, _CT.BUDDHISM]:
-        _count = sum(1 for _loc in state.locations.values()
-                     if _loc.culture_marker == _ct)
+        _count = sum(1 for _rs in state.regions.values()
+                     if _rs.has_culture(_ct))
         if _ct in state.culture_tracks:
             state.culture_tracks[_ct].map_count = _count
+            state.culture_tracks[_ct].supply_level = _count
 
     state.main_discard.extend(setup_discard_pile)
 
@@ -721,9 +772,9 @@ def run_settlement_phase(state: GameState, rng: random.Random):
     _refresh_court(state, "north", rng)
     _refresh_court(state, "jin", rng)
 
-    # Unlock culture markers
-    for loc in state.locations.values():
-        loc.culture_locked = False
+    # Unlock culture markers (region-level)
+    for rs in state.regions.values():
+        rs.unlock_all()
 
     # Reset region control markers to face-up for new round
     from rules.scoring import reset_region_control_markers

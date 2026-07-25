@@ -17,6 +17,21 @@ from .phases import (
 )
 
 
+def _target_type_short_label(t: str) -> str:
+    """Short label for target type in forced event resolution display."""
+    labels = {
+        "player": "目标玩家",
+        "jin_player": "目标东晋玩家",
+        "north_player": "目标北方玩家",
+        "other_jin_player": "其他东晋玩家",
+        "other_player": "其他玩家",
+        "friendly_player": "友方玩家",
+        "location": "目标地点",
+        "sima": "目标司马家地点",
+    }
+    return labels.get(t, f"目标({t})")
+
+
 class GameEngine:
     """Main game orchestrator. Ties together phases, agents, and action system.
 
@@ -28,7 +43,8 @@ class GameEngine:
                  version: "Version" = None,
                  seed: int = 0, action_system: ActionSystem = None,
                  logger: "GameLogger" = None,
-                 on_action_executed: callable = None):
+                 on_action_executed: callable = None,
+                 preset_hands: dict[str, list[str]] = None):
         # Support both old (library=) and new (version=) API
         if version is not None:
             self.library = version.card_library
@@ -49,6 +65,7 @@ class GameEngine:
         self.logger = logger
         self.on_action_executed = on_action_executed  # Optional: fn(state, player_id, action, result)
         self.check_early_quit = None  # Optional: fn() -> bool, called after each player turn
+        self.preset_hands = preset_hands  # Optional: dict[player_id] → list of card names
 
     def run(self) -> GameState:
         """Run a complete game from setup to game over."""
@@ -59,6 +76,7 @@ class GameEngine:
             map_adjacencies=self.map_adjacencies,
             action_system=self.action_system,
             logger=self.logger,
+            preset_hands=self.preset_hands,
         )
         self._post_setup_init()
 
@@ -78,7 +96,10 @@ class GameEngine:
             scores = {p.player_id: p.vp for p in self.state.get_all_players()}
             winner = self._determine_winner()
             self.logger.log_final_scoring(
-                scoring_result={"steps": [s["name"] for s in scoring_result.steps]},
+                scoring_result={"steps": [
+                    {"name": s["name"], "detail": s.get("detail", "")}
+                    for s in scoring_result.steps
+                ]},
                 winner=winner,
                 scores=scores,
                 end_reason=self.state.game_end_reason or "round_10",
@@ -102,6 +123,7 @@ class GameEngine:
             map_adjacencies=self.map_adjacencies,
             action_system=self.action_system,
             logger=self.logger,
+            preset_hands=self.preset_hands,
         )
         self._post_setup_init()
 
@@ -166,8 +188,8 @@ class GameEngine:
                 if loc and loc.controller.value == "sima":
                     context["target_is_sima"] = True
 
-        elif atype in ("march", "convert"):
-            # Check events for sima_army_used signal from card effects
+        elif atype == "occupy":
+            # Check events for sima_army_used signal
             for evt in (result.events or []):
                 if evt.get("type") == "sima_army_used":
                     context["used_sima_army"] = True
@@ -175,25 +197,32 @@ class GameEngine:
 
         elif atype == "play_card":
             card_index = getattr(action, 'card_index', None)
-            if card_index is not None and player:
-                try:
-                    card = player.hand[card_index]
-                    if card.definition.has_marker("culture"):
-                        context["has_culture_marker"] = True
-                    if card.definition.card_type.value == "strategy":
-                        context["is_strategy"] = True
-                except (IndexError, AttributeError):
-                    pass
+            if card_index is not None and player and self.library:
+                # After execution the card is gone from hand; use result events
+                # to determine what was played and look up its definition.
+                card_name = None
+                for evt in (result.events or []):
+                    if evt.get("type") == "play_card":
+                        card_name = evt.get("card", "")
+                        break
+                if card_name:
+                    defns = self.library.get_by_name(card_name)
+                    if defns:
+                        defn = defns[0]
+                        if defn.has_marker("culture"):
+                            context["has_culture_marker"] = True
+                        if defn.card_type.value == "strategy":
+                            context["is_strategy"] = True
 
         elif atype == "court_action":
             card_id = getattr(action, 'card_id', None)
-            if card_id:
-                court = state.get_court_cards(player_id)
-                for c in court:
-                    if c.definition.card_id == card_id:
-                        if c.definition.has_marker("culture"):
-                            context["has_culture_marker"] = True
-                        break
+            if card_id and self.library:
+                # Use library lookup instead of re-reading court state,
+                # because the card has already been removed from court
+                # by the action execution.
+                defn = self.library.get(card_id)
+                if defn and defn.has_marker("culture"):
+                    context["has_culture_marker"] = True
 
         elif atype == "activate_effect":
             card_id = getattr(action, 'card_id', None)
@@ -522,9 +551,12 @@ class GameEngine:
         pre_turn_mil = player.military
 
         # Rulebook §4.2: 玩家行动开始时结算区控奖励
-        award_region_control_phase(state, player_id=player_id)
+        # Fire on_region_reward triggers FIRST — they may set overrides
+        # (e.g. 草原部落 changes partial/full VP to 0/1).
         self._check_triggers("on_region_reward",
                              {"player_id": player_id, "phase": "player_action"})
+        # THEN award region VP (respects region_reward_override on player)
+        award_region_control_phase(state, player_id=player_id)
 
         # Fire turn_start triggers
         self._check_triggers("on_turn_start", {"player_id": player_id})
@@ -549,14 +581,52 @@ class GameEngine:
         # Draw 2 cards
         draw_events = run_player_draw(state, player_id)
 
-        # Print forced event triggers to terminal (for all players — useful debugging)
-        for e in draw_events:
-            if e.get("type") == "forced_event_drawn":
-                card_name = e.get("card", "?")
-                card_text = e.get("card_text", "")
-                print(f"\n  ⚡ [强制事件] {card_name} 触发!")
-                if card_text:
-                    print(f"     效果: {card_text}")
+        # Print forced event triggers AND their resolutions to terminal
+        # (so human players can see what AI selected and what happened)
+        if self._has_human_player():
+            for e in draw_events:
+                if e.get("type") == "forced_event_drawn":
+                    card_name = e.get("card", "?")
+                    card_text = e.get("card_text", "")
+                    print(f"\n  ⚡ [强制事件] {card_name} 触发!")
+                    if card_text:
+                        print(f"     效果: {card_text}")
+                elif e.get("type") == "targeted_effect":
+                    targets = e.get("targets", [])
+                    ttype = e.get("target_type", "?")
+                    label = _target_type_short_label(ttype)
+                    if targets:
+                        print(f"     → {label}: {'，'.join(targets)}")
+                    skipped = e.get("skipped", False)
+                    if skipped:
+                        print(f"     → ({e.get('reason', '无目标')})")
+                elif e.get("type") in ("prestige_gained", "raise_prestige"):
+                    pid = e.get("player", "?")
+                    amt = e.get("amount", 0)
+                    print(f"     → {pid} 威望+{amt}")
+                elif e.get("type") in ("lower_prestige",):
+                    amt = e.get("amount", 0)
+                    print(f"     → 威望-{amt}")
+                elif e.get("type") == "gain_vp":
+                    amt = e.get("amount", 0)
+                    print(f"     → +{amt} VP")
+                elif e.get("type") == "lose_contribution":
+                    amt = e.get("amount", 0)
+                    print(f"     → 功绩-{amt}")
+                elif e.get("type") == "convert_to_neutral":
+                    loc = e.get("location", "?")
+                    print(f"     → {loc} 转为中立")
+                elif e.get("type") == "discard":
+                    card = e.get("card", "?")
+                    print(f"     → 弃牌: {card}")
+                elif e.get("type") == "draw":
+                    card = e.get("card", "?")
+                    print(f"     → 摸牌: {card}")
+                elif e.get("type") == "add_refugee_requested":
+                    target = e.get("target", "?")
+                    print(f"     → 放置流民到 {target}")
+            # Print a blank line after all forced event resolutions
+            if any(e.get("type") == "forced_event_drawn" for e in draw_events):
                 print()
 
         if self.logger:
@@ -586,6 +656,12 @@ class GameEngine:
                 break
 
             result = self.action_system.execute(state, action)
+
+            # Show validation errors to human players
+            if not result.success:
+                if hasattr(agent, '_request_early_quit'):  # HumanPlayer
+                    err_msg = result.error or "未知原因"
+                    print(f"     ↳ ❌ 行动失败: {err_msg}")
 
             # Fire passive triggers based on action type
             if result.success:
@@ -749,6 +825,10 @@ class GameEngine:
         # Fire turn_end triggers
         self._check_triggers("on_turn_end", {"player_id": player_id})
 
+        # Clear turn-level pending triggers (e.g. 幽州突骑 march VP bonus)
+        if hasattr(state, 'turn_triggers'):
+            state.turn_triggers.clear()
+
         # Rulebook §3.4: 基于部队储备区露出的数字获得军力，然后清零
         is_north = (player.faction == FactionType.NORTH)
         revealed_vp, revealed_mil = get_reserve_revealed(
@@ -901,6 +981,9 @@ class GameEngine:
         Called after any game event that may trigger passive abilities.
         Scans staff_area + history_area of all players for blocks with
         matching trigger, checks scope/filter, then executes via resolver.
+
+        Also checks turn-level pending triggers (registered by effects like
+        幽州突骑 "本回合执行[进军]时，获得1vp") and fires matching ones.
         """
         if context is None:
             context = {}
@@ -949,6 +1032,34 @@ class GameEngine:
                         ctx_summary["action_type"] = getattr(action, 'action_type', '')
                     self.logger.log_trigger(
                         trigger_type, owner_id, card.name, ctx_summary,
+                    )
+
+        # ── Turn-level pending triggers ──────────────────────────
+        # e.g. 幽州突骑 "本回合执行[进军]时，获得1vp"
+        if hasattr(state, 'turn_triggers') and state.turn_triggers:
+            for entry in state.turn_triggers:
+                if entry["trigger"] != trigger_type:
+                    continue
+                if entry["player_id"] != context.get("player_id", ""):
+                    continue
+
+                step = entry["step"]
+                block_ctx = dict(context)
+                block_ctx["passive_card_id"] = entry.get("source_card_id", "unknown")
+                block_ctx["passive_trigger"] = trigger_type
+                resolver._execute_step(
+                    step, state, entry["player_id"], block_ctx)
+
+                # Log the turn trigger firing
+                if self.logger:
+                    ctx_summary = {
+                        "triggered_by": trigger_type + " (turn)",
+                        "event_player": context.get("player_id", ""),
+                    }
+                    self.logger.log_trigger(
+                        trigger_type, entry["player_id"],
+                        entry.get("source_card_id", "unknown"),
+                        ctx_summary,
                     )
 
     def _get_passive_sources(self) -> list[tuple["Card", str]]:
@@ -1016,10 +1127,11 @@ class GameEngine:
 
         if "card_type" in filter_spec:
             ct = filter_spec["card_type"]
-            # Card.card_type returns a CardType enum; use .value for comparison
-            ctv = card.card_type.value if hasattr(card.card_type, 'value') else str(card.card_type)
-            if ctv != ct:
-                return False
+            # "any" means no restriction — pass all card types
+            if ct != "any":
+                ctv = card.card_type.value if hasattr(card.card_type, 'value') else str(card.card_type)
+                if ctv != ct:
+                    return False
 
         return True
 

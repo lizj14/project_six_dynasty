@@ -325,6 +325,8 @@ class HumanPlayer(GameAgent):
         options = prompt.get("options", [])
         title = prompt.get("title", prompt.get("message", "选择一个目标"))
         prompt_type = prompt.get("type", "")
+        source_card = prompt.get("source_card", "")
+
         # Add context about what kind of selection this is
         type_labels = {
             "spread_culture_requested": "传播文化",
@@ -337,12 +339,25 @@ class HumanPlayer(GameAgent):
             "player": "选择玩家",
             "location": "选择地点",
             "choose_effect": "效果选择",
+            "jin_player": "选择东晋玩家",
+            "north_player": "选择北方玩家",
+            "other_jin_player": "选择其他东晋玩家",
+            "other_player": "选择其他玩家",
+            "friendly_player": "选择友方玩家",
+            "sima": "选择司马家地点",
         }
-        context = type_labels.get(prompt_type, "")
-        if context:
-            print(f"\n  [{context}] {title}:")
+
+        # Print header with source card context
+        print()
+        if source_card:
+            print(f"  ┌─ 效果来源: 「{source_card}」")
+            print(f"  │ {title}:")
         else:
-            print(f"\n  {title}:")
+            context = type_labels.get(prompt_type, "")
+            if context:
+                print(f"  [{context}] {title}:")
+            else:
+                print(f"\n  {title}:")
         for i, opt in enumerate(options):
             if isinstance(opt, dict):
                 label = opt.get('label', opt.get('id', str(opt)))
@@ -355,7 +370,29 @@ class HumanPlayer(GameAgent):
                 print(f"    {i+1}. {opt}")
         if not options:
             print("    (无可用目标)")
+            # Show locked regions hint if any
+            locked_out = prompt.get("locked_out", [])
+            excluded = prompt.get("excluded", {})
+            if locked_out:
+                print(f"    ⚠ 以下区域因文化标记已锁定，无法选择：")
+                for lr in locked_out:
+                    print(f"      • {lr}")
+            if excluded:
+                print(f"    ⚠ 以下地点已被过滤，无法选择：")
+                for loc_name, reason in excluded.items():
+                    print(f"      • {loc_name}（{reason}）")
             return None
+        # Show locked regions hint before listing available ones
+        locked_out = prompt.get("locked_out", [])
+        excluded = prompt.get("excluded", {})
+        if locked_out:
+            print(f"    ⚠ 以下区域因文化标记已锁定，不可选：")
+            for lr in locked_out:
+                print(f"      • {lr}")
+        if excluded:
+            print(f"    ⚠ 以下地点已被过滤，不可选：")
+            for loc_name, reason in excluded.items():
+                print(f"      • {loc_name}（{reason}）")
         idx = self._input_index("选择目标", len(options))
         opt = options[idx]
         if isinstance(opt, dict):
@@ -435,7 +472,7 @@ class HumanPlayer(GameAgent):
                 pass
             print("  无效选择，重新输入")
 
-    def request_court_play(self, state: "GameState") -> Optional["GameAction"]:
+    def request_court_play(self, state: "GameState", eligible_cards=None, filter_spec=None) -> Optional["GameAction"]:
         """Called when an effect grants an extra court action (e.g. 刘裕 with 4 markers).
 
         Shows available court cards and lets the player choose one to execute
@@ -445,7 +482,7 @@ class HumanPlayer(GameAgent):
         if not player:
             return None
 
-        court = state.get_court_cards(self.player_id)
+        court = eligible_cards if eligible_cards is not None else state.get_court_cards(self.player_id)
         if not court:
             print("\n  ⚡ 获得额外朝堂行动，但朝堂区为空!")
             return None
@@ -709,6 +746,12 @@ class HumanPlayer(GameAgent):
             elif t == "staff_replaced":
                 print(f"     ↳ 替换幕僚: 「{evt.get('card', '?')}」"
                       f" → 「{evt.get('replaced_by', '?')}」")
+            elif t == "capital_relocated":
+                to_loc = evt.get("to", "?")
+                chosen_by = evt.get("chosen_by", "?")
+                was_player = evt.get("was_player_location", False)
+                extra = " — 东晋玩家+1功绩" if was_player else ""
+                print(f"     📍 首都迁至「{to_loc}」(由{chosen_by}选择){extra}")
             elif t == "archive_card":
                 print(f"     ↳ 存档: 「{evt.get('card', '?')}」")
             elif t == "raise_order":
@@ -888,7 +931,8 @@ class HumanPlayer(GameAgent):
 
         elif atype == "occupy":
             target = getattr(action, 'target_location', '?')
-            return f"占据 → {target}"
+            sima = getattr(action, 'use_sima_army', False)
+            return f"占据 → {target}" + (" (司马家)" if sima else "")
 
         elif atype == "fortify":
             target = getattr(action, 'target_location', '?')

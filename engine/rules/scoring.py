@@ -91,9 +91,10 @@ def score_culture(state: "GameState") -> dict:
     details = {}
 
     for culture in CultureType:
-        # Count markers on map
-        n = sum(1 for loc in state.locations.values()
-                if loc.culture_marker == culture)
+        # 文化等级 = 供应轨露出的格子数 (supply_level)
+        # Includes markers removed from supply by spread_culture AND card effects (佛经翻译/太学)
+        track = state.culture_tracks.get(culture)
+        n = track.supply_level if track else 0
 
         if n == 0:
             details[culture.value] = {"markers": 0, "vp_awarded": {}}
@@ -367,6 +368,17 @@ def award_region_control_phase(state: "GameState", player_id: str = None):
                 vp = cr.full_vp
             else:
                 vp = cr.partial_vp
+
+            # Apply region_reward_override if set on the player
+            # (e.g. 草原部落 changes partial/full VP to 0/1)
+            if target != "sima":
+                player = state.get_player(target)
+                override = getattr(player, 'region_reward_override', None) if player else None
+                if override:
+                    if cr.full_controller == target:
+                        vp = override.get("full", vp)
+                    else:
+                        vp = override.get("partial", vp)
 
             if target == "sima":
                 state.sima.vp += vp

@@ -116,6 +116,8 @@ class EffectType:
 
     # Culture
     RAISE_CULTURE_LEVEL = "raise_culture_level"
+    REMOVE_CULTURE_MARKER = "remove_culture_marker"  # 移除文化标记 (供应轨)
+    FLIP_CULTURE_MARKER = "flip_culture_marker"      # 翻面文化标记
 
     # Markers / Tokens
     GET_EXPEDITION = "get_expedition"
@@ -123,6 +125,14 @@ class EffectType:
     PLACE_ARMY = "place_army"
     REMOVE_ARMY = "remove_army"
     REMOVE_FROM_GAME = "remove_from_game"
+
+    # Card interaction
+    GIVE_CARD = "give_card"                  # 给予手牌
+    STEAL_RANDOM_CARD = "steal_random_card"  # 随机偷牌
+    OWNER_ARCHIVE_CARD = "owner_archive_card"  # 卡牌所有者存档
+
+    # Court
+    ABANDON_COURT_CARD = "abandon_court_card"  # 弃置朝堂牌 (作为步骤)
 
     # Choices
     CHOOSE = "choose"
@@ -134,6 +144,8 @@ class EffectType:
 
     # Meta-effects
     EXTRA_ACTION = "extra_action"
+    EXTRA_COURT_ACTION = "extra_court_action"
+    EXTRA_HAND_ACTION = "extra_hand_action"
     TARGETED_EFFECT = "targeted_effect"
     RESHUFFLE_EMPEROR = "reshuffle_emperor"  # 重洗君主牌堆
 
@@ -141,6 +153,11 @@ class EffectType:
     CONVERT_OWN_TO_NEUTRAL = "convert_own_to_neutral"
     CONVERT_TO_NEUTRAL = "convert_to_neutral"
     CONVERT_TO_SIMA = "convert_to_sima"
+    SWAP_TROOPS = "swap_troops"              # 交换部队位置
+
+    # Modifiers (passive)
+    MARCH_COST_REDUCTION = "march_cost_reduction"      # 进军费用减免
+    REGION_REWARD_OVERRIDE = "region_reward_override"  # 区域奖励覆盖
 
 
 class AbilityType:
@@ -150,9 +167,9 @@ class AbilityType:
     ENTER = "enter"
     FORCED = "forced"
     STRATEGY_ACTION = "strategy_action"
-    STRATEGY_PASSIVE = "strategy_passive"
+    # STRATEGY_PASSIVE = "strategy_passive"  # 预留，零引用 — 被动策略未使用此 ability_type
     RESOURCE_OPTION = "resource_option"
-    USURP = "usurp"
+    # USURP = "usurp"  # 预留 — 僭越功能通过 AbilityBlock.usurp_steps + is_usurp 实现
 
 
 class TriggerType:
@@ -174,6 +191,6 @@ class TriggerType:
     ON_USURP = "on_usurp"
     ON_COURT_ACTION = "on_court_action"
     ON_CARD_LEAVE = "on_card_leave"
-    ON_CARD_ENTER = "on_card_enter"
+    # ON_CARD_ENTER = "on_card_enter"  # 预留：解析器(effect_parser.py:930)及触发分发均未实现
     ON_REGION_REWARD = "on_region_reward"
-    ALWAYS = "always"
+    # ALWAYS = "always"  # 预留：解析器内部默认值，无触发分发。已用 None 替代

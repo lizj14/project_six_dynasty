@@ -41,14 +41,16 @@ class CardSummary(TypedDict, total=False):
 class LocationSummary(TypedDict):
     controller: str                # "north", "jin_p1", "sima", "neutral", "empty"
     is_fortified: bool
-    culture_marker: Optional[str]  # "confucianism", "taoism", "buddhism", or None
-    culture_locked: bool
+    region: str                    # Region this location belongs to
+    is_capital: bool               # Whether this is the Sima capital location
 
 
 class RegionSummary(TypedDict):
     name: str
     control_marker: Optional[str]  # which player's marker, or None
     locations: list[str]           # location IDs in this region
+    culture_markers: list[dict]    # [{"type": "玄学", "locked": bool}, ...]
+    culture_slot_count: int        # total culture slots in region
 
 
 # ================================================================

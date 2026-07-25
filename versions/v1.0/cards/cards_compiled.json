@@ -23,7 +23,7 @@
                 "effect_type": "draw_cards"
               },
               {
-                "effect_type": "extra_action",
+                "effect_type": "extra_hand_action",
                 "params": {
                   "action_type": "hand_action",
                   "may": true
@@ -84,7 +84,7 @@
                 "effect_type": "draw_cards"
               },
               {
-                "effect_type": "extra_action",
+                "effect_type": "extra_court_action",
                 "params": {
                   "action_type": "court_action",
                   "may": true
@@ -516,7 +516,7 @@
             "ability_type": "active",
             "steps": [
               {
-                "effect_type": "extra_action",
+                "effect_type": "extra_court_action",
                 "params": {
                   "action_type": "court_action"
                 },

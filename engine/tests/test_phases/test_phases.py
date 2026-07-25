@@ -31,6 +31,55 @@ class TestSetupGame:
         # Jin players have orders 0, 1, 2
         assert [p.order for p in state.jin_players] == [0, 1, 2]
 
+    def test_preset_hands_guarantees_cards_in_hand(self):
+        """preset_hands ensures specified cards are in the player's hand."""
+        from engine.phases import setup_game
+        from config.version import Version
+        v = Version.load("v1.0")
+        from ai.dummy_ai import DummyAI
+        agents = [
+            DummyAI("north", 1),
+            DummyAI("jin_1", 2),
+            DummyAI("jin_2", 3),
+            DummyAI("jin_3", 4),
+        ]
+        # Find two non-hero, non-goal cards for testing
+        eligible = [c for c in v.card_library.all_cards
+                    if c.card_type.value not in ("hero", "goal", "emperor",
+                        "refugee", "initial", "public")
+                    and c.owner_faction != "初始"]
+        assert len(eligible) >= 2, "Need at least 2 eligible cards for test"
+        card1, card2 = eligible[0].name, eligible[1].name
+
+        state = setup_game(
+            v.card_library, agents, seed=42,
+            version=v,
+            preset_hands={"jin_1": [card1, card2]},
+        )
+        jin1 = state.jin_players[0]
+        jin1_hand = [c.name for c in jin1.hand]
+        assert card1 in jin1_hand, f"{card1!r} should be in jin_1 hand"
+        assert card2 in jin1_hand, f"{card2!r} should be in jin_1 hand"
+
+    def test_preset_hands_missing_card_raises(self):
+        """preset_hands with a non-existent card name raises ValueError."""
+        from engine.phases import setup_game
+        from config.version import Version
+        v = Version.load("v1.0")
+        from ai.dummy_ai import DummyAI
+        agents = [
+            DummyAI("north", 1),
+            DummyAI("jin_1", 2),
+            DummyAI("jin_2", 3),
+            DummyAI("jin_3", 4),
+        ]
+        with pytest.raises(ValueError, match="preset_hands"):
+            setup_game(
+                v.card_library, agents, seed=99,
+                version=v,
+                preset_hands={"jin_1": ["__NONEXISTENT_CARD__"]},
+            )
+
 
 class TestPreparationPhase:
     def test_runs_without_crash(self):

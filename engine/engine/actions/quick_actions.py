@@ -74,13 +74,16 @@ class OccupyAction(GameAction):
             # Place Sima army instead of own army
             from rules.sima import place_sima_army
             sima_event = place_sima_army(state, self.target_location, self.player_id)
-            # Pay military cost (Jin player still pays their own military)
-            player.military -= 1
+            # Sima army occupy: Sima pays military, player does NOT pay
+            # (rulebook §3.4: 使用司马家部队执行占据，由司马家支付军力)
             events = [{"type": "occupy", "player": self.player_id,
                        "location": self.target_location, "sima_army": True},
-                      sima_event]
+                      sima_event,
+                      {"type": "sima_army_used", "player": self.player_id,
+                       "location": self.target_location, "action": "occupy"}]
         else:
             # Determine control state
+            old_ctrl = loc.controller  # Save before change (for capital check)
             cs = state._player_control_state(self.player_id)
             loc.controller = cs
 
@@ -105,10 +108,19 @@ class OccupyAction(GameAction):
         from rules.area_control import on_location_change
         on_location_change(state, self.target_location)
 
+        # Check if Sima capital was displaced (unlikely for occupy since
+        # the location was already EMPTY from march, but check for safety)
+        if not self.use_sima_army:
+            from rules.sima import check_capital_displaced
+            cap_events = check_capital_displaced(state, self.target_location, old_ctrl)
+            events.extend(cap_events)
+
         state.log_event("occupy", player=self.player_id, location=self.target_location)
         return ActionResult.ok(events)
 
     def cost_description(self, state: "GameState") -> str:
+        if self.use_sima_army:
+            return "1军力 (司马家)"
         return "1军力"
 
 # ============================================================
@@ -248,8 +260,7 @@ class MarchAction(GameAction):
         # This allows march → occupy chaining for AIs.
         target_loc.controller = ControlState.EMPTY
 
-        # Rewards
-        # 1 VP for non-friendly target (always the case since validate checks this)
+        # Rewards: 1 VP for non-friendly target
         player.vp += 1
         events.append({"type": "march", "player": self.player_id,
                         "target": self.target_location, "cost": cost,
@@ -261,6 +272,12 @@ class MarchAction(GameAction):
 
         state.log_event("march", player=self.player_id,
                          target=self.target_location, cost=cost)
+
+        # Check if Sima capital was displaced
+        from rules.sima import check_capital_displaced
+        cap_events = check_capital_displaced(state, self.target_location, old_controller)
+        events.extend(cap_events)
+
         return ActionResult.ok(events)
 
     def cost_description(self, state: "GameState") -> str:

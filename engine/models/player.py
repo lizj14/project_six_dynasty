@@ -56,6 +56,7 @@ class PlayerState:
     extra_court_actions: int = 0            # 由效果授予的额外牌组行动次数
     extra_hand_actions: int = 0             # 由效果授予的额外手牌行动次数
     extra_hand_action_filter: Optional[str] = None  # 额外手牌行动的卡牌类型限制 (e.g. "friend")
+    filtered_hand_actions_remaining: int = 0  # 尚未消耗的受限额外手牌行动次数
     has_drawn_quick: bool = False           # 已执行快速摸牌（每回合限1次）
     has_fortified_quick: bool = False       # 已执行快速加固（每回合限1次）
     activated_card_ids: set[str] = field(default_factory=set)  # 本回合已激活过主动效果的卡牌ID
@@ -196,6 +197,7 @@ class PlayerState:
         self.extra_court_actions = 0
         self.extra_hand_actions = 0
         self.extra_hand_action_filter = None
+        self.filtered_hand_actions_remaining = 0
         self.has_drawn_quick = False
         self.has_fortified_quick = False
         self.activated_card_ids.clear()

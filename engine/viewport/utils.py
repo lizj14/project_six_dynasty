@@ -333,16 +333,22 @@ def full_player_summary(player: "PlayerState", state=None) -> dict:
 # Location summaries
 # ================================================================
 
-def location_summary(loc: "LocationState") -> dict:
-    """Convert a LocationState to a safe summary dict.
-
-    Culture markers are regional, not per-location — see region_summary().
-    """
-    return {
+def location_summary(loc: "LocationState", state=None) -> dict:
+    """Convert a LocationState to a safe summary dict."""
+    data = {
         "controller": loc.controller.value if hasattr(loc.controller, 'value') else str(loc.controller),
         "is_fortified": loc.is_fortified,
         "region": _get_location_region(loc.location_id),
     }
+    # Capital marker
+    if state is not None:
+        sima = getattr(state, 'sima', None)
+        cap_loc = getattr(sima, 'capital_location', '建康') if sima else '建康'
+        data["is_capital"] = (loc.location_id == cap_loc)
+    else:
+        data["is_capital"] = False
+
+    return data
 
 
 def _get_location_region(location_id: str) -> str:
@@ -386,29 +392,16 @@ def region_summary(region_name: str, rs, state_locations: dict, regions_data: di
                 "controller": loc.controller.value if hasattr(loc.controller, 'value') else str(loc.controller),
                 "is_fortified": getattr(loc, 'is_fortified', False),
             }
-    # Collect culture markers — per-region via RegionState.culture_slots,
-    # with fallback to location-level scanning for backward compatibility.
+    # Collect culture markers — per-region via RegionState.culture_slots
     culture_markers = []
     if rs and getattr(rs, 'culture_slots', None):
         for cs in rs.culture_slots:
-            if cs is not None:
-                ct_str = cs.value if hasattr(cs, 'value') else str(cs)
-                culture_markers.append({"type": ct_str, "region": region_name})
+            if cs.culture is not None:
+                ct_str = cs.culture.value if hasattr(cs.culture, 'value') else str(cs.culture)
+                culture_markers.append({"type": ct_str, "locked": cs.locked})
     else:
-        for loc_id, loc in state_locations.items():
-            if hasattr(loc, 'location_id'):
-                lid = loc.location_id
-            else:
-                lid = loc_id
-            if _get_location_region(lid) != region_name:
-                continue
-            cm = getattr(loc, 'culture_marker', None)
-            if cm:
-                culture_markers.append({
-                    "type": cm.value if hasattr(cm, 'value') else str(cm),
-                    "location": lid,
-                    "locked": getattr(loc, 'culture_locked', False),
-                })
+        # Fallback for regions without culture_slots (shouldn't happen)
+        pass
 
     # Determine control marker — rs is the RegionState passed directly.
     # (regions_data is keyed by Region enum, not string name, so looking up

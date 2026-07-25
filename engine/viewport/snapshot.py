@@ -250,7 +250,7 @@ def _build_snapshot(state: "GameState", viewer_id: str,
     # --- Map ---
     locations = {}
     for loc_id, loc in state.locations.items():
-        locations[loc_id] = location_summary(loc)
+        locations[loc_id] = location_summary(loc, state)
 
     from .utils import region_summary as _region_summary
     regions_data = getattr(state, 'regions', {})
@@ -325,6 +325,7 @@ def _build_snapshot(state: "GameState", viewer_id: str,
         "prestige": sima.prestige if hasattr(sima, 'prestige') else 0,
         "army_placed_count": sima.army_placed_count if hasattr(sima, 'army_placed_count') else 0,
         "army_reserve_count": sima.army_reserve_count if hasattr(sima, 'army_reserve_count') else 0,
+        "capital_location": sima.capital_location if hasattr(sima, 'capital_location') else "建康",
     }
 
     # --- Expedition marker location ---

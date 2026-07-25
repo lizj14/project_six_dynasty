@@ -77,8 +77,16 @@ class GainVPOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        player = state.get_player(player_id)
         amount = self._resolve(step.params.get("amount", 0), state, player_id, resolver, step.params)
+
+        # Handle Sima faction target (cards like 营造宫殿)
+        if player_id == "sima":
+            state.sima.vp += amount
+            result.events.append({"type": "gain_vp", "player": "sima",
+                                  "amount": amount})
+            return result
+
+        player = state.get_player(player_id)
         if player:
             player.vp += amount
             result.events.append({"type": "gain_vp", "amount": amount})
@@ -160,6 +168,15 @@ class DrawCardsOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
+
+        # Pay step-level cost if present (e.g. 王羲之: 支付2vp摸1张牌)
+        step_cost = step.params.get("cost")
+        if step_cost:
+            cost_result = resolver._pay_cost_dict(step_cost, state, player_id)
+            if not cost_result.success:
+                return cost_result
+            result.events.extend(cost_result.events)
+
         count = step.params.get("count", 1)
         draw_events = state.draw_cards(player_id, count)
         result.events.extend(draw_events)
@@ -305,11 +322,13 @@ class ArchiveCardOperator(EffectOperator):
             if card:
                 player.history_area.append(card)
                 player.vp += card.definition.history_vp
-                result.events.append({"type": "archive_card", "card": card.name})
+                result.events.append({"type": "archive_card", "card": card.name,
+                                      "archived_from": card_type_filter or source or "hand"})
                 resolver._fire_trigger("on_archive", player_id,
                                        {"card": card})
+                # 功绩 only for archiving court cards (朝堂牌)
                 from models.enums import FactionType
-                if player.faction == FactionType.JIN:
+                if player.faction == FactionType.JIN and card_type_filter == "court":
                     result.events.extend(state.add_contribution(player_id, 1))
         return result
 
@@ -375,8 +394,9 @@ class PlayCardOperator(EffectOperator):
                 # may=True without card_id: grant extra hand action so the player
                 # can choose to play a card (or skip — logged at end of turn).
                 player.extra_hand_actions += 1
-                if card_type_filter:
+                if card_type_filter and card_type_filter != "any":
                     player.extra_hand_action_filter = card_type_filter
+                    player.filtered_hand_actions_remaining += 1
                 result.events.append({
                     "type": "extra_action_granted", "action_type": "hand_action",
                     "count": 1, "may": True, "free": free,
@@ -605,7 +625,7 @@ class MarchCostReductionOperator(EffectOperator):
     was already reduced before payment.
     """
 
-    effect_type = "march_cost_reduction"
+    effect_type = EffectType.MARCH_COST_REDUCTION
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
@@ -648,7 +668,7 @@ class RegionRewardOverrideOperator(EffectOperator):
     Params: partial (int), full (int) — VP for partial/full control
     """
 
-    effect_type = "region_reward_override"
+    effect_type = EffectType.REGION_REWARD_OVERRIDE
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
@@ -882,6 +902,13 @@ class ConvertOperator(EffectOperator):
         # 0. Context-provided location (from targeted_effect location resolution)
         ctx_loc = (context or {}).get("target_location")
         if ctx_loc:
+            # Pay step-level cost if present (e.g. 崔宏: 支付2军力)
+            step_cost = p.get("cost")
+            if step_cost:
+                cost_result = resolver._pay_cost_dict(step_cost, state, player_id)
+                if not cost_result.success:
+                    return cost_result
+                result.events.extend(cost_result.events)
             action = ConvertAction(
                 player_id=player_id,
                 target_location=ctx_loc,
@@ -896,7 +923,22 @@ class ConvertOperator(EffectOperator):
         # 1. Hardcoded locations — execute directly
         if locs:
             count = p.get("count", len(locs))
+            capital_loc = getattr(state.sima, 'capital_location', '建康')
+            # Pay step-level cost once before batch convert (if present)
+            step_cost = p.get("cost")
+            if step_cost:
+                cost_result = resolver._pay_cost_dict(step_cost, state, player_id)
+                if not cost_result.success:
+                    return cost_result
+                result.events.extend(cost_result.events)
             for loc_id in locs[:count]:
+                if loc_id == capital_loc:
+                    result.events.append({
+                        "type": "convert_requested",
+                        "skipped": True, "reason": "cannot_convert_capital",
+                        "location": loc_id,
+                    })
+                    continue
                 action = ConvertAction(
                     player_id=player_id,
                     target_location=loc_id,
@@ -910,15 +952,23 @@ class ConvertOperator(EffectOperator):
 
         # 2. Filter-based — enumerate valid targets and ask agent
         if filter_spec:
-            valid = self._get_filtered_locations(state, player_id, filter_spec,
-                                                  neutral_only)
+            valid, excluded = self._get_filtered_locations(state, player_id, filter_spec,
+                                                           neutral_only)
             if valid:
                 count = p.get("count", 1)
                 for i in range(count):
                     target = self._pick_target(
                         state, player_id, resolver, valid, "convert_requested",
-                        {"neutral_only": neutral_only})
+                        {"neutral_only": neutral_only},
+                        excluded=excluded)
                     if target:
+                        # Pay step-level cost if present (e.g. 崔宏: 支付2军力)
+                        step_cost = p.get("cost")
+                        if step_cost:
+                            cost_result = resolver._pay_cost_dict(step_cost, state, player_id)
+                            if not cost_result.success:
+                                return cost_result
+                            result.events.extend(cost_result.events)
                         action = ConvertAction(
                             player_id=player_id,
                             target_location=target,
@@ -957,8 +1007,13 @@ class ConvertOperator(EffectOperator):
           - fortified: true/false
           - region: str → in specified region
           - not_controller: str → exclude a controller
+
+        Returns (valid_locations, excluded) where excluded is a dict of
+        {location_id: reason_string} for locations that were filtered out
+        for reasons worth telling the player about.
         """
         valid = []
+        excluded = {}
         adjacency_sources = state.get_adjacency_source_locations(player_id)
         player_cs = state._player_control_state(player_id)
 
@@ -1026,18 +1081,25 @@ class ConvertOperator(EffectOperator):
             if loc.controller == player_cs:
                 continue
 
-            # Jin cannot convert capital
-            player = state.get_player(player_id)
-            if player and player.faction.value == "jin" and loc_id == "建康":
+            # Cannot convert the capital (§5.1.5) — no faction can
+            capital_loc = getattr(state.sima, 'capital_location', '建康')
+            if loc_id == capital_loc:
+                excluded[loc_id] = "首都，无法转化"
                 continue
 
             valid.append(loc_id)
 
-        return valid
+        return valid, excluded
 
     @staticmethod
-    def _pick_target(state, player_id, resolver, valid, event_type, extra_info=None):
-        """Helper: ask agent to select from valid targets."""
+    def _pick_target(state, player_id, resolver, valid, event_type, extra_info=None,
+                     excluded=None):
+        """Helper: ask agent to select from valid targets.
+
+        Args:
+            excluded: Optional dict of {location_id: reason} for locations
+                      that were filtered out and should be mentioned.
+        """
         if not valid or not resolver.select_target_callback:
             return None
         prompt = {
@@ -1050,6 +1112,8 @@ class ConvertOperator(EffectOperator):
         }
         if extra_info:
             prompt.update(extra_info)
+        if excluded:
+            prompt["excluded"] = excluded
         return resolver.select_target_callback(player_id, prompt)
 
 
@@ -1104,7 +1168,7 @@ class SpreadCultureOperator(EffectOperator):
             return result
 
         # 2. Agent selects region
-        valid_regions = self._get_valid_regions(state, player_id, culture)
+        valid_regions, locked_out = self._get_valid_regions(state, player_id, culture)
         if valid_regions and resolver.select_target_callback:
             culture_label = {"confucianism": "儒学", "taoism": "玄学",
                            "buddhism": "佛学"}.get(culture, culture)
@@ -1113,6 +1177,7 @@ class SpreadCultureOperator(EffectOperator):
                 "title": f"选择传播{culture_label}的目标区域",
                 "options": valid_regions,
                 "culture": culture,
+                "locked_out": locked_out,
             }
             chosen = resolver.select_target_callback(player_id, prompt)
             if chosen:
@@ -1150,7 +1215,7 @@ class SpreadCultureOperator(EffectOperator):
         return result
 
     @staticmethod
-    def _get_valid_regions(state, player_id, culture) -> list[dict]:
+    def _get_valid_regions(state, player_id, culture) -> tuple[list[dict], list[str]]:
         """Enumerate regions where the player can spread this culture.
 
         Rulebook §5.1.6: valid if ANY of:
@@ -1161,26 +1226,39 @@ class SpreadCultureOperator(EffectOperator):
           already has this culture marker)
         - 初始文化 (region has this culture as its initial_culture)
 
-        Returns list of dicts: {"id": region_value, "label": region_value, "reason": str}
+        Regions with locked culture markers are excluded (cannot overwrite).
+
+        Returns (valid, locked_out):
+          valid: list of dicts {"id": region_value, "label": region_value, "reason": str}
+          locked_out: list of region names excluded due to locked markers
         """
         from rules.area_control import REGION_CONFIG, get_adjacent_regions
         from models.enums import CultureType, ControlState
 
         culture_ct = CultureType(culture) if culture else None
 
-        # Regions that already have culture markers of this type on the map
+        # Regions that already have culture markers of this type (region-level)
         regions_with_culture = set()
-        for loc_id, loc in state.locations.items():
-            if loc.culture_marker and loc.culture_marker == culture_ct:
-                for reg, cfg in REGION_CONFIG.items():
-                    if loc_id in cfg.get("locations", []):
-                        regions_with_culture.add(reg)
+        for reg, rs in state.regions.items():
+            if rs.has_culture(culture_ct):
+                regions_with_culture.add(reg)
 
         valid = []
+        locked_out = []
         for reg, cfg in REGION_CONFIG.items():
+            rs = state.regions.get(reg)
+            # Exclude regions that already have this culture marker
+            if rs and culture_ct and rs.has_culture(culture_ct):
+                continue
+            # Exclude regions with locked culture markers (cannot overwrite)
+            if rs:
+                existing = rs.get_cultures()
+                if existing and any(rs.is_slot_locked(c) for c in existing):
+                    locked_names = "、".join(c.value for c in existing if rs.is_slot_locked(c))
+                    locked_out.append(f"{reg.value}({locked_names}已锁定)")
+                    continue
             # Rulebook §"区域控制": region is controlled only if a
             # control marker is present (partial: > threshold; full: all).
-            rs = state.regions.get(reg)
             if rs and rs.control_marker is not None:
                 if player_id == "north":
                     controls = (rs.control_marker == ControlState.NORTH)
@@ -1210,7 +1288,7 @@ class SpreadCultureOperator(EffectOperator):
                     "reason": "、".join(reasons),
                 })
 
-        return valid
+        return valid, locked_out
 
 
 @register
@@ -1257,8 +1335,16 @@ class RaisePrestigeOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        player = state.get_player(player_id)
         amount = step.params.get("amount", 1)
+
+        # Handle Sima faction target (cards like 名教之争, 清君侧)
+        if player_id == "sima":
+            state.sima.prestige += amount
+            result.events.append({"type": "raise_prestige",
+                                  "player": "sima", "amount": amount})
+            return result
+
+        player = state.get_player(player_id)
         if player:
             events = state.add_prestige(player_id, amount)
             result.events.extend(events)
@@ -1274,8 +1360,16 @@ class LowerPrestigeOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        player = state.get_player(player_id)
         amount = step.params.get("amount", 1)
+
+        # Handle Sima faction target (cards like 清君侧, 名教之争)
+        if player_id == "sima":
+            state.sima.prestige = max(0, state.sima.prestige - amount)
+            result.events.append({"type": "lower_prestige",
+                                  "player": "sima", "amount": amount})
+            return result
+
+        player = state.get_player(player_id)
         if player:
             player.prestige = max(0, player.prestige - amount)
             result.events.append({"type": "lower_prestige", "amount": amount})
@@ -1333,6 +1427,39 @@ class RaiseCultureLevelOperator(EffectOperator):
 
 
 @register
+class RemoveCultureMarkerOperator(EffectOperator):
+    """Remove a culture marker from the supply track (供应轨).
+
+    Used by cards like 佛经翻译 and 太学.
+    Rulebook: 从供应轨移除标记 → 减少该文化在供应轨的可用标记数。
+    Tracked via CultureTrackState.supply_level (markers removed from supply).
+    """
+    effect_type = EffectType.REMOVE_CULTURE_MARKER
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        from models.enums import CultureType
+        result = ResolveResult()
+        culture = step.params.get("culture", "")
+        culture_map = {
+            "confucianism": CultureType.CONFUCIANISM, "儒学": CultureType.CONFUCIANISM,
+            "taoism": CultureType.TAOISM, "玄学": CultureType.TAOISM,
+            "buddhism": CultureType.BUDDHISM, "佛学": CultureType.BUDDHISM,
+        }
+        ct = culture_map.get(culture)
+        count = max(1, step.params.get("count", 1))
+        if ct and ct in state.culture_tracks:
+            state.culture_tracks[ct].supply_level += count
+            result.events.append({
+                "type": "remove_culture_marker",
+                "culture": culture,
+                "count": count,
+                "supply_removed": state.culture_tracks[ct].supply_level,
+            })
+        return result
+
+
+@register
 class GetExpeditionOperator(EffectOperator):
     effect_type = EffectType.GET_EXPEDITION
 
@@ -1352,6 +1479,17 @@ class GetExpeditionOperator(EffectOperator):
 
 @register
 class AddRefugeeOperator(EffectOperator):
+    """Place refugee cards from the refugee supply into a discard pile.
+
+    Used by 流民帅, 流民四起, 衣冠南渡, 掠夺, 司马道子 (place_refugee → add_refugee).
+
+    Params:
+        count: int — how many refugee cards to place (default 1)
+        target: str — which discard pile:
+            "jin_discard"       → 东晋国家弃牌区
+            "north_discard"     → 北方国家弃牌区
+            "own_national_discard" → 当前玩家 faction 的国家弃牌区
+    """
     effect_type = EffectType.ADD_REFUGEE
 
     def execute(self, step, state, player_id, context, resolver):
@@ -1359,10 +1497,48 @@ class AddRefugeeOperator(EffectOperator):
         result = ResolveResult()
         count = step.params.get("count", 1)
         target = step.params.get("target", "")
-        # TODO: Phase 2a — implement refugee supply population logic
-        result.events.append({"type": "add_refugee_requested",
-                              "count": count, "target": target})
+
+        if not state.refugee_supply:
+            result.events.append({"type": "add_refugee_skipped",
+                                  "reason": "refugee_supply_empty",
+                                  "count": count, "target": target})
+            return result
+
+        # Resolve target discard pile
+        pile = self._resolve_target_pile(state, player_id, target)
+        if pile is None:
+            result.events.append({"type": "add_refugee_skipped",
+                                  "reason": f"unknown_target:{target}",
+                                  "count": count})
+            return result
+
+        # Take refugee cards from supply and place into discard
+        actual = min(count, len(state.refugee_supply))
+        for _ in range(actual):
+            card = state.refugee_supply.pop(0)
+            pile.append(card)
+            result.events.append({"type": "refugee_placed",
+                                  "target": target,
+                                  "card": card.name})
+
+        if resolver:
+            resolver._fire_trigger("on_discard", player_id,
+                                   {"card": card if actual == 1 else None,
+                                    "count": actual, "source": "refugee_supply"})
+
         return result
+
+    def _resolve_target_pile(self, state, player_id, target):
+        """Resolve a target string to an actual discard pile list."""
+        if target == "jin_discard":
+            return state.jin_discard
+        elif target == "north_discard":
+            return state.north_discard
+        elif target == "own_national_discard":
+            return state.get_national_discard(player_id)
+        elif target == "main_discard":
+            return state.main_discard
+        return None
 
 
 @register
@@ -1565,7 +1741,7 @@ class StealRandomCardOperator(EffectOperator):
     target a player, then steal_random_card from them.
     The source_player (who activated the card) is read from context.
     """
-    effect_type = "steal_random_card"
+    effect_type = EffectType.STEAL_RANDOM_CARD
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
@@ -1583,6 +1759,14 @@ class StealRandomCardOperator(EffectOperator):
         # player_id = victim (target of steal)
         # context.source_player = original card activator (who receives stolen cards)
         source_player_id = (context or {}).get("source_player", player_id)
+
+        # Guard: cannot steal from yourself (was silently discarding cards)
+        if source_player_id == player_id:
+            result.events.append({"type": "steal_random_card",
+                                  "skipped": True, "reason": "cannot_steal_from_self",
+                                  "from_player": player_id})
+            return result
+
         source_player = state.get_player(source_player_id)
         rng = random.Random(state.seed + state.round + hash(player_id) % 10000)
         stolen = []
@@ -1604,14 +1788,15 @@ class StealRandomCardOperator(EffectOperator):
 
 
 @register
-class ExtraActionOperator(EffectOperator):
-    """Grant an extra action (court_action or hand_action) this turn.
+@register
+class ExtraCourtActionOperator(EffectOperator):
+    """Grant an extra court action this turn (e.g. 慕容儁).
 
-    Used by cards like 慕容儁 (extra court action) and 苻坚 (extra hand action).
-    The operator increments the player's extra action counter; the action system
-    reads this counter to determine availability.
+    Increments the player's extra_court_actions counter; the action
+    system reads this to determine availability. The game loop
+    immediately prompts the player when may=True.
     """
-    effect_type = EffectType.EXTRA_ACTION
+    effect_type = EffectType.EXTRA_COURT_ACTION
 
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
@@ -1620,20 +1805,58 @@ class ExtraActionOperator(EffectOperator):
         if not player:
             return ResolveResult(success=False, errors=["Player not found"])
 
-        action_type = step.params.get("action_type", "court_action")
         may = step.params.get("may", False)
         count = step.params.get("count", 1)
 
-        if action_type == "court_action":
-            player.extra_court_actions += count
-        elif action_type == "hand_action":
-            player.extra_hand_actions += count
+        player.extra_court_actions += count
 
         result.events.append({
             "type": "extra_action_granted",
-            "action_type": action_type,
+            "action_type": "court_action",
             "count": count,
             "may": may,
+            "free": step.params.get("free", False),
+            "card_type": step.params.get("card_type", "") or "any",
+            "filter": step.params.get("filter") or {},
+        })
+        return result
+
+
+@register
+class ExtraHandActionOperator(EffectOperator):
+    """Grant an extra hand action this turn (e.g. 苻坚, 招抚).
+
+    Increments the player's extra_hand_actions counter and optionally
+    sets a card_type filter. The game loop immediately prompts the
+    player when may=True.
+    """
+    effect_type = EffectType.EXTRA_HAND_ACTION
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        player = state.get_player(player_id)
+        if not player:
+            return ResolveResult(success=False, errors=["Player not found"])
+
+        may = step.params.get("may", False)
+        count = step.params.get("count", 1)
+        card_type_filter = step.params.get("card_type", "")
+        filter_spec = step.params.get("filter") or {}
+
+        player.extra_hand_actions += count
+        if card_type_filter and card_type_filter != "any":
+            player.extra_hand_action_filter = card_type_filter
+            player.filtered_hand_actions_remaining += count
+
+        result.events.append({
+            "type": "extra_action_granted",
+            "action_type": "hand_action",
+            "count": count,
+            "may": may,
+            "free": step.params.get("free", False),
+            "card_type": card_type_filter or "any",
+            "filter": filter_spec,
         })
         return result
 
@@ -1677,12 +1900,56 @@ class TargetedEffectOperator(EffectOperator):
         enriched_ctx = dict(context or {})
         enriched_ctx["source_player"] = player_id
 
+        # Inline card_id into target_spec so _resolve_* can show source card info
+        card_id = enriched_ctx.get("card_id", "")
+        if card_id:
+            target_spec["_source_card_id"] = card_id
+
         t = target_spec.get("type", "player")
 
+        # ── Sima faction target ────────────────────────────────
+        # Cards like 清君侧, 名教之争, 营造宫殿 target the Sima
+        # clan entity (state.sima), not locations. Sub-effects
+        # (raise/lower_prestige, gain_vp) are applied to the Sima
+        # faction via "sima" pseudo-player id.
+        if t == "sima":
+            result.events.insert(0, {
+                "type": "targeted_effect",
+                "target_type": "sima",
+                "targets_found": 1,
+                "targets": ["sima"],
+            })
+            for sub_dict in sub_effects:
+                sub_step = self._dict_to_effect_step(sub_dict)
+                sub_result = resolver._execute_step(
+                    sub_step, state, "sima", enriched_ctx)
+                result.events.extend(sub_result.events)
+                result.errors.extend(sub_result.errors)
+            return result
+
         # ── Location targets ──────────────────────────────────
-        if t in ("location", "sima"):
+        if t == "location":
+            # Check whether sub-effects include conversion (convert,
+            # convert_to_neutral, convert_to_sima). If so, exclude
+            # the capital from valid targets (§5.1.5).
+            conversion_types = {"convert", "convert_to_neutral", "convert_to_sima"}
+            is_conversion = any(
+                s.get("effect_type") in conversion_types
+                for s in sub_effects if s
+            )
             location_ids = self._resolve_location_targets(
                 target_spec, state, player_id, resolver)
+            if is_conversion:
+                capital_loc = getattr(state.sima, 'capital_location', '建康')
+                excluded = [lid for lid in location_ids if lid == capital_loc]
+                location_ids = [lid for lid in location_ids if lid != capital_loc]
+                if excluded:
+                    result.events.append({
+                        "type": "targeted_effect",
+                        "target_type": t,
+                        "excluded_capital": True,
+                        "excluded": excluded,
+                    })
             if not location_ids:
                 result.events.append({
                     "type": "targeted_effect",
@@ -1767,10 +2034,16 @@ class TargetedEffectOperator(EffectOperator):
         # "choose": ask agent via callback
         if selection == "choose" and len(candidates) > 1:
             if resolver and resolver.select_target_callback:
+                # Include source card info so the human player knows WHY
+                # they're being asked to select a target
+                source_info = self._source_card_info(spec, state)
                 prompt = {
-                    "type": "player",
+                    "type": t if t in ("jin_player", "north_player",
+                                       "other_jin_player", "other_player",
+                                       "friendly_player") else "player",
                     "options": candidates,
-                    "message": f"Choose target for effect (type={t})",
+                    "title": _target_type_label(t),
+                    "source_card": source_info,
                 }
                 chosen = resolver.select_target_callback(source_pid, prompt)
                 if chosen and chosen in candidates:
@@ -1822,7 +2095,14 @@ class TargetedEffectOperator(EffectOperator):
 
         selection = spec.get("selection", "choose")
         count = spec.get("count", 1)
-        filters = spec.get("filters", [])
+        filters = list(spec.get("filters", []))
+
+        # "sima" type implicitly filters to sima-controlled locations
+        # (cards like 清君侧, 名教之争, 营造宫殿 use type="sima"
+        # without explicit controller filter in compiled JSON)
+        if spec.get("type") == "sima":
+            if not any(f.get("controller") for f in filters):
+                filters.append({"controller": "sima"})
 
         # Collect candidates from all locations
         candidates = list(state.locations.keys())
@@ -1838,10 +2118,13 @@ class TargetedEffectOperator(EffectOperator):
 
         if selection == "choose" and len(candidates) > 1:
             if resolver and resolver.select_target_callback:
+                source_info = self._source_card_info(spec, state)
+                target_type = spec.get('type', 'location')
                 prompt = {
-                    "type": "location",
+                    "type": target_type,
                     "options": candidates,
-                    "message": f"Choose location for effect (type={spec.get('type', '?')})",
+                    "title": _target_type_label(target_type),
+                    "source_card": source_info,
                 }
                 chosen = resolver.select_target_callback(source_pid, prompt)
                 if chosen and chosen in candidates:
@@ -1856,6 +2139,8 @@ class TargetedEffectOperator(EffectOperator):
             return candidates
 
         from models.enums import ControlState
+        from rules.area_control import REGION_CONFIG
+        from models.enums import Region, CultureType as _CT2
         player_cs = state._player_control_state(source_pid)
 
         for f in filters:
@@ -1886,6 +2171,22 @@ class TargetedEffectOperator(EffectOperator):
                                   state.locations[lid].controller not in jin_states]
                 continue
 
+            # Region name filter — supports single string ("关中") or list (["江南", "荆襄"])
+            region_names = f.get("region_name") or f.get("region_names")
+            if region_names:
+                if isinstance(region_names, list):
+                    names = region_names
+                else:
+                    names = [region_names]
+                locs_in_region = set()
+                for rn in names:
+                    for reg, cfg in REGION_CONFIG.items():
+                        if reg.value == rn:
+                            locs_in_region.update(cfg.get("locations", []))
+                            break
+                candidates = [lid for lid in candidates if lid in locs_in_region]
+                continue
+
             if ft == "not_jin_controlled":
                 jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
                 candidates = [lid for lid in candidates
@@ -1897,17 +2198,18 @@ class TargetedEffectOperator(EffectOperator):
                               not state.locations[lid].is_fortified]
             elif controller is None and "culture_region" in f:
                 culture_type = f.get("culture_region", "")
-                from rules.area_control import REGION_CONFIG
-                from models.enums import Region
+                try:
+                    ct_enum = _CT2(culture_type)
+                except ValueError:
+                    ct_enum = None
                 locs_in_culture_region = set()
                 for reg, cfg in REGION_CONFIG.items():
                     if cfg.get("initial_culture") == culture_type:
                         locs_in_culture_region.update(cfg.get("locations", []))
-                    # Also match regions that have this culture placed
-                    for loc_id in cfg.get("locations", []):
-                        loc = state.locations.get(loc_id)
-                        if loc and loc.culture_marker and loc.culture_marker.value == culture_type:
-                            locs_in_culture_region.update(cfg.get("locations", []))
+                    # Also match regions that have this culture placed (region-level)
+                    rs = state.regions.get(reg)
+                    if rs and ct_enum and rs.has_culture(ct_enum):
+                        locs_in_culture_region.update(cfg.get("locations", []))
                 candidates = [lid for lid in candidates if lid in locs_in_culture_region]
 
         return candidates
@@ -1970,6 +2272,56 @@ class TargetedEffectOperator(EffectOperator):
             source_text=d.get("source_text", ""),
         )
 
+    @staticmethod
+    def _source_card_info(target_spec, state):
+        """Look up the source card name from card_id stored in target_spec.
+
+        When targeted_effect fires, execute() inlines the context card_id
+        into target_spec so downstream resolvers can show which card
+        triggered the effect.
+        """
+        card_id = target_spec.get("_source_card_id", "")
+        if card_id:
+            # Search player hands, staff, court, etc. for a card with this id
+            for player in state.get_all_players():
+                for area in [player.hand, player.staff_area,
+                            getattr(player, 'history_area', [])]:
+                    for card in (area or []):
+                        if card.definition.card_id == card_id:
+                            return card.name
+            # Also check court and public actions
+            for pid in ["north", "jin_1", "jin_2", "jin_3"]:
+                for card in state.get_court_cards(pid) or []:
+                    if card.definition.card_id == card_id:
+                        return card.name
+            for card in getattr(state, 'public_action_pool', []) or []:
+                if card.definition.card_id == card_id:
+                    return card.name
+            # Check hero cards
+            for player in state.get_all_players():
+                if player.hero and player.hero.definition.card_id == card_id:
+                    return player.hero.name
+            # Check forced_event_pile (mechanism cards resolved during draw)
+            for card in getattr(state, 'forced_event_pile', []) or []:
+                if card.definition.card_id == card_id:
+                    return card.name
+        return ""
+
+
+def _target_type_label(t: str) -> str:
+    """Human-readable label for a target type used in selection prompts."""
+    labels = {
+        "player": "选择目标玩家",
+        "jin_player": "选择东晋玩家",
+        "north_player": "选择北方玩家",
+        "other_jin_player": "选择其他东晋玩家",
+        "other_player": "选择其他玩家",
+        "friendly_player": "选择友方玩家",
+        "location": "选择地点",
+        "sima": "司马家",  # Now targets Sima faction entity, not locations
+    }
+    return labels.get(t, f"选择目标 ({t})")
+
 
 # ============================================================
 # Aliases — register same operator under alternate names
@@ -1993,8 +2345,343 @@ OPERATOR_REGISTRY["raise_culture_contribution"] = OPERATOR_REGISTRY["raise_cultu
 
 
 # ============================================================
+# Culture marker operators
+# ============================================================
+
+@register
+class FlipCultureMarkerOperator(EffectOperator):
+    """Flip a culture marker on the map (toggle locked/unlocked state).
+
+    Used by 慧远, 道安: active ability to choose a culture marker
+    on the map and flip it (face-up ↔ face-down).
+    Rulebook §5.1.6: new markers are locked (背面朝上); flipping
+    toggles the lock state.
+    """
+    effect_type = EffectType.FLIP_CULTURE_MARKER
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+
+        # Find all regions that have a culture marker (with their culture types)
+        candidates = []  # list of (region_name, culture_type)
+        for region, rs in state.regions.items():
+            for slot in rs.culture_slots:
+                if slot.culture is not None:
+                    rn = region.value if hasattr(region, 'value') else str(region)
+                    candidates.append({"id": rn, "region": rn, "culture": slot.culture})
+                    break  # one entry per region (first non-empty slot)
+
+        if not candidates:
+            result.events.append({"type": "flip_culture_marker",
+                                  "skipped": True, "reason": "no_markers"})
+            return result
+
+        chosen = candidates[0]
+        if resolver and resolver.select_target_callback and len(candidates) > 1:
+            # Build options as region identifiers
+            _cl = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
+            options = [{"id": c["region"], "label": f"{c['region']}({_cl.get(c['culture'].value if hasattr(c['culture'], 'value') else str(c['culture']), '?')})"}
+                       for c in candidates]
+            prompt = {
+                "type": "flip_culture",
+                "options": [c["region"] for c in candidates],
+                "message": "选择1个版图上的文化标记翻面",
+            }
+            pick = resolver.select_target_callback(player_id, prompt)
+            if pick:
+                matched = [c for c in candidates if c["region"] == pick or c["id"] == pick]
+                if matched:
+                    chosen = matched[0]
+
+        # Toggle lock on the region's culture slot
+        region_enum = None
+        try:
+            from models.enums import Region
+            region_enum = Region(chosen["region"])
+        except (ValueError, KeyError):
+            pass
+
+        rs = state.regions.get(region_enum) if region_enum else None
+        if rs:
+            ct = chosen["culture"]
+            try:
+                from models.enums import CultureType as _CT
+                culture_type = ct if isinstance(ct, _CT) else _CT(ct) if isinstance(ct, str) else ct
+            except (ValueError, KeyError):
+                culture_type = ct
+            old_locked = rs.is_slot_locked(culture_type)
+            rs.flip_culture_lock(culture_type)
+            culture_name = culture_type.value if hasattr(culture_type, 'value') else str(culture_type)
+            result.events.append({
+                "type": "flip_culture_marker",
+                "region": chosen["region"],
+                "culture": culture_name,
+                "from_locked": old_locked,
+                "to_locked": not old_locked,
+            })
+        return result
+
+
+# ============================================================
+# Card interaction operators
+# ============================================================
+
+@register
+class GiveCardOperator(EffectOperator):
+    """Give cards from current player's hand to target player.
+
+    Used by 尊奉江东: north player gives 1 card from hand to
+    a chosen Jin player. The target (recipient) is player_id
+    (from targeted_effect) and the giver is context["source_player"].
+    """
+    effect_type = EffectType.GIVE_CARD
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+
+        # Giver is source_player from context (original card activator)
+        source_pid = (context or {}).get("source_player", player_id)
+        source = state.get_player(source_pid)
+        target = state.get_player(player_id)
+
+        if not source or not target:
+            return ResolveResult(success=False, errors=["Player not found"])
+
+        if not source.hand:
+            result.events.append({"type": "give_card", "skipped": True,
+                                  "reason": "no_cards_in_hand"})
+            return result
+
+        given = []
+        for _ in range(min(count, len(source.hand))):
+            card = None
+            if resolver and resolver.select_target_callback:
+                prompt = {
+                    "type": "give_card",
+                    "title": f"选择{count}张手牌给予{getattr(target, 'name', player_id)}",
+                    "options": [
+                        {"id": c.definition.card_id,
+                         "label": getattr(c, 'name', str(c))}
+                        for c in source.hand
+                    ],
+                }
+                chosen_id = resolver.select_target_callback(source_pid, prompt)
+                if chosen_id:
+                    for i, c in enumerate(source.hand):
+                        cid = c.definition.card_id if hasattr(c, 'definition') else str(i)
+                        if cid == chosen_id:
+                            card = source.hand.pop(i)
+                            break
+
+            if card is None:
+                card = source.hand.pop()
+
+            target.hand.append(card)
+            given.append(card)
+
+        for card in given:
+            result.events.append({"type": "give_card",
+                                  "card": card.name if hasattr(card, 'name') else str(card),
+                                  "from_player": source_pid,
+                                  "to_player": player_id})
+        return result
+
+
+@register
+class OwnerArchiveCardOperator(EffectOperator):
+    """The owner of a targeted card archives it (not the current player).
+
+    Used by 鸩酒: choose a friend card from a friendly player's staff,
+    and that player (the card's owner) archives it. The card's owner
+    receives the history VP and contribution.
+    """
+    effect_type = EffectType.OWNER_ARCHIVE_CARD
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+
+        source_pid = (context or {}).get("source_player", player_id)
+
+        # Collect all friend cards from friendly players' staff areas
+        candidates = []  # (card, owner_pid)
+        for p in state.get_all_players():
+            if p.staff_area:
+                for card in p.staff_area:
+                    candidates.append((card, p.player_id))
+
+        if not candidates:
+            result.events.append({"type": "owner_archive_card",
+                                  "skipped": True, "reason": "no_candidates"})
+            return result
+
+        # Ask current player to choose one
+        card = None
+        owner_pid = None
+        if resolver and resolver.select_target_callback and len(candidates) > 1:
+            prompt = {
+                "type": "archive_card",
+                "title": "选择1个友方玩家的幕僚，该玩家存档被选择的幕僚",
+                "options": [
+                    {"id": c.definition.card_id,
+                     "label": f"{c.name} [{owner}] (史书{c.definition.history_vp}vp)"}
+                    for c, owner in candidates
+                ],
+            }
+            chosen_id = resolver.select_target_callback(source_pid, prompt)
+            if chosen_id:
+                for c, o in candidates:
+                    if c.definition.card_id == chosen_id:
+                        card = c
+                        owner_pid = o
+                        break
+
+        if card is None:
+            card, owner_pid = candidates[0]
+
+        # Remove from owner's staff and add to owner's history
+        owner = state.get_player(owner_pid)
+        if owner and card in owner.staff_area:
+            owner.staff_area.remove(card)
+            # Fire on_card_leave triggers
+            resolver.fire_card_leave_triggers(
+                card, owner_pid, state,
+                context={"source": "archive_owner"})
+            owner.history_area.append(card)
+            owner.vp += card.definition.history_vp
+            result.events.append({"type": "owner_archive_card",
+                                  "card": card.name, "owner": owner_pid})
+            resolver._fire_trigger("on_archive", owner_pid, {"card": card})
+            from models.enums import FactionType
+            if owner.faction == FactionType.JIN:
+                result.events.extend(state.add_contribution(owner_pid, 1))
+
+        return result
+
+
+# ============================================================
+# Court operators (step variants)
+# ============================================================
+
+@register
+class AbandonCourtCardOperator(EffectOperator):
+    """Discard a candidate strategy card from court area (as an effect step).
+
+    Used by 尹纬, 阳骛: choice option to abandon a court card and supply.
+    This is the step version — the cost version is handled separately
+    in EffectResolver._resolve_block().
+    """
+    effect_type = EffectType.ABANDON_COURT_CARD
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+        count = step.params.get("count", 1)
+
+        court = state.get_court_cards(player_id)
+        if not court:
+            result.events.append({"type": "abandon_court_card",
+                                  "skipped": True, "reason": "no_court_cards"})
+            return result
+
+        abandoned = []
+        for _ in range(min(count, len(court))):
+            card = None
+            if resolver and resolver.select_target_callback:
+                prompt = {
+                    "type": "abandon_court_card",
+                    "title": f"选择{count}张候选策略牌弃置",
+                    "options": [
+                        {"id": c.definition.card_id,
+                         "label": f"{c.name} (费用{c.cost})"}
+                        for c in court
+                    ],
+                }
+                chosen_id = resolver.select_target_callback(player_id, prompt)
+                if chosen_id:
+                    for i, c in enumerate(court):
+                        if c.definition.card_id == chosen_id:
+                            card = court.pop(i)
+                            break
+
+            if card is None:
+                card = court.pop()
+
+            abandoned.append(card)
+
+        if abandoned:
+            events = state.discard_cards(
+                player_id, abandoned, target="national", source="court",
+                reason="abandon_court_card")
+            result.events.extend(events)
+            for card in abandoned:
+                resolver._fire_trigger("on_discard", player_id, {"card": card})
+
+        return result
+
+
+# ============================================================
 # Map-action variants with distinct semantics
 # ============================================================
+
+@register
+class SwapTroopsOperator(EffectOperator):
+    """Swap troops/control between two locations.
+
+    Used by 还都洛阳: swap the Jin capital and 洛阳's troops.
+    "jin_capital" is resolved to state.capital_location.
+    Also swaps fortification status.
+    """
+    effect_type = EffectType.SWAP_TROOPS
+
+    def execute(self, step, state, player_id, context, resolver):
+        from .effect_resolver import ResolveResult
+        result = ResolveResult()
+
+        loc_a = step.params.get("location_a", "")
+        loc_b = step.params.get("location_b", "")
+
+        # Resolve symbolic location references
+        if loc_a == "jin_capital":
+            loc_a = getattr(state.sima, 'capital_location', '建康')
+        if loc_b == "jin_capital":
+            loc_b = getattr(state.sima, 'capital_location', '建康')
+
+        loc_a_state = state.locations.get(loc_a)
+        loc_b_state = state.locations.get(loc_b)
+
+        if not loc_a_state:
+            return ResolveResult(success=False,
+                                errors=[f"swap_troops: location not found: {loc_a}"])
+        if not loc_b_state:
+            return ResolveResult(success=False,
+                                errors=[f"swap_troops: location not found: {loc_b}"])
+
+        # Swap controllers
+        loc_a_state.controller, loc_b_state.controller = \
+            loc_b_state.controller, loc_a_state.controller
+
+        # Swap fortification status
+        loc_a_state.is_fortified, loc_b_state.is_fortified = \
+            loc_b_state.is_fortified, loc_a_state.is_fortified
+
+        # Update capital tracking if capital moved
+        cap = getattr(state.sima, 'capital_location', None)
+        if cap == loc_a:
+            state.sima.capital_location = loc_b
+        elif cap == loc_b:
+            state.sima.capital_location = loc_a
+
+        result.events.append({
+            "type": "swap_troops",
+            "location_a": loc_a,
+            "location_b": loc_b,
+        })
+        return result
+
 
 @register
 class ConvertOwnToNeutralOperator(EffectOperator):
@@ -2014,9 +2701,14 @@ class ConvertOwnToNeutralOperator(EffectOperator):
             loc = state.locations.get(ctx_loc)
             if loc:
                 from models.enums import ControlState
+                old_ctrl = loc.controller
                 loc.controller = ControlState.NEUTRAL
                 result.events.append({"type": "convert_own_to_neutral",
                                      "location": ctx_loc})
+                # Check if Sima capital was displaced
+                from rules.sima import check_capital_displaced
+                cap_events = check_capital_displaced(state, ctx_loc, old_ctrl)
+                result.events.extend(cap_events)
             return result
 
         count = step.params.get("count", 1)
@@ -2051,9 +2743,14 @@ class ConvertOwnToNeutralOperator(EffectOperator):
             loc = state.locations.get(loc_id)
             if loc:
                 from models.enums import ControlState
+                old_ctrl = loc.controller
                 loc.controller = ControlState.NEUTRAL
                 result.events.append({"type": "convert_own_to_neutral",
                                      "location": loc_id})
+                # Check if Sima capital was displaced
+                from rules.sima import check_capital_displaced
+                cap_events = check_capital_displaced(state, loc_id, old_ctrl)
+                result.events.extend(cap_events)
 
         return result
 
@@ -2073,20 +2770,34 @@ class ConvertToNeutralOperator(EffectOperator):
         # 0. Context-provided location (from targeted_effect location resolution)
         ctx_loc = (context or {}).get("target_location")
         if ctx_loc:
+            # Cannot convert the capital (§5.1.5)
+            capital_loc = getattr(state.sima, 'capital_location', '建康')
+            if ctx_loc == capital_loc:
+                result.events.append({"type": "convert_to_neutral",
+                                     "skipped": True, "reason": "cannot_convert_capital",
+                                     "location": ctx_loc})
+                return result
             loc = state.locations.get(ctx_loc)
             if loc:
                 from models.enums import ControlState
+                old_ctrl = loc.controller
                 loc.controller = ControlState.NEUTRAL
                 result.events.append({"type": "convert_to_neutral",
                                      "location": ctx_loc})
+                # Check if Sima capital was displaced (defensive fallback)
+                from rules.sima import check_capital_displaced
+                cap_events = check_capital_displaced(state, ctx_loc, old_ctrl)
+                result.events.extend(cap_events)
             return result
 
         count = step.params.get("count", 1)
 
-        # Find all non-neutral locations
+        # Find all non-neutral locations (exclude capital)
         from models.enums import ControlState
+        capital_loc = getattr(state.sima, 'capital_location', '建康')
         candidates = [lid for lid, loc in state.locations.items()
-                     if loc.controller not in (ControlState.NEUTRAL, ControlState.EMPTY)]
+                     if loc.controller not in (ControlState.NEUTRAL, ControlState.EMPTY)
+                     and lid != capital_loc]
 
         chosen = []
         if resolver and resolver.select_target_callback and candidates:
@@ -2106,9 +2817,14 @@ class ConvertToNeutralOperator(EffectOperator):
         for loc_id in chosen:
             loc = state.locations.get(loc_id)
             if loc:
+                old_ctrl = loc.controller
                 loc.controller = ControlState.NEUTRAL
                 result.events.append({"type": "convert_to_neutral",
                                      "location": loc_id})
+                # Check if Sima capital was displaced
+                from rules.sima import check_capital_displaced
+                cap_events = check_capital_displaced(state, loc_id, old_ctrl)
+                result.events.extend(cap_events)
 
         return result
 

@@ -64,6 +64,7 @@ class SimaState:
     army_reserve_revealed_vp: int = 0
     army_reserve_revealed_military: int = 0
     is_capital_on_map: bool = True      # 首都标记在地图上
+    capital_location: str = "建康"     # 首都当前位置 (初始=建康, 可被卡牌效果移动)
 
 
 @dataclass
@@ -149,6 +150,12 @@ class GameState:
     # === Engine-injected dependencies ===
     effect_resolver: Optional[Any] = None
     action_system: Optional[Any] = None
+
+    # === Turn-level Pending Triggers ===
+    # Effects like 幽州突骑 "本回合执行[进军]时，获得1vp" register steps here
+    # that fire reactively for the rest of the turn. Cleared at end of turn.
+    # Each entry: {"player_id": str, "trigger": str, "step": EffectStep, "source_card_id": str}
+    turn_triggers: list[dict] = field(default_factory=list)
 
     # === Order tiebreaking (后到者优先) ===
     _order_seq_counter: int = 0             # Global counter for order-change sequencing
@@ -540,7 +547,12 @@ class GameState:
         """Collect all in-play cards that may have passive abilities.
 
         Returns list of (card, owner_player_id).
-        Scans: hero, staff_area, history_area, and court (朝堂) of all players.
+        Scans: hero, staff_area, and court (朝堂) of all players.
+
+        NOTE: history_area is intentionally excluded — archived cards are
+        retired and do not provide ongoing passive effects. A card like
+        草原部落 trades its passives for a one-time gain_military when
+        archive_this is executed.
 
         Court cards are included because strategy cards (策略牌) with passive
         effects (e.g. 草原部落: on_march → cost -1) are active while in court.
@@ -552,8 +564,7 @@ class GameState:
                 sources.append((player.hero, pid))
             for card in player.staff_area:
                 sources.append((card, pid))
-            for card in player.history_area:
-                sources.append((card, pid))
+            # history_area intentionally excluded — archived cards don't provide passives
 
         # Court cards (策略牌) — faction-level, not per-player
         # North court belongs to north player; Jin court is shared by all Jin players

@@ -56,10 +56,11 @@ class TestLocationState:
         loc = LocationState(location_id="长安", is_fortified=True)
         assert loc.is_fortified
 
-    def test_culture_marker(self):
-        loc = LocationState(location_id="建康", culture_marker=CultureType.TAOISM)
-        assert loc.culture_marker == CultureType.TAOISM
-        assert not loc.culture_locked  # Default is face up
+    def test_no_culture_on_location(self):
+        """Culture markers are regional, not per-location."""
+        loc = LocationState(location_id="建康")
+        assert not hasattr(loc, 'culture_marker'), "LocationState should not have culture_marker"
+        assert not hasattr(loc, 'culture_locked'), "LocationState should not have culture_locked"
 
 
 class TestLocationDef:
@@ -93,3 +94,27 @@ class TestRegionState:
         rs = RegionState(region=Region.GUANZHONG)
         assert rs.control_marker is None
         assert rs.control_face_up
+
+    def test_culture_slot_place_and_lock(self):
+        from models.enums import Region, CultureType
+        from models.location import CultureSlot
+        rs = RegionState(region=Region.JIANGNAN)
+        # Initially no culture
+        assert rs.get_cultures() == []
+        # Place a marker
+        rs.place_culture(CultureType.TAOISM)
+        assert rs.has_culture(CultureType.TAOISM)
+        assert rs.is_slot_locked(CultureType.TAOISM)  # New markers are locked
+        # Unlock
+        rs.unlock_all()
+        assert not rs.is_slot_locked(CultureType.TAOISM)
+        # Flip
+        rs.flip_culture_lock(CultureType.TAOISM)
+        assert rs.is_slot_locked(CultureType.TAOISM)
+
+    def test_culture_slot_direct(self):
+        from models.enums import CultureType
+        from models.location import CultureSlot
+        slot = CultureSlot()
+        assert slot.culture is None
+        assert slot.locked is True  # Default locked per §5.1.6

@@ -114,7 +114,7 @@ class GameAgent(ABC):
         """
         return None
 
-    def request_court_play(self, state: "GameState") -> Optional["GameAction"]:
+    def request_court_play(self, state: "GameState", eligible_cards=None, filter_spec=None) -> Optional["GameAction"]:
         """Called when an effect grants an extra court action with may=True.
 
         The agent should select a card from the court and return a

@@ -61,8 +61,11 @@ class PlayCardAction(GameAction):
             used_indices.add(pi)
 
         # Check extra hand action filter (e.g. 招抚: only friend cards)
-        extra_filter = getattr(player, 'extra_hand_action_filter', None)
-        if extra_filter and player.hand_action_taken_count >= 1:
+        # Only applies when consuming a filtered extra action slot
+        # (hand_action_taken_count >= 1 means the regular slot is used/spent)
+        if (player.filtered_hand_actions_remaining > 0
+                and player.hand_action_taken_count >= 1):
+            extra_filter = getattr(player, 'extra_hand_action_filter', None)
             if extra_filter == "friend" and not card.is_friend:
                 return ActionResult.fail(
                     f"本轮额外手牌行动只能打出幕僚牌（{card.name} 不是幕僚）")
@@ -212,11 +215,13 @@ class PlayCardAction(GameAction):
                 # Check for archive_this event — move card from appropriate zone to history_area
                 _check_archive_this(events, card, player, state, self.player_id)
 
-        # Clear extra hand action filter on use (consumed by this play)
-        extra_filter = getattr(player, 'extra_hand_action_filter', None)
-        if extra_filter and player.hand_action_taken_count >= 1:
-            player.extra_hand_action_filter = None
-            events.append({"type": "extra_action_consumed", "filter": extra_filter})
+        # Consume filtered extra hand action on use (this was an extra slot)
+        if player.filtered_hand_actions_remaining > 0 and player.hand_action_taken_count >= 1:
+            consumed_filter = player.extra_hand_action_filter
+            player.filtered_hand_actions_remaining -= 1
+            if player.filtered_hand_actions_remaining == 0:
+                player.extra_hand_action_filter = None
+            events.append({"type": "extra_action_consumed", "filter": consumed_filter})
 
         player.hand_action_taken_count += 1
         player.has_taken_hand_action = True
@@ -509,9 +514,8 @@ def _check_archive_this(events: list[dict], card, player,
                     events.append({"type": "archive_card", "card": card.name,
                                    "history_vp": vp_gain,
                                    "from": "main_discard"})
-                    # Jin players gain 1 contribution for archiving
-                    if player.faction == FactionType.JIN:
-                        events.extend(state.add_contribution(player_id, 1))
+                    # Note: 功绩 only from court archiving (CourtAction), NOT from
+                    # archive_this effects on hand-played cards.
                     # Fire on_archive trigger (e.g. 桓温 passive: gain 2 VP)
                     if resolver:
                         resolver._fire_trigger("on_archive", player_id,
@@ -528,11 +532,8 @@ def _check_archive_this(events: list[dict], card, player,
                     events.append({"type": "archive_card", "card": card.name,
                                    "history_vp": vp_gain,
                                    "from": "staff_area"})
-                    if player.faction == FactionType.JIN:
-                        events.extend(state.add_contribution(player_id, 1))
                     # Fire on_archive trigger (e.g. 桓温 passive: gain 2 VP)
                     if resolver:
                         resolver._fire_trigger("on_archive", player_id,
                                                {"card": card})
                     return
-            break

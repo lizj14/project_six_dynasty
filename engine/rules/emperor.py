@@ -73,11 +73,21 @@ def roll_emperor_dice(state: "GameState", rng: random.Random) -> list[dict]:
       艺术面 → 司马家+2vp，移走骰子
       其他面 → 放置到君主牌上作为任务标记
     """
-    dice_count = min(5, state.sima.military // 3)
-    events = []
-
     # Clear tasks from previous round (tasks are per-round only)
     state.emperor.active_tasks = []
+
+    # Check for skip_emperor_die effect (e.g. emperor 纯质 — no tasks at all)
+    # Rule: 纯质等皇帝无任务，直接跳过整个投骰子阶段
+    if state.emperor.current_emperor:
+        effect_ast = getattr(state.emperor.current_emperor, 'effect_ast', None) or {}
+        skip_die = (effect_ast.get("effect_type") == "skip_emperor_die"
+                    if isinstance(effect_ast, dict) else False)
+        dice_faces = getattr(state.emperor.current_emperor, 'emperor_tasks', None)
+        if skip_die or (isinstance(dice_faces, list) and len(dice_faces) == 0):
+            return []  # No dice, no tasks, no Sima military consumed
+
+    dice_count = min(5, state.sima.military // 3)
+    events = []
 
     for _ in range(dice_count):
         # Each die roll costs 1 Sima military
@@ -89,7 +99,6 @@ def roll_emperor_dice(state: "GameState", rng: random.Random) -> list[dict]:
             dice_faces = getattr(state.emperor.current_emperor, 'emperor_tasks', None)
             if dice_faces and roll <= len(dice_faces):
                 task_type_str = dice_faces[roll - 1]
-                # Map Chinese task name to enum
                 task_type = _parse_task_type(task_type_str)
             else:
                 task_type = DEFAULT_DICE_FACES.get(roll, EmperorTaskType.ART)
@@ -135,7 +144,7 @@ def check_task_completion(state: "GameState", player_id: str,
         completed = False
 
         if task.task_type == EmperorTaskType.EXPANSION:
-            if action_type in ("march", "convert"):
+            if action_type == "occupy":
                 # Must have placed a Sima army
                 if context and context.get("used_sima_army"):
                     completed = True

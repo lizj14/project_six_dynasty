@@ -70,12 +70,12 @@ class EffectParser:
                             # Modifier goes to the last sub_block (which has the actual trigger)
                             if i == len(sub_passives) - 1 and ability.modifier:
                                 sub_block.modifier = ability.modifier
-                            if sub_block.trigger == TriggerType.ALWAYS and sub_block.steps:
+                            if sub_block.trigger is None and sub_block.steps:
                                 sub_block.trigger = self._infer_trigger_from_steps(
                                     sub_block.steps, trigger_text)
-                            # Skip empty always blocks (static permissions filtered out)
+                            # Skip empty default-trigger blocks (static permissions filtered out)
                             if (sub_block.steps or sub_block.choice_options or
-                                (sub_block.modifier and sub_block.trigger != TriggerType.ALWAYS)):
+                                (sub_block.modifier and sub_block.trigger is not None)):
                                 effect.blocks.append(sub_block)
                 else:
                     # Propagate restrictions from blocks to card-level
@@ -199,7 +199,7 @@ class EffectParser:
             else:
                 block.trigger, block.trigger_scope, block.trigger_filter = \
                     self._detect_trigger(text)
-                if block.trigger == TriggerType.ALWAYS and block.steps:
+                if block.trigger is None and block.steps:
                     block.trigger = self._infer_trigger_from_steps(block.steps, text)
 
         # Convert "choice" steps to block-level choice_options
@@ -297,7 +297,7 @@ class EffectParser:
         # Check text for clues
         if re.search(r'进军', text):
             return TriggerType.ON_MARCH
-        return TriggerType.ALWAYS
+        return None  # was TriggerType.ALWAYS
 
     def _split_passive_triggers(self, text: str) -> list[tuple[str, str]]:
         """Split passive text into (trigger_desc, effect_text) pairs.
@@ -927,10 +927,10 @@ class EffectParser:
             (r'任意玩家.*顺位.*时', TriggerType.ON_ORDER_CHANGE),
             (r'离开幕僚区\s*时', TriggerType.ON_CARD_LEAVE),
             (r'友方.*传播.*文化', TriggerType.ON_SPREAD_CULTURE),
-            (r'标记\s*放置.*版图', TriggerType.ON_CARD_ENTER),
+            # (r'标记\s*放置.*版图', TriggerType.ON_CARD_ENTER),  # on_card_enter 未实现触发分发，已注释
             (r'(?:每次|结算)?.*僭越.*?(?:时|后)', TriggerType.ON_USURP),
         ]
-        trigger_type = TriggerType.ALWAYS
+        trigger_type = None  # was TriggerType.ALWAYS
         for pattern, tt in trigger_map:
             if re.search(pattern, clean):
                 trigger_type = tt
@@ -1862,7 +1862,7 @@ def _parse_both_lose_vp_with_variable(text: str, orig: str) -> Optional[EffectSt
 
 
 def _parse_change_to_player_control(text: str, orig: str) -> Optional[EffectStep]:
-    """改为玩家占据 / 转为中立控制"""
+    """改为/转为 X 占据 → convert_to_neutral / convert_to_sima / convert"""
     m = re.search(r'(改为|转为)\s*(玩家|司马家|中立)\s*(占据|控制)?', text)
     if m:
         target = m.group(2)
@@ -1872,14 +1872,16 @@ def _parse_change_to_player_control(text: str, orig: str) -> Optional[EffectStep
                 params={},
                 source_text=orig,
             )
+        if target == '司马家':
+            return EffectStep(
+                effect_type="convert_to_sima",
+                params={},
+                source_text=orig,
+            )
+        # "改为玩家占据" — generic convert (used in targeted_effect sub-effects)
         return EffectStep(
-            effect_type="change_controller",
-            params={"to": "player" if target == '玩家' else "sima"},
-            source_text=orig,
-        )
-        return EffectStep(
-            effect_type="change_controller",
-            params={"to": m.group(2)},
+            effect_type="convert",
+            params={},
             source_text=orig,
         )
     return None
@@ -1909,10 +1911,11 @@ def _parse_extra_action(text: str, orig: str) -> Optional[EffectStep]:
         # "获得1个朝堂行动" variant
         m = re.search(r'获得\s*(\d+)\s*个\s*朝堂行动', text)
     if m:
-        action_type = "hand_action" if "手牌" in m.group(2) else "court_action"
+        is_hand = "手牌" in m.group(2)
+        effect_type = "extra_hand_action" if is_hand else "extra_court_action"
         return EffectStep(
-            effect_type="extra_action",
-            params={"count": int(m.group(1)), "action_type": action_type, "may": "可以" in text},
+            effect_type=effect_type,
+            params={"count": int(m.group(1)), "may": "可以" in text},
             source_text=orig,
         )
     return None
@@ -1973,6 +1976,20 @@ def _parse_abandon_court_card(text: str, orig: str) -> Optional[EffectStep]:
         return EffectStep(
             effect_type="abandon_court_card",
             params={"count": int(m.group(1))},
+            source_text=orig,
+        )
+    return None
+
+
+def _parse_swap_troops(text: str, orig: str) -> Optional[EffectStep]:
+    """交换X和Y的部队 — swap troops between two locations"""
+    m = re.search(r'交换\s*(.+?)\s*和\s*(.+?)\s*的部队', text)
+    if m:
+        loc_a = m.group(1).strip()
+        loc_b = m.group(2).strip()
+        return EffectStep(
+            effect_type="swap_troops",
+            params={"location_a": loc_a, "location_b": loc_b},
             source_text=orig,
         )
     return None
@@ -2046,6 +2063,7 @@ _STEP_PATTERNS = [
     _parse_march_cost_modifier,
     _parse_region_reward_modifier,
     _parse_abandon_court_card,
+    _parse_swap_troops,
     _parse_lose_contribution,
     _parse_cost_reduction,
 ]

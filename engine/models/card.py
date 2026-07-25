@@ -201,7 +201,12 @@ class Card:
 
     @property
     def is_refugee(self) -> bool:
-        return self.card_type == CardType.REFUGEE
+        """Whether this card is a refugee (流民) card.
+
+        Refugee cards are loaded as CardType.INITIAL via the category bridge
+        (card_category="initial"), so we also check the card name.
+        """
+        return self.card_type == CardType.REFUGEE or self.name == "流民"
 
     def __repr__(self) -> str:
         owner = f"@{self.owner_player_id}" if self.owner_player_id else ""

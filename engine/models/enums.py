@@ -178,6 +178,6 @@ class EventTrigger(Enum):
     ON_ORDER_CHANGE = "on_order_change"  # 顺位变化后
     ON_TURN_START = "on_turn_start"    # 回合开始
     ON_TURN_END = "on_turn_end"        # 回合结束
-    ON_CARD_ENTER = "on_card_enter"    # 卡牌登场
+    # ON_CARD_ENTER = "on_card_enter"  # 卡牌登场 — 预留，解析器及触发分发均未实现
     ON_CARD_LEAVE = "on_card_leave"    # 卡牌退场
     ON_CONDITION = "on_condition"      # 条件触发

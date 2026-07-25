@@ -1,11 +1,17 @@
 """Interactive game: human player vs HeuristicAI opponents.
 
 Usage:
-    python play_game.py              # Interactive faction selection
-    python play_game.py north        # Play as 北方
-    python play_game.py jin_1        # Play as 东晋 player 1
-    python play_game.py jin_2        # Play as 东晋 player 2
-    python play_game.py jin_3        # Play as 东晋 player 3
+    python play_game.py                    # Interactive faction selection
+    python play_game.py north              # Play as 北方
+    python play_game.py jin                # Play as 东晋 player 1
+    python play_game.py jin_1              # Play as 东晋 player 1
+    python play_game.py jin_2              # Play as 东晋 player 2
+    python play_game.py jin_3              # Play as 东晋 player 3
+
+    # Custom initial hand (for testing specific cards):
+    python play_game.py jin --preset jin_1=慧远,尊奉江东
+    python play_game.py north --preset north=司马道子,流民四起
+    python play_game.py jin -p jin_1=慧远,还都洛阳 -p jin_2=道安
 """
 
 import os
@@ -129,25 +135,61 @@ class LoggingAgentWrapper:
     def request_card_play(self, state, eligible_indices, filter_spec=None, free=False):
         return self._agent.request_card_play(state, eligible_indices, filter_spec=filter_spec, free=free)
 
-    def request_court_play(self, state, eligible_cards, filter_spec=None):
-        return self._agent.request_court_play(state, eligible_cards, filter_spec=filter_spec)
+    def request_court_play(self, state, eligible_cards=None, filter_spec=None):
+        return self._agent.request_court_play(state, eligible_cards=eligible_cards, filter_spec=filter_spec)
 
 
-def select_faction() -> str:
+def parse_preset_hands(argv: list[str]) -> dict[str, list[str]]:
+    """Parse --preset / -p arguments into preset_hands dict.
+
+    Format: player_id=card1,card2,...
+    Example: --preset jin_1=慧远,尊奉江东
+    Supports multiple -p flags.
+    """
+    result: dict[str, list[str]] = {}
+    for i, arg in enumerate(argv):
+        if arg in ("--preset", "-p") and i + 1 < len(argv):
+            val = argv[i + 1]
+            if "=" in val:
+                pid, names_str = val.split("=", 1)
+                # Split by comma: supports 中文逗号 and 英文逗号
+                names = [n.strip() for n in names_str.replace("，", ",").split(",") if n.strip()]
+                if pid not in result:
+                    result[pid] = []
+                result[pid].extend(names)
+            else:
+                print(f"[!] --preset 格式错误: 应为 player_id=牌名1,牌名2")
+                print(f"    例如: --preset jin_1=慧远,尊奉江东")
+                sys.exit(1)
+    return result
+
+
+def select_faction(argv: list[str]) -> str:
     """Let the user choose which faction to play. Returns player_id.
 
     "north" → human plays 北方
     "jin"   → human plays 东晋 (assigned to jin_1 slot)
     """
-    # Check command-line argument
-    if len(sys.argv) >= 2:
-        arg = sys.argv[1].lower()
+    # Filter out --preset / -p flags and their values to find the faction arg
+    cleaned = []
+    skip_next = False
+    for a in argv[1:]:
+        if skip_next:
+            skip_next = False
+            continue
+        if a in ("--preset", "-p"):
+            skip_next = True
+            continue
+        cleaned.append(a)
+
+    if cleaned:
+        arg = cleaned[0].lower()
         if arg in FACTION_CHOICES:
             return arg
         # Backward compat: accept specific slot names
         if arg in ("jin_1", "jin_2", "jin_3"):
             return arg
-        print(f"无效的阵营: {sys.argv[1]}")
+        print(f"无效的阵营: {cleaned[0]}")
         print(f"可选: {', '.join(FACTION_CHOICES.keys())}")
         sys.exit(1)
 
@@ -271,8 +313,11 @@ def _print_final_scoring_breakdown(state, scoring_result, winner: str, human_pid
 
 
 def main():
+    # Parse preset hands from CLI before faction selection
+    preset_hands = parse_preset_hands(sys.argv)
+
     # Select faction
-    chosen_faction = select_faction()
+    chosen_faction = select_faction(sys.argv)
     faction_label = FACTION_CHOICES.get(chosen_faction, chosen_faction)
 
     # Determine human player_id
@@ -326,9 +371,13 @@ def main():
         """Check if human player requested early quit."""
         return human_player.wants_early_quit
 
+    if preset_hands:
+        print(f"  🧪 测试模式 — 预设手牌: {preset_hands}")
+
     engine = GameEngine(
         agents=agents, version=v, seed=game_seed, logger=logger,
         on_action_executed=on_action,
+        preset_hands=preset_hands if preset_hands else None,
     )
     engine.check_early_quit = check_quit
 

@@ -91,14 +91,14 @@ class LiveViewport(Viewport):
     def get_all_locations(self) -> dict[str, dict]:
         result = {}
         for loc_id, loc in self._state.locations.items():
-            result[loc_id] = location_summary(loc)
+            result[loc_id] = location_summary(loc, self._state)
         return result
 
     def get_location(self, location_id: str) -> Optional[dict]:
         loc = self._state.locations.get(location_id)
         if not loc:
             return None
-        return location_summary(loc)
+        return location_summary(loc, self._state)
 
     def get_adjacent_locations(self, location_id: str) -> list[str]:
         return list(self._state.get_adjacent_locations(location_id))
@@ -282,6 +282,7 @@ class LiveViewport(Viewport):
             "prestige": sima.prestige if hasattr(sima, 'prestige') else 0,
             "army_placed_count": sima.army_placed_count if hasattr(sima, 'army_placed_count') else 0,
             "army_reserve_count": sima.army_reserve_count if hasattr(sima, 'army_reserve_count') else 0,
+            "capital_location": sima.capital_location if hasattr(sima, 'capital_location') else "建康",
         }
 
     # ================================================================

@@ -15,7 +15,7 @@ from .actions.special_actions import (
     ActivateEffectAction,
 )
 from .actions.card_actions import PlayCardAction, CourtAction, PublicCardAction
-from models.enums import ControlState
+from models.enums import ControlState, CardType
 
 
 # Union type for all possible actions
@@ -125,9 +125,21 @@ class ActionSystem:
             return []
 
         available = []
+        extra_filter = getattr(player, 'extra_hand_action_filter', None)
         for i, card in enumerate(player.hand):
             if not card.definition.is_playable_by(player.faction):
                 continue
+
+            # If extra hand action has a card_type filter, only show matching cards
+            # ("any" means no filter — don't block any card type)
+            if extra_filter and extra_filter != "any":
+                card_type_matches = (
+                    extra_filter == "friend" and card.definition.is_friend or
+                    extra_filter == "strategy" and card.definition.card_type == CardType.STRATEGY or
+                    extra_filter == "event" and card.definition.card_type == CardType.EVENT
+                )
+                if not card_type_matches:
+                    continue
 
             # Check play_condition from card's parsed effect
             parsed = card.definition.parsed_effect

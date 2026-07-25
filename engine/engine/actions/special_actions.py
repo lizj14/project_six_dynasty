@@ -51,9 +51,10 @@ class ConvertAction(GameAction):
         if self.neutral_only and loc.controller != ControlState.NEUTRAL:
             return ActionResult.fail("Can only convert neutral locations")
 
-        # Jin special: cannot convert the capital (建康)
-        if player.faction.value == "jin" and self.target_location == "建康":
-            return ActionResult.fail("Cannot convert the Jin capital (建康)")
+        # Cannot convert the capital (§5.1.5: 东晋的首都不能被转化)
+        capital_loc = getattr(state.sima, 'capital_location', '建康')
+        if self.target_location == capital_loc:
+            return ActionResult.fail(f"Cannot convert the capital ({capital_loc})")
 
         return ActionResult.ok()
 
@@ -93,6 +94,12 @@ class ConvertAction(GameAction):
         # Track region control change
         from rules.area_control import on_location_change
         on_location_change(state, self.target_location)
+
+        # Check if Sima capital was displaced by this conversion
+        from rules.sima import check_capital_displaced
+        capital_events = check_capital_displaced(
+            state, self.target_location, old_controller)
+        events.extend(capital_events)
 
         # Rewards for non-friendly conversion
         if not was_friendly:
@@ -185,7 +192,7 @@ class ArchiveAction(GameAction):
         events = []
 
         # Special handling for refugee cards (流民)
-        if card.is_refugee or card.name == "流民":
+        if card.is_refugee:
             # Return to supply, player gets 2 VP
             state.refugee_supply.append(card)
             player.vp += 2
@@ -247,11 +254,44 @@ class SpreadCultureAction(GameAction):
         except ValueError:
             return ActionResult.fail(f"Invalid region: {self.target_region}")
 
-        # Check region has culture slot
-        # (For now, assume 1 slot per region — refined when region defs loaded)
+        # Validate region is legal for this culture spread
+        from rules.area_control import REGION_CONFIG, get_adjacent_regions
+        from models.enums import CultureType as _CT
 
-        # Must have control or adjacency to existing culture
-        # Simplified check for now
+        cfg = REGION_CONFIG.get(region, {})
+        culture_ct = _CT(self.culture_type)
+
+        # Exclude regions that already have this culture marker
+        rs = state.regions.get(region)
+        if rs and rs.has_culture(culture_ct):
+            return ActionResult.fail(
+                f"Cannot spread {self.culture_type} to {self.target_region}: "
+                f"region already has a {self.culture_type} marker")
+
+        # Condition 1: player controls the region
+        if rs and rs.control_marker is not None:
+            controls = (rs.control_marker != ControlState.NORTH
+                       if self.player_id != "north"
+                       else rs.control_marker == ControlState.NORTH)
+        else:
+            controls = False
+
+        # Condition 2: region adjacent to existing culture region (region-level)
+        regions_with_culture = set()
+        for r, reg_state in state.regions.items():
+            if reg_state.has_culture(culture_ct):
+                regions_with_culture.add(r)
+        adjacent = bool(get_adjacent_regions(region) & regions_with_culture)
+
+        # Condition 3: initial culture of the region matches
+        initial_culture = cfg.get("initial_culture", "")
+        has_initial = (initial_culture == self.culture_type)
+
+        if not (controls or adjacent or has_initial):
+            return ActionResult.fail(
+                f"Cannot spread {self.culture_type} to {self.target_region}: "
+                f"no control, no adjacency, and not initial culture")
+
         return ActionResult.ok()
 
     def execute(self, state: "GameState") -> ActionResult:
@@ -260,17 +300,19 @@ class SpreadCultureAction(GameAction):
             return validation
 
         player = state.get_player(self.player_id)
-
         culture = CultureType(self.culture_type)
         events = []
 
-        # Count culture markers in this region + adjacent regions
-        # Simplified: count the total map markers of this type
-        same_culture_count = sum(
-            1 for loc in state.locations.values()
-            if loc.culture_marker == culture
-        )
-        vp = min(5, same_culture_count + 1)  # +1 for the new one
+        # VP: count of this culture in target region + adjacent regions (max 5)
+        # Rulebook §5.1.6: "数值等于该区域及相邻区域中该文化标记的总数"
+        from rules.area_control import get_adjacent_regions
+        culture_ct = CultureType(self.culture_type)
+        adjacent_count = 0
+        for adj in get_adjacent_regions(Region(self.target_region)):
+            adj_rs = state.regions.get(adj)
+            if adj_rs and adj_rs.has_culture(culture_ct):
+                adjacent_count += 1
+        vp = min(5, 1 + adjacent_count)  # +1 for the newly placed marker
         player.vp += vp
         events.append({"type": "spread_culture_vp", "culture": self.culture_type, "vp": vp})
 
@@ -284,56 +326,53 @@ class SpreadCultureAction(GameAction):
             player.vp += 3
             events.append({"type": "culture_max_contribution_bonus", "vp": 3})
 
-        # Place marker (locked) and award placement bonus
-        # Culture markers belong to regions (§board_info: 文化空位 per region).
-        # We place the marker on the first location in the target region that
-        # the player controls (or any location if none controlled).
-        was_empty = False
-        friendly = state.get_friendly_locations(self.player_id)
-        # Prefer a friendly location within the region
-        region_locations = [lid for lid in state.locations
-                          if self.target_region in _get_location_regions(lid)]
-        chosen_loc = None
-        for lid in region_locations:
-            if lid in friendly:
-                chosen_loc = lid
-                break
-        if not chosen_loc and region_locations:
-            chosen_loc = region_locations[0]
+        # Place marker on the region (culture is regional, not per-location)
+        try:
+            region_enum = Region(self.target_region)
+        except ValueError:
+            return ActionResult.fail(f"Invalid region: {self.target_region}")
 
-        if chosen_loc:
-            loc = state.locations.get(chosen_loc)
-            if loc:
-                was_empty = (loc.culture_marker is None)
-                old_culture = loc.culture_marker  # Track for map_count adjustment
-                loc.culture_marker = culture
-                loc.culture_locked = True
-                events.append({"type": "culture_placed",
-                               "region": self.target_region,
-                               "location": chosen_loc,
-                               "culture": self.culture_type,
-                               "was_empty": was_empty})
-                # Update CultureTrackState.map_count
-                try:
-                    ct_enum = CultureType(self.culture_type)
-                    track = state.culture_tracks.get(ct_enum)
-                    if track:
-                        track.map_count += 1
-                        if old_culture and old_culture != self.culture_type:
-                            old_ct = CultureType(old_culture)
-                            old_track = state.culture_tracks.get(old_ct)
-                            if old_track and old_track.map_count > 0:
-                                old_track.map_count -= 1
-                except (ValueError, KeyError):
-                    pass
-                # Also populate the region's culture_slots for viewport display
-                try:
-                    region_enum = Region(self.target_region)
-                    rs = state.regions.get(region_enum)
-                    if rs and culture not in rs.culture_slots:
-                        rs.culture_slots.append(culture)
-                except (ValueError, KeyError):
-                    pass
+        rs = state.regions.get(region_enum)
+        if rs is None:
+            return ActionResult.fail(f"Region state not found: {self.target_region}")
+
+        # Check if a different culture marker exists and is locked
+        existing = rs.get_cultures()
+        was_empty = (len(existing) == 0)     # True only if region has NO culture at all
+        # Find the existing culture that would be displaced (if any)
+        old_culture = existing[0] if existing else None
+
+        if not was_empty and old_culture != culture:
+            if rs.is_slot_locked(old_culture):
+                return ActionResult.fail(
+                    f"Cannot overwrite locked culture marker in {self.target_region} "
+                    f"({old_culture.value}) — 锁定状态下不可覆盖")
+
+        rs.place_culture(culture)
+        events.append({"type": "culture_placed",
+                       "region": self.target_region,
+                       "culture": self.culture_type,
+                       "was_empty": was_empty})
+
+        # Update CultureTrackState: map_count + supply_level (文化等级)
+        # §5.1.6: 文化等级 = 供应轨露出的格子数
+        # Marker leaves supply → map: supply_level +1
+        # Old marker replaced → goes back to supply: old supply_level -1
+        try:
+            track = state.culture_tracks.get(culture_ct)
+            if track:
+                track.map_count += 1
+                track.supply_level += 1
+                if old_culture and old_culture != culture:
+                    old_ct = CultureType(old_culture)
+                    old_track = state.culture_tracks.get(old_ct)
+                    if old_track:
+                        if old_track.map_count > 0:
+                            old_track.map_count -= 1
+                        if old_track.supply_level > 0:
+                            old_track.supply_level -= 1
+        except (ValueError, KeyError):
+            pass
 
         # Placement bonus (only if slot was empty)
         if was_empty:

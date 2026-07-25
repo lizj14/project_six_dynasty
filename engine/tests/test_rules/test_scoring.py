@@ -7,7 +7,7 @@ import pytest
 from models.enums import ControlState, Region, FactionType, CultureType, PhaseType
 from models.location import LocationState
 from models.player import PlayerState
-from models.game_state import GameState, SimaState
+from models.game_state import GameState, SimaState, CultureTrackState
 from rules.scoring import (
     score_culture, score_sima_distribution, run_final_scoring,
     CULTURE_SUPPLY_VP,
@@ -46,15 +46,13 @@ class TestCultureScoring:
     def test_markers_reveal_positions(self):
         """3 markers → reveal positions 1-3: VP values 1, 2, 4."""
         state = make_scoring_state()
-        # Place 3 Confucianism markers
+        # Set up culture track with 3 markers removed from supply (supply_level)
+        state.culture_tracks[CultureType.CONFUCIANISM] = CultureTrackState(
+            culture=CultureType.CONFUCIANISM, supply_level=3,
+        )
         for loc_id in ["长安", "洛阳", "建康"]:
-            if loc_id in state.locations:
-                state.locations[loc_id].culture_marker = CultureType.CONFUCIANISM
-            else:
-                state.locations[loc_id] = LocationState(
-                    location_id=loc_id,
-                    culture_marker=CultureType.CONFUCIANISM,
-                )
+            if loc_id not in state.locations:
+                state.locations[loc_id] = LocationState(location_id=loc_id)
 
         # Give contributions
         state.jin_players[0].culture_contributions[CultureType.CONFUCIANISM] = 5

@@ -208,6 +208,13 @@ class QueryEngine:
         elif key == "friendly":
             return self._vp.get_friendly_locations()
         elif key == "regions":
+            if len(rest) > 1:
+                # map.regions.<name> — query single region
+                regions = self._vp.get_regions()
+                region_name = rest[1]
+                if region_name in regions:
+                    return regions[region_name]
+                return {"error": f"region {region_name} not found"}
             return self._vp.get_regions()
         elif key == "region" and len(rest) > 1:
             return self._vp.get_locations_in_region(rest[1])
@@ -223,17 +230,31 @@ class QueryEngine:
             return {"error": f"location {key} not found"}
 
     def _query_court(self, rest: list[str]) -> Any:
-        """Handle court.* queries.  Default: names-only per faction."""
+        """Handle court.* queries.  Default: names-only per faction
+        with deck/discard counts."""
         if not rest:
             return {
-                "north": self._zone_names(self._vp.get_court_cards("north")),
-                "jin": self._zone_names(self._vp.get_court_cards("jin")),
+                "north": {
+                    "court": self._zone_names(self._vp.get_court_cards("north")),
+                    "deck_count": self._vp.get_national_deck_count("north"),
+                    "discard": self._vp.get_national_discard("north"),
+                },
+                "jin": {
+                    "court": self._zone_names(self._vp.get_court_cards("jin")),
+                    "deck_count": self._vp.get_national_deck_count("jin"),
+                    "discard": self._vp.get_national_discard("jin"),
+                },
             }
 
         faction = rest[0]
         if faction in ("north", "jin"):
             items = self._vp.get_court_cards(faction)
-            return self._zone_detail(items, rest[1:])
+            detail = self._zone_detail(items, rest[1:])
+            return {
+                "court": detail,
+                "deck_count": self._vp.get_national_deck_count(faction),
+                "discard": self._vp.get_national_discard(faction),
+            }
         return {"error": f"unknown faction: {faction}"}
 
     def _query_played(self, rest: list[str]) -> Any:
@@ -357,7 +378,8 @@ class QueryEngine:
                 task_strs.append(f"{mark}{t.get('type', '?')}")
             tasks_part = " ".join(task_strs) if task_strs else "无任务"
             lines.append(f"【皇帝】{emp_name} (年龄{emp_age})  任务: {tasks_part}")
-            lines.append(f"【司马家】VP:{sima.get('vp', 0)}  军力:{sima.get('military', 0)}  威望:{sima.get('prestige', 0)}")
+            capital = sima.get('capital_location', '建康')
+            lines.append(f"【司马家】VP:{sima.get('vp', 0)}  军力:{sima.get('military', 0)}  威望:{sima.get('prestige', 0)}  首都:{capital}")
         except Exception:
             pass
 
@@ -385,6 +407,22 @@ class QueryEngine:
                     lines.append(f"  {label}: 控制 {' '.join(loc_strs)}")
                 else:
                     lines.append(f"  {label}: 控制 (无)")
+        except Exception:
+            pass
+
+        # --- Culture by Region ---
+        try:
+            regions = self._vp.get_regions()
+            culture_parts = []
+            for rn, rd in sorted(regions.items()):
+                markers = rd.get("culture_markers", [])
+                if markers:
+                    locked = "🔒" if any(m.get("locked") for m in markers) else ""
+                    ct_names = ",".join(m["type"] for m in markers)
+                    culture_parts.append(f"{rn}:{ct_names}{locked}")
+                else:
+                    culture_parts.append(f"{rn}:-")
+            lines.append("【区域文化】" + " ".join(culture_parts))
         except Exception:
             pass
 
