@@ -1,6 +1,8 @@
 # Agent 调研存档
 
-> 创建日期: 2026-07-20 | 最后更新: 2026-07-21
+> 创建日期: 2026-07-20 | 最后更新: 2026-07-29
+> 
+> 深度解析: [Tree of Thoughts](Tree%20of%20Thoughts/Tree%20of%20Thoughts%20深度解析.md) | [Reflexion](Reflexion%20Language%20Agents%20with%20Verbal%20Reinforcement%20Learning/Reflexion%20深度解析.md) | [CAMEL](CAMEL/CAMEL%20多Agent协作优势分析.md) | [Beyond ReAct](Beyond%20ReAct/Beyond%20ReAct%20深度解析.md) | [PokéLLMon](Pok%C3%A9LLMon/Pok%C3%A9LLMon%20%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) | [JARVIS-1](JARVIS-1%20Open-world%20Multi-task%20Agents%20with/JARVIS-1%20%E8%AE%B0%E5%BF%86%E5%A2%9E%E5%BC%BA%E8%A7%84%E5%88%92%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) | [MindAgent](MindAgent%20Multi-Agent%20Cooperation%20Benchmark/MindAgent%20%E5%A4%9Agent%E5%8D%8F%E4%BD%9C%E6%9C%BA%E5%88%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) | [SPRING](SPRING%20Studying%20Papers%20and%20Reasoning%20to%20Play%20Games/SPRING%20%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md)
 > 本项目 (`research/agents/`) 存档对 AI Agent 三个方向的系统调研。
 
 ---
@@ -26,6 +28,9 @@
 
 ### [方向二：LLM Agent 的决策能力](02_llm_agent_decision.md)
 **大语言模型作为自主决策体**
+
+> 📄 [Tree of Thoughts 深度解析](Tree%20of%20Thoughts/Tree%20of%20Thoughts%20深度解析.md) — 完整 Case + 五大范式对比 + 适用问题判断框架
+> 📄 [Reflexion 深度解析](Reflexion%20Language%20Agents%20with%20Verbal%20Reinforcement%20Learning/Reflexion%20深度解析.md) — 口头强化学习全面剖析
 
 | # | 代表工作 | 年份 | 核心范式 | 关键贡献 |
 |---|---------|------|----------|----------|
@@ -55,6 +60,11 @@
 | 6 | **GITM** | 2023 | Minecraft | 层级规划，70+ 通用任务 |
 | 7 | **MindAgent** | 2023 | Overcooked | 多 Agent 协作基准 |
 | 8 | **SPRING** | 2024 | 多游戏 | 读说明书→玩游戏 |
+
+> 📄 [PokéLLMon 深度解析](Pok%C3%A9LLMon/Pok%C3%A9LLMon%20%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — ICRL + KAG + CAG 三大策略全面剖析
+> 📄 [JARVIS-1 记忆增强规划深度解析](JARVIS-1%20Open-world%20Multi-task%20Agents%20with/JARVIS-1%20%E8%AE%B0%E5%BF%86%E5%A2%9E%E5%BC%BA%E8%A7%84%E5%88%92%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — 多模态记忆 + RAG 检索 + 终身学习全面剖析
+> 📄 [MindAgent 多Agent协作深度解析](MindAgent%20Multi-Agent%20Cooperation%20Benchmark/MindAgent%20%E5%A4%9Agent%E5%8D%8F%E4%BD%9C%E6%9C%BA%E5%88%B6%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — 集中式调度器 + CuisineWorld + CoS 评估全面剖析
+> 📄 [SPRING 深度解析](SPRING%20Studying%20Papers%20and%20Reasoning%20to%20Play%20Games/SPRING%20%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — 读论文→玩游戏 + QA-DAG 结构化推理 + 零训练超越 RL SOTA
 
 **关键洞察**：LLM Agent 可以零样本理解游戏、生成策略、与人类对战。87% 的开发者已在采用。
 
