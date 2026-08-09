@@ -482,6 +482,15 @@ class QueryEngine:
                 parts.append(f"威望:{prestige}")
                 parts.append(f"功绩:{contribution}")
                 parts.append(f"顺位:{order}")
+                # Public goal (all players can see)
+                pub_goal = p.get("public_goal")
+                if pub_goal:
+                    parts.append(f"公开目标:{pub_goal}")
+                # Secret goal (viewer only)
+                if pid == my_id:
+                    sec_goal = p.get("secret_goal")
+                    if sec_goal:
+                        parts.append(f"秘密目标:{sec_goal}")
 
             staff_str = " ".join(staff_names) if staff_names else "无"
             parts.append(f"幕僚:[{staff_str}]")

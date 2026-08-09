@@ -91,7 +91,7 @@ regions:
     initial_culture: null
     placement_bonus: 2军力
 
-  关外:
+  塞外:
     locations: [盛乐, 平城]
     control_vp_partial: 0
     control_vp_full: 1
@@ -196,7 +196,7 @@ adjacencies:
   - [蓟城, 平城, difficult]
   - [蓟城, 龙城, difficult]
 
-  # === 关外 ===
+  # === 塞外 ===
   - [盛乐, 平城, simple]
   - [平城, 太原, difficult]
   # 平城 to 蓟城 (listed above)

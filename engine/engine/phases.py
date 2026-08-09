@@ -679,7 +679,7 @@ def _create_initial_locations() -> dict[str, LocationState]:
         "淮南": ["寿春", "合肥", "广陵"],
         "河北": ["中山", "襄国", "邺城", "信都"],
         "幽燕": ["蓟城", "龙城"],
-        "关外": ["盛乐", "平城"],
+        "塞外": ["盛乐", "平城"],
     }
     north_starts = []
     sima_starts = [

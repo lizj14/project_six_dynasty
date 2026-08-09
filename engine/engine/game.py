@@ -167,7 +167,7 @@ class GameEngine:
     def _has_human_player(self) -> bool:
         """Check if any agent is a HumanPlayer (interactive)."""
         for agent in self.agents:
-            if agent.__class__.__name__ == 'HumanPlayer':
+            if getattr(agent, 'is_human', False):
                 return True
         return False
 
@@ -502,6 +502,10 @@ class GameEngine:
             if self.check_early_quit and self.check_early_quit():
                 state.phase = PhaseType.GAME_OVER
                 state.game_end_reason = "early_quit"
+                if self.logger:
+                    self.logger.log_round_end_decks(state)
+                    self.logger.log_round_end_locations(state)
+                    self.logger.log_round_end()
                 return
 
         # === Settlement Phase ===
@@ -708,7 +712,7 @@ class GameEngine:
                 for evt in result.events:
                     if evt.get("type") == "play_card_requested":
                         free = evt.get("free", False)
-                        filter_spec = evt.get("filter", {})
+                        filter_spec = evt.get("filter") or {}
                         eligible = []
                         for i, c in enumerate(player.hand):
                             if self._card_matches_filter(c, filter_spec):
@@ -802,7 +806,8 @@ class GameEngine:
                                                 state, player_id, court_action, r2)
                                 except Exception:
                                     raise
-                        break  # Only handle one extra_action_granted per action
+                        # Continue to handle remaining extra_action_granted events
+                        # (e.g. 刘裕 generates both court_action + hand_action)
 
         # Log skipped extra actions (may=True actions not used)
         if self.logger and player.extra_hand_actions > 0:
@@ -1131,13 +1136,25 @@ class GameEngine:
         if "marker" in filter_spec:
             marker_type = filter_spec["marker"]
             markers = getattr(defn, 'markers', None) or {}
-            if markers.get(marker_type, 0) <= 0:
+            # markers dict uses MarkerType enum keys; filter uses string values
+            # (e.g. "military" ↔ MarkerType.MILITARY)
+            from models.enums import MarkerType
+            try:
+                mt = MarkerType(marker_type)
+            except ValueError:
+                mt = None
+            if not mt or markers.get(mt, 0) <= 0:
                 return False
 
         if "exclude_marker" in filter_spec:
             marker_type = filter_spec["exclude_marker"]
             markers = getattr(defn, 'markers', None) or {}
-            if markers.get(marker_type, 0) > 0:
+            from models.enums import MarkerType
+            try:
+                mt = MarkerType(marker_type)
+            except ValueError:
+                mt = None
+            if mt and markers.get(mt, 0) > 0:
                 return False
 
         if "card_type" in filter_spec:

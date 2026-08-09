@@ -161,7 +161,7 @@ class TestVPRegions:
         assert cfg["full_vp"] == 8
 
     def test_youyan_guanwai_zero_partial(self):
-        """幽燕 and 关外 have 0 partial VP."""
+        """幽燕 and 塞外 have 0 partial VP."""
         assert REGION_CONFIG[Region.YOUYAN]["partial_vp"] == 0
         assert REGION_CONFIG[Region.GUANWAI]["partial_vp"] == 0
 

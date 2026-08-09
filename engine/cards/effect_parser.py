@@ -1632,7 +1632,7 @@ def _parse_target(desc: str) -> dict:
     if re.search(r'非东晋占据', desc):
         target["filters"].append({"type": "not_jin_controlled"})
     # Region filter
-    region_m = re.search(r'\[?(玄学|儒学|佛学|江南|中原|关中|河北|山东|山西|淮南|荆襄|巴蜀|西凉|幽燕|关外)\]?\s*区域', desc)
+    region_m = re.search(r'\[?(玄学|儒学|佛学|江南|中原|关中|河北|山东|山西|淮南|荆襄|巴蜀|西凉|幽燕|塞外)\]?\s*区域', desc)
     if region_m:
         target["filters"].append({"type": "region", "value": region_m.group(1)})
     # Culture marker filter

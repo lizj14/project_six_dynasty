@@ -1,12 +1,13 @@
-"""Interactive game: human player vs HeuristicAI opponents.
+"""Interactive game: human player vs HeuristicAI opponents, or hot-seat multiplayer.
 
 Usage:
+    # Single human + 3 AI
     python play_game.py                    # Interactive faction selection
     python play_game.py north              # Play as 北方
     python play_game.py jin                # Play as 东晋 player 1
-    python play_game.py jin_1              # Play as 东晋 player 1
-    python play_game.py jin_2              # Play as 东晋 player 2
-    python play_game.py jin_3              # Play as 东晋 player 3
+
+    # 4-player hot-seat (all human, pass the keyboard)
+    python play_game.py --all-human
 
     # Custom initial hand (for testing specific cards):
     python play_game.py jin --preset jin_1=慧远,尊奉江东
@@ -122,6 +123,99 @@ class LoggingAgentWrapper:
             except Exception:
                 print(f"  [{self.player_id}] {getattr(action, 'action_type', '?')}")
         return action
+
+    def make_choice(self, state, prompt):
+        return self._agent.make_choice(state, prompt)
+
+    def choose_discards(self, state, hand_cards, count, reason="hand_limit"):
+        return self._agent.choose_discards(state, hand_cards, count, reason=reason)
+
+    def select_target(self, state, prompt):
+        return self._agent.select_target(state, prompt)
+
+    def request_card_play(self, state, eligible_indices, filter_spec=None, free=False):
+        return self._agent.request_card_play(state, eligible_indices, filter_spec=filter_spec, free=free)
+
+    def request_court_play(self, state, eligible_cards=None, filter_spec=None):
+        return self._agent.request_court_play(state, eligible_cards=eligible_cards, filter_spec=filter_spec)
+
+
+class HotSeatProxy:
+    """Wraps a HumanPlayer for hot-seat multiplayer.
+
+    Clears screen and shows a "pass keyboard to player X" prompt at the
+    start of each player's turn and setup, so 4 humans can share one terminal
+    without seeing each other's private information.
+
+    Implements the full GameAgent interface by delegating to the inner
+    HumanPlayer.
+    """
+
+    is_human: bool = True
+    _last_player: str | None = None  # Track whose turn was last displayed
+
+    def __init__(self, human_player: "HumanPlayer"):
+        self._agent = human_player
+
+    # ---- identity ----
+
+    @property
+    def player_id(self):
+        return self._agent.player_id
+
+    @property
+    def wants_early_quit(self) -> bool:
+        return self._agent.wants_early_quit
+
+    @wants_early_quit.setter
+    def wants_early_quit(self, v: bool):
+        self._agent._request_early_quit = v
+
+    # ---- turn transition ----
+
+    @staticmethod
+    def _clear_and_prompt(player_label: str, phase: str = "行动"):
+        """Clear terminal and show 'pass keyboard' banner."""
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"\n{'='*60}")
+        print(f"  🔄 请将键盘交给: {player_label}")
+        print(f"     即将进入: {phase}")
+        print(f"     按 Enter 继续...")
+        print(f"{'='*60}")
+        try:
+            input()
+        except (EOFError, KeyboardInterrupt):
+            pass
+
+    # ---- GameAgent delegation ----
+
+    def setup_decision(self, ctx) -> "SetupDecision":
+        faction_label = "北方" if ctx.faction == "north" else "东晋"
+        HotSeatProxy._clear_and_prompt(
+            f"[{faction_label}] {self.player_id}", "初设")
+        return self._agent.setup_decision(ctx)
+
+    def decide_action(self, state, available_actions):
+        if HotSeatProxy._last_player != self.player_id:
+            HotSeatProxy._last_player = self.player_id
+            # Build a quick summary of whose turn it is
+            player = state.get_player(self.player_id)
+            faction_label = ""
+            if player:
+                from models.enums import FactionType
+                faction_label = "北方" if player.faction == FactionType.NORTH else "东晋"
+            HotSeatProxy._clear_and_prompt(
+                f"[{faction_label}] {self.player_id}", f"第{state.round}回合行动")
+            # Print viewport summary after switching
+            try:
+                from viewport import create_viewport, QueryEngine
+                vp = create_viewport(state, self.player_id, [], mode="live")
+                qe = QueryEngine(vp)
+                print(qe.query("summary"))
+                print()
+            except Exception:
+                pass
+        return self._agent.decide_action(state, available_actions)
 
     def make_choice(self, state, prompt):
         return self._agent.make_choice(state, prompt)
@@ -300,7 +394,7 @@ def _print_final_scoring_breakdown(state, scoring_result, winner: str, human_pid
         pd = player_details[pid]
         label = faction_labels.get(pid, pid)
         marker = " ★胜者" if pid == winner else ""
-        is_you = " (你)" if pid == human_pid else ""
+        is_you = " (你)" if human_pid and pid == human_pid else ""
 
         # Calculate pre-scoring VP (final VP minus scoring gains)
         scoring_gain = pd["culture"] + pd["region"] + pd["sima"] + pd["goal"]
@@ -340,8 +434,111 @@ def _print_final_scoring_breakdown(state, scoring_result, winner: str, human_pid
 
 
 def main():
-    # Parse preset hands from CLI before faction selection
+    # Parse preset hands and detect --all-human flag
     preset_hands, bare_presets = parse_preset_hands(sys.argv)
+    all_human = "--all-human" in sys.argv
+
+    if all_human:
+        # ================================================================
+        # 4-player hot-seat mode — all human, share one terminal
+        # ================================================================
+        human_pid = None  # No single human — all are human
+        print("\n" + "=" * 50)
+        print("  六朝何事 — 四人热座对战")
+        print("=" * 50)
+        print("\n  四位玩家轮流使用同一终端。")
+        print("  每回合开始前会清屏并提示'换人'。")
+        print("  输入 q 可随时退出并保存日志。")
+        print("\n  游戏开始...\n")
+
+        # Load version
+        v = Version.load('v1.0')
+
+        # Create 4 HumanPlayer instances wrapped in HotSeatProxy
+        human_players: list[HumanPlayer] = []
+        agents: list[HotSeatProxy] = []
+        for pid in ["north", "jin_1", "jin_2", "jin_3"]:
+            hp = HumanPlayer(player_id=pid)
+            human_players.append(hp)
+            agents.append(HotSeatProxy(hp))
+
+        # Wire callbacks for multi-human visibility:
+        # Each player sees their own draw card names (the action owner is
+        # always a human, so human_pid = pid always matches).
+        def on_action(state, pid, action, result):
+            HumanPlayer.print_action_result(state, pid, action, result, human_pid=pid)
+
+        def check_quit():
+            return any(hp.wants_early_quit for hp in human_players)
+
+        if preset_hands:
+            print(f"  🧪 测试模式 — 预设手牌: {preset_hands}")
+
+        # Create logger and engine
+        logger = GameLogger()
+        game_seed = int(time.time() * 1000) % 999999
+
+        engine = GameEngine(
+            agents=agents, version=v, seed=game_seed, logger=logger,
+            on_action_executed=on_action,
+            preset_hands=preset_hands if preset_hands else None,
+        )
+        engine.check_early_quit = check_quit
+
+        # Run game
+        t0 = time.time()
+        final_state = engine.run()
+        elapsed = time.time() - t0
+
+        # Check if early quit
+        if any(hp.wants_early_quit for hp in human_players):
+            quitters = [hp.player_id for hp in human_players if hp.wants_early_quit]
+            print(f"\n{'='*50}")
+            print(f"  ⚠ 游戏提前终止（玩家 {', '.join(quitters)} 请求）")
+            print(f"  回合数: {final_state.round}")
+            print(f"{'='*50}")
+
+        # Print results
+        winner = engine.get_winner()
+        scores = engine.get_scores()
+        if not any(hp.wants_early_quit for hp in human_players):
+            print(f"\n{'='*50}")
+            print(f"  游戏结束!")
+            print(f"  耗时: {elapsed:.1f}s")
+            print(f"  回合数: {final_state.round}")
+            print(f"  结束原因: {final_state.game_end_reason or 'round_10'}")
+            print(f"{'='*50}")
+
+            scoring_result = getattr(final_state, '_final_scoring_result', None)
+            if scoring_result:
+                _print_final_scoring_breakdown(final_state, scoring_result, winner, None)
+            else:
+                print()
+                for pid, score in scores.items():
+                    marker = " ★胜者" if pid == winner else ""
+                    print(f"  {pid}: {score} VP{marker}")
+
+        # Save logs
+        log_dir = os.path.join(os.path.dirname(__file__), "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        early_tag = "_early_quit" if any(hp.wants_early_quit for hp in human_players) else ""
+        base_name = f"{timestamp}_hotseat_4p{early_tag}"
+
+        txt_path = os.path.join(log_dir, f"{base_name}.txt")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(logger.to_text())
+        print(f"\n  文本日志: {txt_path}")
+
+        json_path = os.path.join(log_dir, f"{base_name}.json")
+        with open(json_path, "w", encoding="utf-8") as f:
+            f.write(logger.to_json())
+        print(f"  JSON日志: {json_path}")
+        return
+
+    # ================================================================
+    # Standard mode: 1 human + 3 AI (original behavior)
+    # ================================================================
 
     # Select faction
     chosen_faction = select_faction(sys.argv)
@@ -396,11 +593,11 @@ def main():
     game_seed = int(time.time() * 1000) % 999999
 
     # Wire callbacks for human player
-    def on_action(state, pid, action, result):
+    def on_action_1p(state, pid, action, result):
         """Print action results to terminal — enforce viewport visibility rules."""
         HumanPlayer.print_action_result(state, pid, action, result, human_pid=human_pid)
 
-    def check_quit():
+    def check_quit_1p():
         """Check if human player requested early quit."""
         return human_player.wants_early_quit
 
@@ -409,10 +606,10 @@ def main():
 
     engine = GameEngine(
         agents=agents, version=v, seed=game_seed, logger=logger,
-        on_action_executed=on_action,
+        on_action_executed=on_action_1p,
         preset_hands=preset_hands if preset_hands else None,
     )
-    engine.check_early_quit = check_quit
+    engine.check_early_quit = check_quit_1p
 
     # Run game
     t0 = time.time()

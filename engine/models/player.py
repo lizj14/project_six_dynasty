@@ -64,8 +64,16 @@ class PlayerState:
 
     @property
     def staff_limit(self) -> int:
-        """Maximum number of staff (幕僚) cards."""
-        return 4 if self.faction == FactionType.NORTH else 3
+        """Maximum number of staff (幕僚) cards.
+
+        Base: Jin=3, North=4. Hero cards may override (e.g. 刘裕=5).
+        """
+        base = 4 if self.faction == FactionType.NORTH else 3
+        if self.hero and self.hero.definition:
+            hero_limit = self.hero.definition.staff_limit
+            if hero_limit and hero_limit > base:
+                return hero_limit
+        return base
 
     @property
     def hand_limit(self) -> int:

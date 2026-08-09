@@ -89,7 +89,7 @@ class Region(Enum):
     HUAINAN = "淮南"         # 寿春, 合肥, 广陵
     HEBEI = "河北"           # 中山, 襄国, 邺城, 信都
     YOUYAN = "幽燕"          # 蓟城, 龙城
-    GUANWAI = "关外"         # 盛乐, 平城
+    GUANWAI = "塞外"         # 盛乐, 平城
 
 
 class MarkerType(Enum):

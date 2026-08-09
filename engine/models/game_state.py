@@ -498,7 +498,7 @@ class GameState:
 
         Fallback (无地点兜底):
           - 东晋玩家占据0个地点: 视为拥有北伐标记（所有友方地点）
-          - 北方玩家占据0个地点: 河北/幽燕/关外 视为相邻地点
+          - 北方玩家占据0个地点: 河北/幽燕/塞外 视为相邻地点
         """
         player = self.get_player(player_id)
         if not player:
@@ -525,12 +525,12 @@ class GameState:
                 if loc.is_friendly_to(cs) and loc_id not in sources:
                     sources.append(loc_id)
 
-        # Fallback: North player with 0 own locations → 河北/幽燕/关外
+        # Fallback: North player with 0 own locations → 河北/幽燕/塞外
         if player.faction == FactionType.NORTH and len(sources) == 0:
             _north_fallback_regions = {
                 "河北": ["中山", "襄国", "邺城", "信都"],
                 "幽燕": ["蓟城", "龙城"],
-                "关外": ["盛乐", "平城"],
+                "塞外": ["盛乐", "平城"],
             }
             for _locs in _north_fallback_regions.values():
                 for _lid in _locs:

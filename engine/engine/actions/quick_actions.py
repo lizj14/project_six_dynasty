@@ -148,13 +148,13 @@ class MarchAction(GameAction):
     player_id: str = ""
     target_location: str = ""
     source_location: Optional[str] = None  # Optional: which adjacent location to march from
+    cost_reduction: int = 0       # Per-action reduction (e.g. 王镇恶 active: -2)
 
     def _calculate_cost(self, state: "GameState") -> int:
         """Calculate the military cost for this march."""
         cost = 3  # base
 
         # Difficult terrain
-        # Find which adjacency source location we're marching from
         sources = state.get_adjacency_source_locations(self.player_id)
         neighbors = state.get_adjacent_locations(self.target_location)
         for nb in neighbors:
@@ -170,9 +170,6 @@ class MarchAction(GameAction):
             cost += 1
 
         # Isolated location
-        # A location is isolated if NONE of its neighbors are friendly to the target.
-        # Only applies to player/Sima-controlled targets — neutral/empty locations
-        # have no faction allegiance, so there is no concept of "isolated".
         target_cs = target_loc.controller if target_loc else None
         if target_cs and target_cs not in (ControlState.NEUTRAL, ControlState.EMPTY):
             isolated = True
@@ -184,9 +181,10 @@ class MarchAction(GameAction):
             if isolated:
                 cost -= 1
 
+        # Active cost reduction from effect step (e.g. 王镇恶: -2)
+        cost -= self.cost_reduction
+
         # Passive cost reduction (e.g. 草原部落: 进军费用-1)
-        # Query all in-play passives for march_cost_reduction effects.
-        # This is a true pre-cost reduction, not a post-hoc reimbursement.
         reduction = state.query_march_cost_reduction(
             self.player_id,
             context={"player_id": self.player_id, "action": self})

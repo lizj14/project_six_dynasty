@@ -358,7 +358,8 @@ def _build_snapshot(state: "GameState", viewer_id: str,
         private["staff"] = [card_to_summary(c) for c in player.staff_area]
         private["history"] = [card_to_summary(c) for c in player.history_area]
         private["hero"] = card_to_summary(player.hero) if player.hero else None
-        private["secret_goal"] = None  # Not yet stored on GameState
+        goal_cards = getattr(player, 'goal_cards', []) or []
+        private["secret_goal"] = goal_cards[1] if len(goal_cards) > 1 else None
         private["can_take_hand_action"] = player.can_take_hand_action()
         private["can_take_court_action"] = player.can_take_court_action()
         private["extra_hand_actions"] = player.extra_hand_actions

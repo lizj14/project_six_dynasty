@@ -374,6 +374,16 @@ class _RegionCondition(ConditionOperator):
                 return reg
         return None
 
+        for reg, cfg in REGION_CONFIG.items():
+            if reg.value == resolved:
+                return reg
+            if resolved in cfg.get("locations", []):
+                return reg
+        for reg in Region:
+            if reg.value == resolved:
+                return reg
+        return None
+
 
 @register_condition
 class ControlRegionCondition(_RegionCondition):

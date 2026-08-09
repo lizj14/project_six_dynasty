@@ -22,6 +22,8 @@ class HumanPlayer(GameAgent):
     options, then waits for numeric input from the user.
     """
 
+    is_human: bool = True  # Class marker for _has_human_player() checks
+
     def __init__(self, player_id: str = ""):
         self.player_id = player_id
         self._action_count = 0  # Track how many actions taken this turn
@@ -825,7 +827,7 @@ class HumanPlayer(GameAgent):
                 else:
                     print(f"     ↳ 获得额外行动: {free_label}{action_type}")
             elif t == "play_card_requested":
-                filter_spec = evt.get("filter", {})
+                filter_spec = evt.get("filter") or {}
                 free = evt.get("free", False)
                 free_label = " (免费)" if free else ""
                 fil = filter_spec.get("type", filter_spec.get("keyword", ""))

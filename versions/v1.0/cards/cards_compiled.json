@@ -2909,7 +2909,8 @@
                       "effect_type": "archive_card",
                       "params": {
                         "from": "staff",
-                        "count": 1
+                        "count": 1,
+                        "highest_cost": true
                       }
                     }
                   ]

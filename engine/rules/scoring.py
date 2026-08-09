@@ -107,28 +107,26 @@ def score_culture(state: "GameState") -> dict:
         # Rank players by contribution
         ranked = _rank_by_contribution(state, culture)
 
-        # Award top 3 revealed VP values
+        # Award top 3 revealed VP values.
+        # Rulebook §5.4.1: 平手时合并所占名次的VP池，平分（向下取整）。
         awards = {}
-        for rank_idx in range(min(3, n, len(ranked))):
+        rank_idx = 0
+        while rank_idx < min(3, n, len(ranked)):
             if rank_idx >= len(revealed_vp):
                 break
-            vp_value = revealed_vp[rank_idx]
-            # Check for ties at this rank
+            # Collect all players tied at this rank
             tied_players = _get_tied_at_rank(ranked, rank_idx)
-
-            if len(tied_players) > 1:
-                split_vp = vp_value // len(tied_players)
-                for pid in tied_players:
-                    player = state.get_player(pid)
-                    if player:
-                        player.vp += split_vp
-                        awards[pid] = awards.get(pid, 0) + split_vp
-            else:
-                pid = ranked[rank_idx]
+            tie_count = len(tied_players)
+            # Pool VP values for the rank positions occupied by this tied group
+            pool_end = min(rank_idx + tie_count, len(revealed_vp), 3, n)
+            vp_pool = sum(revealed_vp[rank_idx:pool_end])
+            split_vp = vp_pool // tie_count
+            for pid in tied_players:
                 player = state.get_player(pid)
                 if player:
-                    player.vp += vp_value
-                    awards[pid] = awards.get(pid, 0) + vp_value
+                    player.vp += split_vp
+                    awards[pid] = awards.get(pid, 0) + split_vp
+            rank_idx += tie_count
 
         details[culture.value] = {
             "markers": n,
@@ -141,8 +139,8 @@ def score_culture(state: "GameState") -> dict:
     return details
 
 
-def _rank_by_contribution(state: "GameState", culture: CultureType) -> list[str]:
-    """Return player_ids ranked by contribution to this culture (highest first).
+def _rank_by_contribution(state: "GameState", culture: CultureType) -> list[tuple[str, int]]:
+    """Return (player_id, contribution) ranked by contribution (highest first).
 
     Tiebreaker: earlier action order (顺位靠前的玩家排名靠前).
     """
@@ -151,14 +149,20 @@ def _rank_by_contribution(state: "GameState", culture: CultureType) -> list[str]
               for p in players]
     # Sort: highest contribution first, then lowest order (earlier = better)
     scored.sort(key=lambda x: (-x[1], x[2]))
-    return [pid for pid, _, _ in scored]
+    return [(pid, contrib) for pid, contrib, _ in scored]
 
 
-def _get_tied_at_rank(ranked: list[str], rank_idx: int) -> list[str]:
-    """Get all players tied with the player at rank_idx."""
+def _get_tied_at_rank(ranked: list[tuple[str, int]], rank_idx: int) -> list[str]:
+    """Get all players tied with the player at rank_idx (same contribution value)."""
     if rank_idx >= len(ranked):
         return []
-    return [pid for pid in ranked if pid == ranked[rank_idx]]
+    target_contrib = ranked[rank_idx][1]
+    # Include current and subsequent ranks with the same contribution
+    tied = []
+    for pid, contrib in ranked:
+        if contrib == target_contrib:
+            tied.append(pid)
+    return tied
 
 
 def _all_player_ids(state: "GameState") -> list[str]:

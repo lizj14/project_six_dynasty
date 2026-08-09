@@ -200,7 +200,7 @@ def _find_region(name: str) -> Optional[Region]:
         "江南": Region.JIANGNAN, "中原": Region.ZHONGYUAN,
         "山西": Region.SHANXI, "山东": Region.SHANDONG,
         "淮南": Region.HUAINAN, "河北": Region.HEBEI,
-        "幽燕": Region.YOUYAN, "关外": Region.GUANWAI,
+        "幽燕": Region.YOUYAN, "塞外": Region.GUANWAI,
     }
     return region_map.get(name)
 

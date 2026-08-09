@@ -754,12 +754,18 @@ class GameLogger:
                     lines.append(f"      {detail}")
                 lines.append(f"")
 
-        # Final scores
-        faction_labels = {"north": "北方", "jin_1": "东晋-顾荣", "jin_2": "东晋-刘裕",
-                         "jin_3": "东晋-谢安", "sima": "司马家"}
+        # Final scores — build labels from actual hero names
+        hero_map = {p["id"]: p.get("hero", "?") for p in self.log.players}
+        faction_labels = {"north": "北方", "sima": "司马家"}
         for pid, score in self.log.final_scores.items():
             marker = " ★胜者" if pid == self.log.winner else ""
-            label = faction_labels.get(pid, pid)
+            if pid in faction_labels:
+                label = faction_labels[pid]
+            elif pid.startswith("jin_"):
+                hero = hero_map.get(pid, "?")
+                label = f"东晋-{hero}"
+            else:
+                label = pid
             lines.append(f"  {label} ({pid}): {score} VP{marker}")
 
         return "\n".join(lines)

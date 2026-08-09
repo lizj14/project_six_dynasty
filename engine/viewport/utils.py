@@ -281,6 +281,9 @@ def public_player_summary(player: "PlayerState", state=None) -> dict:
         summary["contribution"] = player.contribution
         summary["order"] = player.order
         summary["order_seq"] = player.order_seq
+        # Public goal (goal_cards[0]); secret goal only visible to owner
+        goal_cards = getattr(player, 'goal_cards', []) or []
+        summary["public_goal"] = goal_cards[0] if goal_cards else None
 
     # Culture contributions (public track)
     summary["culture_contributions"] = {
@@ -298,11 +301,16 @@ def private_player_summary(player: "PlayerState") -> dict:
     Use get_my_hand() / get_my_staff() / get_my_history() on the viewport
     for full card details, or query my.hand.detail / my.hand.<N> via CLI.
     """
+    # Secret goal: second goal in goal_cards (only when differs from public)
+    goal_cards = getattr(player, 'goal_cards', []) or []
+    secret_goal = goal_cards[1] if len(goal_cards) > 1 else None
+
     return {
         "hand": card_name_list(player.hand),
         "staff": card_name_list(player.staff_area),
         "history": card_name_list(player.history_area),
         "hero": card_to_summary(player.hero) if player.hero else None,
+        "secret_goal": secret_goal,
         "can_take_hand_action": player.can_take_hand_action(),
         "can_take_court_action": player.can_take_court_action(),
         "extra_hand_actions": player.extra_hand_actions,
@@ -368,7 +376,7 @@ def _get_location_region(location_id: str) -> str:
         "寿春": "淮南", "合肥": "淮南", "广陵": "淮南",
         "中山": "河北", "襄国": "河北", "邺城": "河北", "信都": "河北",
         "蓟城": "幽燕", "龙城": "幽燕",
-        "盛乐": "关外", "平城": "关外",
+        "盛乐": "塞外", "平城": "塞外",
     }
     return region_map.get(location_id, "")
 

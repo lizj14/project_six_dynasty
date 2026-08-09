@@ -425,9 +425,6 @@ class LiveViewport(Viewport):
             private["staff"] = self.get_my_staff()
             private["history"] = self.get_my_history()
             private["hero"] = self.get_my_hero()
-            # Secret goal is not stored on GameState currently;
-            # include placeholder for future use.
-            private["secret_goal"] = None
 
         return {
             "viewer_id": self.viewer_id,

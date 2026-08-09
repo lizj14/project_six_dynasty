@@ -259,6 +259,7 @@ class ArchiveCardOperator(EffectOperator):
         count = step.params.get("count", 1)
         card_type_filter = step.params.get("card_type")  # "court", "friend", "any", or None
         source = step.params.get("from")  # "staff", "hand", or None
+        highest_cost = step.params.get("highest_cost", False)  # 仅最高费用
 
         for _ in range(count):
             card = None
@@ -294,17 +295,29 @@ class ArchiveCardOperator(EffectOperator):
             elif source == "staff":
                 # Archive from staff area
                 if player and player.staff_area:
+                    staff_cards = list(player.staff_area)
+                    if highest_cost:
+                        # 仅保留费用最高的幕僚 (人何以堪 etc.)
+                        max_cost = max(c.cost for c in staff_cards)
+                        staff_cards = [c for c in staff_cards if c.cost == max_cost]
                     if resolver.select_target_callback:
-                        prompt = {
-                            "type": "archive_card",
-                            "title": "选择1张幕僚存档",
-                            "options": [
-                                {"id": c.definition.card_id,
-                                 "label": f"{c.name} (史书{c.definition.history_vp}vp)"}
-                                for c in player.staff_area
-                            ],
-                        }
-                        chosen_id = resolver.select_target_callback(player_id, prompt)
+                        if len(staff_cards) == 1:
+                            # Auto-select the only eligible card
+                            card = staff_cards[0]
+                            chosen_id = card.definition.card_id
+                        else:
+                            prompt = {
+                                "type": "archive_card",
+                                "title": "选择1张幕僚存档"
+                                        + (" (仅最高费用)" if highest_cost else ""),
+                                "options": [
+                                    {"id": c.definition.card_id,
+                                     "label": f"{c.name} (费用{c.cost}, 史书{c.definition.history_vp}vp)"}
+                                    for c in staff_cards
+                                ],
+                            }
+                            chosen_id = resolver.select_target_callback(player_id, prompt)
+                            card = None
                         if chosen_id:
                             for i, c in enumerate(player.staff_area):
                                 if c.definition.card_id == chosen_id:
@@ -404,9 +417,15 @@ class PlayCardOperator(EffectOperator):
                     "source": "play_card_effect",
                 })
             else:
+                # Merge card_type into filter_spec so eligibility checks work.
+                # e.g. 卫夫人: {"card_type": "friend"} → only 幕僚 cards.
+                combined_filter = dict(filter_spec) if filter_spec else {}
+                if card_type_filter:
+                    combined_filter["card_type"] = card_type_filter
                 result.events.append({
                     "type": "play_card_requested", "count": count,
-                    "filter": filter_spec, "index": i, "free": free,
+                    "filter": combined_filter if combined_filter else None,
+                    "index": i, "free": free,
                 })
         return result
 
@@ -706,7 +725,7 @@ class MarchOperator(_TargetedMapOperator):
         Uses get_adjacency_source_locations() which implements:
           - Normal: own locations only
           - Expedition marker: all friendly locations
-          - Fallback (0 own locations): Jin→all friendly, North→河北/幽燕/关外
+          - Fallback (0 own locations): Jin→all friendly, North→河北/幽燕/塞外
         """
         sources = state.get_adjacency_source_locations(player_id)
         player_cs = state._player_control_state(player_id)
@@ -742,25 +761,27 @@ class MarchOperator(_TargetedMapOperator):
                     target_location=target,
                     source_location=p.get("source_location"),
                 )
-                # Handle free / cost_reduction — temporarily grant military
-                player = state.get_player(player_id)
-                if free or cost_reduction:
+                # Per-action cost reduction (e.g. 王镇恶: cost_reduction=2)
+                # Applied inside _calculate_cost() so validate() sees the
+                # reduced cost — same mechanism as 草原部落 passive.
+                if free:
+                    # Free march: temporarily grant full cost for validation,
+                    # then march deducts cost → net 0 for the player.
                     cost = action._calculate_cost(state)
-                    reduction = cost if free else min(cost_reduction, cost - 1)
-                    if reduction > 0 and player:
-                        # Pre-grant the reduction, then let action.execute() deduct
-                        # the full cost. Net: player pays (cost - reduction).
-                        # e.g. cost=3, reduction=2 → grant 2, deduct 3 → net -1 ✓
-                        player.military += reduction
+                    player = state.get_player(player_id)
+                    if player:
+                        player.military += cost
                         r = resolver.action_system.execute(state, action)
                         result.events.extend(r.events if r.success else [])
                         if not r.success:
-                            if not r.success: result.errors.append(r.error or "action failed")
-                        continue
+                            result.errors.append(r.error or "action failed")
+                    continue
+                if cost_reduction:
+                    action.cost_reduction = cost_reduction
                 r = resolver.action_system.execute(state, action)
                 result.events.extend(r.events if r.success else [])
                 if not r.success:
-                    if not r.success: result.errors.append(r.error or "action failed")
+                    result.errors.append(r.error or "action failed")
             else:
                 result.events.append({
                     "type": "march_requested", "free": free,
@@ -780,7 +801,7 @@ class OccupyOperator(_TargetedMapOperator):
         """Empty/neutral locations adjacent to own locations (not allies/Sima).
 
         Uses get_adjacency_source_locations() which implements the fallback rule
-        for players with 0 own locations (Jin→all friendly, North→河北/幽燕/关外).
+        for players with 0 own locations (Jin→all friendly, North→河北/幽燕/塞外).
         """
         sources = state.get_adjacency_source_locations(player_id)
         valid = []
