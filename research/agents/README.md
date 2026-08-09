@@ -60,6 +60,7 @@
 | 6 | **GITM** | 2023 | Minecraft | 层级规划，70+ 通用任务 |
 | 7 | **MindAgent** | 2023 | Overcooked | 多 Agent 协作基准 |
 | 8 | **SPRING** | 2024 | 多游戏 | 读说明书→玩游戏 |
+| 9 | **[Brass (伯明翰) 调研](brass/README.md)** | 2026 | 两项基础设施 | 近乎空白 —— 游戏环境+LLM架构 |
 
 > 📄 [PokéLLMon 深度解析](Pok%C3%A9LLMon/Pok%C3%A9LLMon%20%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — ICRL + KAG + CAG 三大策略全面剖析
 > 📄 [JARVIS-1 记忆增强规划深度解析](JARVIS-1%20Open-world%20Multi-task%20Agents%20with/JARVIS-1%20%E8%AE%B0%E5%BF%86%E5%A2%9E%E5%BC%BA%E8%A7%84%E5%88%92%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90.md) — 多模态记忆 + RAG 检索 + 终身学习全面剖析

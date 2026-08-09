@@ -1,0 +1,11 @@
+{
+  "timestamp": "20260801_143935",
+  "model": "deepseek-v4-pro",
+  "temperature": 0.3,
+  "max_tokens": 4096,
+  "token_usage": {
+    "prompt_tokens": 21867,
+    "completion_tokens": 1117,
+    "total_tokens": 22984
+  }
+}
