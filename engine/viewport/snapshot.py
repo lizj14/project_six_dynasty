@@ -122,7 +122,7 @@ class SnapshotViewport(Viewport):
             ctrl = loc.get("controller", "")
             if faction == "north" and ctrl == "north":
                 friendly.append(loc_id)
-            elif faction == "jin" and ctrl in ("jin_p1", "jin_p2", "jin_p3", "jin_1", "jin_2", "jin_3"):
+            elif faction == "jin" and ctrl in ("jin_p1", "jin_p2", "jin_p3", "jin_1", "jin_2", "jin_3", "sima"):
                 friendly.append(loc_id)
         return friendly
 
@@ -186,6 +186,9 @@ class SnapshotViewport(Viewport):
 
     def get_forced_event_pile_count(self) -> int:
         return self._data["public"].get("forced_event_pile_count", 0)
+
+    def get_forced_event_pile_names(self) -> list[str]:
+        return self._data["public"].get("forced_event_pile_names", [])
 
     def get_refugee_supply_count(self) -> int:
         return self._data["public"].get("refugee_supply_count", 0)
@@ -345,6 +348,7 @@ def _build_snapshot(state: "GameState", viewer_id: str,
         "tracks": tracks,
         "decks": decks,
         "forced_event_pile_count": len(state.forced_event_pile),
+        "forced_event_pile_names": [c.name for c in state.forced_event_pile],
         "refugee_supply_count": len(state.refugee_supply),
         "emperor": emperor,
         "sima": sima_data,

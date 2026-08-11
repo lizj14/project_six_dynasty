@@ -236,11 +236,13 @@ class QueryEngine:
             return {
                 "north": {
                     "court": self._zone_names(self._vp.get_court_cards("north")),
+                    "played": self._zone_names(self._vp.get_played_this_round("north")),
                     "deck_count": self._vp.get_national_deck_count("north"),
                     "discard": self._vp.get_national_discard("north"),
                 },
                 "jin": {
                     "court": self._zone_names(self._vp.get_court_cards("jin")),
+                    "played": self._zone_names(self._vp.get_played_this_round("jin")),
                     "deck_count": self._vp.get_national_deck_count("jin"),
                     "discard": self._vp.get_national_discard("jin"),
                 },
@@ -252,6 +254,7 @@ class QueryEngine:
             detail = self._zone_detail(items, rest[1:])
             return {
                 "court": detail,
+                "played": self._zone_names(self._vp.get_played_this_round(faction)),
                 "deck_count": self._vp.get_national_deck_count(faction),
                 "discard": self._vp.get_national_discard(faction),
             }
@@ -380,6 +383,15 @@ class QueryEngine:
             lines.append(f"【皇帝】{emp_name} (年龄{emp_age})  任务: {tasks_part}")
             capital = sima.get('capital_location', '建康')
             lines.append(f"【司马家】VP:{sima.get('vp', 0)}  军力:{sima.get('military', 0)}  威望:{sima.get('prestige', 0)}  首都:{capital}")
+        except Exception:
+            pass
+
+        # --- Deck & Forced Events ---
+        try:
+            deck_cnt = self._vp.get_main_deck_count()
+            fe_names = self._vp.get_forced_event_pile_names()
+            fe_part = f" 强制事件: [{', '.join(fe_names)}]" if fe_names else ""
+            lines.append(f"【牌库】主牌库: {deck_cnt}张{fe_part}")
         except Exception:
             pass
 

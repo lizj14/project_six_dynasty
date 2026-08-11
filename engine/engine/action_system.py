@@ -31,6 +31,9 @@ AnyAction = Union[
 class ActionSystem:
     """Central dispatcher for validating and executing game actions."""
 
+    def __init__(self):
+        self.on_executed: callable = None  # fn(action, state, player_id, result)
+
     def validate(self, state: "GameState", action: AnyAction) -> ActionResult:
         """Validate an action against the current game state."""
         return action.validate(state)
@@ -40,6 +43,8 @@ class ActionSystem:
 
         Returns ActionResult with events. Modifies state in place.
         The caller should check action.success before relying on state changes.
+        Fires on_executed callback on success so passive triggers are
+        dispatched even when actions are executed inside card effects.
         """
         # Validate first
         result = action.validate(state)
@@ -47,7 +52,15 @@ class ActionSystem:
             return result
 
         # Execute
-        return action.execute(state)
+        result = action.execute(state)
+
+        # Fire on_executed callback for passive trigger dispatch
+        if result.success and self.on_executed:
+            self.on_executed(action, state,
+                             getattr(action, 'player_id', ''),
+                             result)
+
+        return result
 
     def get_available_quick_actions(self, state: "GameState", player_id: str) -> list[GameAction]:
         """Get all currently legal quick actions for a player."""
@@ -179,6 +192,28 @@ class ActionSystem:
 
         return available
 
+    def get_available_court_cards(self, state: "GameState", player_id: str) -> list:
+        """Get court cards that pass faction + play_condition checks.
+
+        Shared between get_available_court_actions (normal court menu) and
+        the extra_action_granted handler (extra court action prompt).
+        """
+        player = state.get_player(player_id)
+        if not player:
+            return []
+        resolver = getattr(state, 'effect_resolver', None)
+        result = []
+        for card in state.get_court_cards(player_id):
+            if not card.definition.is_playable_by(player.faction):
+                continue
+            parsed = card.definition.parsed_effect
+            if parsed and parsed.play_condition:
+                if resolver and not resolver.check_condition(
+                    parsed.play_condition, state, player_id):
+                    continue
+            result.append(card)
+        return result
+
     def get_available_court_actions(self, state: "GameState", player_id: str) -> list[CourtAction]:
         """Get all legal court actions."""
         player = state.get_player(player_id)
@@ -186,20 +221,10 @@ class ActionSystem:
             return []
 
         available = []
-        court = state.get_court_cards(player_id)
-        for card in court:
-            if card.definition.is_playable_by(player.faction):
-                # Check play_condition from card's parsed effect
-                parsed = card.definition.parsed_effect
-                if parsed and parsed.play_condition:
-                    resolver = getattr(state, 'effect_resolver', None)
-                    if resolver and not resolver.check_condition(
-                        parsed.play_condition, state, player_id):
-                        continue
-
-                action = CourtAction(player_id=player_id, card_id=card.definition.card_id)
-                if action.validate(state).success:
-                    available.append(action)
+        for card in self.get_available_court_cards(state, player_id):
+            action = CourtAction(player_id=player_id, card_id=card.definition.card_id)
+            if action.validate(state).success:
+                available.append(action)
 
         return available
 

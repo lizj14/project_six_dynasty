@@ -6,3 +6,4 @@ images/ai/
 **/assets/images/ai/
 logs/
 projects/
+.llm_tokens

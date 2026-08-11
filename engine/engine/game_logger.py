@@ -136,6 +136,15 @@ class GameLogger:
             "jin_status": [],  # Jin players' status snapshot at round start
         }
 
+    def log_round_deck_state(self, state: "GameState"):
+        """Capture main deck count and forced event pile at round start."""
+        if not self._current_round:
+            return
+        self._current_round["deck_state"] = {
+            "main_count": len(state.main_deck),
+            "forced_events": [c.name for c in state.forced_event_pile],
+        }
+
     def log_jin_round_status(self, state: "GameState"):
         """Capture all Jin players' prestige/contribution/order at round start."""
         if not self._current_round:
@@ -541,6 +550,14 @@ class GameLogger:
             lines.append(f"───────────────────────────────────")
             lines.append(f"  第 {rn} 回合")
             lines.append(f"───────────────────────────────────")
+
+            # Deck state at round start
+            deck_info = r.get("deck_state", {})
+            if deck_info:
+                main_cnt = deck_info.get("main_count", 0)
+                fe_list = deck_info.get("forced_events", [])
+                fe_part = f"  已打出强制事件: [{', '.join(fe_list)}]" if fe_list else ""
+                lines.append(f"  [牌库] 剩余: {main_cnt}张{fe_part}")
 
             # Preparation
             prep = r.get("preparation", {})

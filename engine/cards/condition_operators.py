@@ -489,7 +489,7 @@ class HasRouteCondition(ConditionOperator):
                 ctrl = loc.controller.value if hasattr(loc.controller, 'value') else str(loc.controller)
                 if controller == "jin":
                     if ctrl in ("jin_p1", "jin_p2", "jin_p3",
-                                "jin_1", "jin_2", "jin_3"):
+                                "jin_1", "jin_2", "jin_3", "sima"):
                         visited.add(nb)
                         queue.append(nb)
                 elif ctrl == controller:

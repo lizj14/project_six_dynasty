@@ -13,7 +13,9 @@ LLM 回合规划能力实验
     python experiments/llm_turn_planning/run_experiment.py
 
 配置：
-    设置环境变量 OPENAI_API_KEY（或修改脚本中的 API 配置）
+    Token 存放在项目根目录的 .llm_tokens 文件中（已加入 .gitignore）：
+        LLM_DECISION_TEST_TOKEN=sk-xxx
+    也可以通过环境变量 LLM_DECISION_TEST_TOKEN 覆盖。
 """
 
 import json
@@ -28,10 +30,27 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "engine"))
 
+
+# ── Token 文件加载 ─────────────────────────────────────────────
+def _load_token_file(filepath: Path) -> dict[str, str]:
+    """从 .llm_tokens 文件加载 token，返回 {key: value} 字典。"""
+    tokens: dict[str, str] = {}
+    if filepath.exists():
+        for line in filepath.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                tokens[k.strip()] = v.strip()
+    return tokens
+
+
+_TOKEN_FILE = PROJECT_ROOT / ".llm_tokens"
+_tokens = _load_token_file(_TOKEN_FILE)
+
 # ── API 配置 ──────────────────────────────────────────────────
 LLM_CONFIG = {
     "base_url": os.environ.get("OPENAI_BASE_URL", "https://api.deepseek.com/v1"),
-    "api_key": os.environ.get("OPENAI_API_KEY", "sk-ae7688570fe042b78a8f9b250ea6775a"),
+    "api_key": os.environ.get("LLM_DECISION_TEST_TOKEN", _tokens.get("LLM_DECISION_TEST_TOKEN", "")),
     "model": os.environ.get("LLM_MODEL", "deepseek-v4-pro"),
     "temperature": 0.3,
     "max_tokens": 8192,

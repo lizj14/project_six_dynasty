@@ -508,6 +508,7 @@ class SearchAction(GameAction):
             "culture": "culture",    # by tag
             "power": "power",        # by tag
             "military": "military",  # by tag
+            "affair": "affair",      # by tag
             "event": CardType.EVENT,
         }
 
@@ -523,6 +524,7 @@ class SearchAction(GameAction):
             "culture": "marker_culture",
             "power": "marker_power",
             "military": "marker_military",
+            "affair": "marker_affair",
         }
         attr = tag_mapping.get(self.search_type)
         if attr:

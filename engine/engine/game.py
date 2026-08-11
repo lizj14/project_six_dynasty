@@ -146,6 +146,12 @@ class GameEngine:
             if self.logger:
                 self.state.effect_resolver.log_callback = self._log_effect
 
+        # Wire action_system.on_executed so passive triggers fire for ALL
+        # action executions, including those inside card effects (e.g. 王镇恶
+        # active march → on_march passive). Without this, triggers only fired
+        # for actions executed directly by the main game loop.
+        self.action_system.on_executed = self._on_action_executed
+
         if self.logger:
             self.logger.log_game_start(self.state, self.state.seed)
             initial_hands = {}
@@ -369,7 +375,7 @@ class GameEngine:
         # Find human player to avoid leaking AI hand contents
         human_pid = None
         for agent in self.agents:
-            if agent.__class__.__name__ == 'HumanPlayer':
+            if getattr(agent, 'is_human', False):
                 human_pid = agent.player_id
                 break
         for pid, card_info in setup_cards.items():
@@ -458,6 +464,7 @@ class GameEngine:
         if self.logger:
             self.logger.log_round_start(state.round)
             self.logger.log_jin_round_status(state)
+            self.logger.log_round_deck_state(state)
 
         # === Preparation Phase ===
         emperor_events, sima_events = run_preparation_phase(state, self.rng)
@@ -667,17 +674,6 @@ class GameEngine:
                     err_msg = result.error or "未知原因"
                     print(f"     ↳ ❌ 行动失败: {err_msg}")
 
-            # Fire passive triggers based on action type
-            if result.success:
-                trigger_type = self._ACTION_TRIGGER_MAP.get(
-                    getattr(action, 'action_type', ''))
-                if trigger_type:
-                    self._check_triggers(trigger_type, {
-                        "player_id": player_id,
-                        "action": action,
-                        "result": result,
-                    })
-
             if self.logger:
                 from .game_logger import log_action_result
                 log_action_result(self.logger, action, result, state)
@@ -793,10 +789,13 @@ class GameEngine:
                         elif may and action_type == "court_action":
                             # Extra court action (e.g. 刘裕 with 4 markers).
                             # Immediately prompt the player to choose a court card.
-                            court = state.get_court_cards(player_id)
+                            # Use shared filter from ActionSystem (play_condition etc.)
+                            court = self.action_system.get_available_court_cards(
+                                state, player_id)
                             if court:
                                 try:
-                                    court_action = agent.request_court_play(state)
+                                    court_action = agent.request_court_play(
+                                        state, eligible_cards=court)
                                     if court_action is not None:
                                         r2 = self.action_system.execute(state, court_action)
                                         if self.logger:
@@ -942,7 +941,9 @@ class GameEngine:
         if not agent or count == 0:
             return []
         # For human players, use make_choice with court card options.
-        if agent.__class__.__name__ == 'HumanPlayer':
+        # (Use is_human flag instead of __class__.__name__ to support
+        # HotSeatProxy wrapping)
+        if getattr(agent, 'is_human', False):
             chosen = []
             remaining = list(court_cards)  # Local copy to track remaining choices
             remaining_map = list(range(len(court_cards)))  # Map to original indices
@@ -964,6 +965,21 @@ class GameEngine:
     # ================================================================
     # Passive trigger system
     # ================================================================
+
+    def _on_action_executed(self, action, state, player_id, result):
+        """Callback invoked by ActionSystem after every successful action.
+
+        Dispatches passive triggers so card effects that execute actions
+        internally (e.g. 王镇恶 march) also fire matching triggers.
+        """
+        trigger_type = self._ACTION_TRIGGER_MAP.get(
+            getattr(action, 'action_type', ''))
+        if trigger_type:
+            self._check_triggers(trigger_type, {
+                "player_id": player_id,
+                "action": action,
+                "result": result,
+            })
 
     # Maps action_type → trigger_type for action-level hooks
     _ACTION_TRIGGER_MAP: dict[str, str] = {

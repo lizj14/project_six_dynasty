@@ -32,23 +32,23 @@ GOAL_DEFINITIONS = [
     {"name": "配享太庙", "simple_vp": 10, "full_vp": 18,
      "simple": "功绩大于等于7", "full": "功绩等于9"},
     {"name": "加九锡", "simple_vp": 8, "full_vp": 30,
-     "simple": "威望超过6",
-     "full": "威望最高，且超过第二名至少3点"},
+     "simple": "威望大于等于6",
+     "full": "威望最高，且大于等于第二名至少3点"},
     {"name": "家财万贯", "simple_vp": 6, "full_vp": 12,
-     "simple": "手牌超过5张", "full": "手牌超过8张"},
+     "simple": "手牌大于等于5张", "full": "手牌大于等于8张"},
     {"name": "遗臭万年", "simple_vp": 7, "full_vp": 14,
      "simple": "拥有3个权谋标记", "full": "拥有5个权谋标记"},
     {"name": "敦悦五经", "simple_vp": 6, "full_vp": 16,
-     "simple": "儒学贡献超过3",
-     "full": "儒学贡献超过5，且儒学贡献最高"},
+     "simple": "儒学贡献大于等于3",
+     "full": "儒学贡献大于等于5，且儒学贡献最高"},
     {"name": "清言世业", "simple_vp": 6, "full_vp": 16,
-     "simple": "玄学贡献超过3",
-     "full": "玄学贡献超过5，且玄学贡献最高"},
+     "simple": "玄学贡献大于等于3",
+     "full": "玄学贡献大于等于5，且玄学贡献最高"},
     {"name": "崇奉三宝", "simple_vp": 6, "full_vp": 16,
-     "simple": "佛学贡献超过3",
-     "full": "佛学贡献超过5，且佛学贡献最高"},
+     "simple": "佛学贡献大于等于3",
+     "full": "佛学贡献大于等于5，且佛学贡献最高"},
     {"name": "配享武庙", "simple_vp": 10, "full_vp": 18,
-     "simple": "威望超过6，且没有完成加九锡",
+     "simple": "威望大于等于6，且没有完成加九锡",
      "full": "威望等于9，且没有完成加九锡"},
     {"name": "世说新语", "simple_vp": 8, "full_vp": 16,
      "simple": "史书区有5张牌", "full": "史书区有8张牌"},
@@ -83,11 +83,11 @@ def _check_condition(state: "GameState", player: "PlayerState",
 
     - 友方控制[X]区域 / 玩家控制[X]区域
     - 功绩大于等于N / 功绩等于N
-    - 威望超过N / 威望等于N
+    - 威望大于等于N / 威望等于N
     - 威望最高，且超过第二名至少N点
-    - 手牌超过N张
+    - 手牌大于等于N张
     - 拥有N个权谋标记
-    - 儒学/玄学/佛学贡献超过N，且贡献最高
+    - 儒学/玄学/佛学贡献大于等于N，且贡献最高
     - 史书区有N张牌
     - 且没有完成[加九锡]
     """
@@ -118,10 +118,10 @@ def _check_condition(state: "GameState", player: "PlayerState",
     if m:
         return player.contribution == int(m.group(1))
 
-    # 威望 > N
-    m = re.search(r'威望超过(\d+)', condition)
+    # 威望 >= N
+    m = re.search(r'威望(?:超过|大于等于)(\d+)', condition)
     if m:
-        return player.prestige > int(m.group(1))
+        return player.prestige >= int(m.group(1))
 
     # 威望 == N
     m = re.search(r'威望等于(\d+)', condition)
@@ -136,7 +136,7 @@ def _check_condition(state: "GameState", player: "PlayerState",
         sorted_by_pres = sorted(jin_players, key=lambda p: -p.prestige)
         if sorted_by_pres[0].player_id != player.player_id:
             return False
-        m = re.search(r'超过第二名至少(\d+)点', condition)
+        m = re.search(r'(?:超过|大于等于)第二名至少(\d+)点', condition)
         if m:
             gap = int(m.group(1))
             if len(sorted_by_pres) < 2:
@@ -144,27 +144,27 @@ def _check_condition(state: "GameState", player: "PlayerState",
             return (sorted_by_pres[0].prestige - sorted_by_pres[1].prestige) >= gap
         return True
 
-    # 手牌超过N张
-    m = re.search(r'手牌超过(\d+)张', condition)
+    # 手牌大于等于 N张
+    m = re.search(r'手牌(?:超过|大于等于)(\d+)张', condition)
     if m:
-        return len(player.hand) > int(m.group(1))
+        return len(player.hand) >= int(m.group(1))
 
     # 拥有N个权谋标记
     m = re.search(r'拥有(\d+)个权谋标记', condition)
     if m:
         return player.marker_power >= int(m.group(1))
 
-    # 儒学/玄学/佛学贡献超过N
+    # 儒学/玄学/佛学贡献大于等于N
     for culture_name, culture_enum in [
         ("儒学", CultureType.CONFUCIANISM),
         ("玄学", CultureType.TAOISM),
         ("佛学", CultureType.BUDDHISM),
     ]:
-        pattern = f'{culture_name}贡献超过(\\d+)'
+        pattern = f'{culture_name}贡献(?:超过|大于等于)(\\d+)'
         m = re.search(pattern, condition)
         if m:
             contrib = player.culture_contributions.get(culture_enum, 0)
-            if contrib <= int(m.group(1)):
+            if contrib < int(m.group(1)):
                 return False
             # Optional: "且贡献最高"
             if "贡献最高" in condition or "轨道露出" in condition:

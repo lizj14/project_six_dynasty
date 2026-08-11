@@ -440,10 +440,15 @@ class SearchOperator(EffectOperator):
         if resolver.action_system:
             from engine.actions.special_actions import SearchAction
             p = step.params
+            search_type = p.get("search_type", "")
+            if not search_type:
+                filter_spec = p.get("filter")
+                if filter_spec:
+                    search_type = filter_spec.get("marker", "")
             action = SearchAction(
                 player_id=player_id,
                 search_count=p.get("count", 1),
-                search_type=p.get("search_type", ""),
+                search_type=search_type,
             )
             r = resolver.action_system.execute(state, action)
             result.events.extend(r.events if r.success else [])
@@ -782,6 +787,23 @@ class MarchOperator(_TargetedMapOperator):
                 result.events.extend(r.events if r.success else [])
                 if not r.success:
                     result.errors.append(r.error or "action failed")
+                    player = state.get_player(player_id)
+                    cost = action._calculate_cost(state) if player else -1
+                    mil = player.military if player else -1
+                    import sys
+                    msg = (f"[MarchOperator FAIL] target={target} "
+                           f"cost={cost} military={mil} "
+                           f"cost_reduction={cost_reduction} "
+                           f"error={r.error}")
+                    print(f"\n  {msg}", file=sys.stderr)
+                    result.events.append({"type": "march_failed", "reason": msg})
+                else:
+                    import sys
+                    msg = (f"[MarchOperator OK] target={target} "
+                           f"cost_executed={r.events[0].get('cost','?') if r.events else '?'} "
+                           f"events={len(r.events)}")
+                    print(f"\n  {msg}", file=sys.stderr)
+                    result.events.append({"type": "march_executed", "detail": msg})
             else:
                 result.events.append({
                     "type": "march_requested", "free": free,
@@ -1063,7 +1085,7 @@ class ConvertOperator(EffectOperator):
                         continue
                 elif want_controller == "jin":
                     jin_states = {ControlState.JIN_P1, ControlState.JIN_P2,
-                                  ControlState.JIN_P3}
+                                  ControlState.JIN_P3, ControlState.SIMA}
                     if loc.controller not in jin_states:
                         continue
 
@@ -1655,8 +1677,28 @@ class RemoveFromGameOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        # Remove the current card from the game (not just discard)
-        result.events.append({"type": "remove_from_game"})
+        p = step.params
+        target = p.get("target", "")
+        count = p.get("count", 1)
+        from_reserve = p.get("from_reserve", False)
+
+        if target == "troop" and from_reserve:
+            player = state.get_player(player_id)
+            if player:
+                removed = min(count, player.army_reserve_count)
+                player.army_reserve_count -= removed
+                result.events.append({
+                    "type": "remove_from_game",
+                    "target": "troop",
+                    "from_reserve": True,
+                    "count": removed,
+                    "player": player_id,
+                })
+                if removed < count:
+                    result.errors.append(
+                        f"储备区部队不足：需要{count}，只有{removed + player.army_reserve_count}")
+        else:
+            result.events.append({"type": "remove_from_game"})
         return result
 
 
@@ -1709,6 +1751,16 @@ class ChooseOperator(EffectOperator):
                                 "buddhism": "佛学",
                             }
                             culture_label = f"[{culture_map.get(culture, culture)}]"
+                        # Include search marker in label (e.g. 检索[文化])
+                        search_label = "检索"
+                        if et == "search":
+                            filter_spec = p.get("filter") or {}
+                            marker = filter_spec.get("marker", "")
+                            marker_map = {"culture": "文化", "affair": "内政",
+                                          "military": "军事", "power": "权谋"}
+                            if marker in marker_map:
+                                search_label = f"检索[{marker_map[marker]}]"
+
                         label_map = {
                             "draw_cards": f"摸{cnt}张牌",
                             "draft": f"征发{cnt}张候选策略牌" if cnt > 1 else "征发1张候选策略牌",
@@ -1720,7 +1772,7 @@ class ChooseOperator(EffectOperator):
                             "raise_culture_level": f"提高{culture_label}等级" if culture_label else "提高文化等级",
                             "remove_culture_marker": f"移除{culture_label}标记" if culture_label else "移除文化标记",
                             "archive_card": "存档",
-                            "search": "检索",
+                            "search": search_label,
                         }
                         labels.append(label_map.get(et, et))
                 prompt["options"].append({
@@ -2223,7 +2275,8 @@ class TargetedEffectOperator(EffectOperator):
                                   if state.locations.get(lid) and
                                   state.locations[lid].controller == ControlState.SIMA]
                 elif controller == "jin":
-                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2,
+                                  ControlState.JIN_P3, ControlState.SIMA}
                     candidates = [lid for lid in candidates
                                   if state.locations.get(lid) and
                                   state.locations[lid].controller in jin_states]
@@ -2236,7 +2289,8 @@ class TargetedEffectOperator(EffectOperator):
                                   if state.locations.get(lid) and
                                   state.locations[lid].controller == ControlState.NORTH]
                 elif controller == "not_jin_controlled":
-                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                    jin_states = {ControlState.JIN_P1, ControlState.JIN_P2,
+                                  ControlState.JIN_P3, ControlState.SIMA}
                     candidates = [lid for lid in candidates
                                   if state.locations.get(lid) and
                                   state.locations[lid].controller not in jin_states]
@@ -2259,7 +2313,8 @@ class TargetedEffectOperator(EffectOperator):
                 continue
 
             if ft == "not_jin_controlled":
-                jin_states = {ControlState.JIN_P1, ControlState.JIN_P2, ControlState.JIN_P3}
+                jin_states = {ControlState.JIN_P1, ControlState.JIN_P2,
+                              ControlState.JIN_P3, ControlState.SIMA}
                 candidates = [lid for lid in candidates
                               if state.locations.get(lid) and
                               state.locations[lid].controller not in jin_states]

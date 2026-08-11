@@ -210,6 +210,11 @@ class Viewport(ABC):
         ...
 
     @abstractmethod
+    def get_forced_event_pile_names(self) -> list[str]:
+        """Return names of cards in forced event pile."""
+        ...
+
+    @abstractmethod
     def get_refugee_supply_count(self) -> int:
         """Return count of cards in refugee supply."""
         ...

@@ -224,6 +224,28 @@ class HotSeatProxy:
         return self._agent.choose_discards(state, hand_cards, count, reason=reason)
 
     def select_target(self, state, prompt):
+        # If the target selection is for a different player than the one
+        # currently holding the keyboard (e.g. capital relocation during
+        # another player's march), clear screen and switch.
+        if HotSeatProxy._last_player != self.player_id:
+            HotSeatProxy._last_player = self.player_id
+            player = state.get_player(self.player_id)
+            faction_label = ""
+            if player:
+                from models.enums import FactionType
+                faction_label = "北方" if player.faction == FactionType.NORTH else "东晋"
+            HotSeatProxy._clear_and_prompt(
+                f"[{faction_label}] {self.player_id}",
+                prompt.get("message", "选择目标"))
+            # Print viewport summary
+            try:
+                from viewport import create_viewport, QueryEngine
+                vp = create_viewport(state, self.player_id, [], mode="live")
+                qe = QueryEngine(vp)
+                print(qe.query("summary"))
+                print()
+            except Exception:
+                pass
         return self._agent.select_target(state, prompt)
 
     def request_card_play(self, state, eligible_indices, filter_spec=None, free=False):

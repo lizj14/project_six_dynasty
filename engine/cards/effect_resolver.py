@@ -364,6 +364,8 @@ class EffectResolver:
                 total = 0
                 for src in sources:
                     total += self._resolve_value(src, state, player_id)
+                if 'max' in step_params:
+                    total = min(total, step_params['max'])
                 return total
 
             # ── Standard variable map ──────────────────────────────
@@ -386,7 +388,10 @@ class EffectResolver:
                     self._culture_enum('佛学'), 0) if player else 0,
             }
             if value in var_map:
-                return var_map[value]
+                result = var_map[value]
+                if step_params and 'max' in step_params:
+                    result = min(result, step_params['max'])
+                return result
 
             # ── Jin court refugee count ────────────────────────────
             if value == 'jin_court_refugee_count':

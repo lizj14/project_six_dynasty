@@ -221,6 +221,9 @@ class LiveViewport(Viewport):
     def get_forced_event_pile_count(self) -> int:
         return len(self._state.forced_event_pile)
 
+    def get_forced_event_pile_names(self) -> list[str]:
+        return [c.name for c in self._state.forced_event_pile]
+
     def get_refugee_supply_count(self) -> int:
         return len(self._state.refugee_supply)
 
@@ -411,6 +414,7 @@ class LiveViewport(Viewport):
             "tracks": tracks,
             "decks": decks,
             "forced_event_pile_count": self.get_forced_event_pile_count(),
+            "forced_event_pile_names": self.get_forced_event_pile_names(),
             "refugee_supply_count": self.get_refugee_supply_count(),
             "emperor": emperor,
             "sima": sima,
