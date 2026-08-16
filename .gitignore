@@ -7,3 +7,13 @@ images/ai/
 logs/
 projects/
 .llm_tokens
+
+# 运行时状态（step/move/new 会覆盖，不入库；归档快照如 0818_*/archive 保留）
+engine/claude_run/claude_game.json
+engine/claude_run/claude_state.json
+engine/claude_run/moves.jsonl
+engine/claude_run/discard_order.json
+engine/claude_run_fast/claude_game.json
+engine/claude_run_fast/claude_state.json
+engine/claude_run_fast/moves.jsonl
+engine/claude_run_fast/discard_order.json
