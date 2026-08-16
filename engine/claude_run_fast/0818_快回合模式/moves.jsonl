@@ -1,0 +1,19 @@
+{"player": "north", "type": "setup", "hero": 1, "face_down": 5, "payment": [], "seq": 1}
+{"player": "jin_1", "type": "setup", "hero": 0, "public_goal": 2, "secret_goal": 1, "face_down": 4, "payment": [], "seq": 2}
+{"player": "jin_2", "type": "setup", "hero": 1, "public_goal": 1, "secret_goal": 0, "face_down": 0, "payment": [], "seq": 3}
+{"player": "jin_3", "type": "setup", "hero": 1, "public_goal": 1, "secret_goal": 0, "face_down": 7, "payment": [], "seq": 4}
+{"player": "north", "type": "play_card", "card": "苏峻", "payment": ["京口重镇"], "seq": 5}
+{"player": "north", "type": "court_action", "card": "招抚", "seq": 6}
+{"player": "north", "type": "target", "index": 4, "seq": 7}
+{"player": "north", "type": "card_play", "index": 0, "seq": 8}
+{"player": "north", "type": "march", "target": "洛阳", "seq": 9}
+{"player": "north", "type": "occupy", "target": "洛阳", "use_sima": false, "seq": 10}
+{"player": "north", "type": "recruit", "card": "鸩酒", "seq": 11}
+{"player": "north", "type": "recruit", "card": "清商乐", "seq": 12}
+{"player": "north", "type": "activate", "card": "崔宏", "seq": 13}
+{"player": "north", "type": "target", "index": 3, "seq": 14}
+{"player": "north", "type": "fortify", "target": "洛阳", "seq": 15}
+{"player": "north", "type": "activate", "card": "苻坚", "seq": 16}
+{"player": "north", "type": "card_play", "index": -1, "seq": 17}
+{"player": "north", "type": "end_turn", "seq": 18}
+{"player": "jin_1", "type": "court_action", "card": "士卒", "seq": 19}

@@ -1,0 +1,35 @@
+{"player": "north", "type": "setup", "hero": 0, "face_down": 6, "payment": [8, 4], "seq": 1}
+{"player": "jin_1", "type": "setup", "hero": 1, "public_goal": 0, "secret_goal": 1, "face_down": 3, "payment": [0, 1, 6], "seq": 2}
+{"player": "jin_2", "type": "setup", "hero": 0, "public_goal": 0, "secret_goal": 1, "face_down": 7, "payment": [], "seq": 3}
+{"player": "jin_3", "type": "setup", "hero": 0, "public_goal": 1, "secret_goal": 0, "face_down": 6, "payment": [], "seq": 4}
+{"player": "north", "type": "target", "index": 0, "seq": 5}
+{"player": "north", "type": "target", "index": 3, "seq": 6}
+{"player": "north", "type": "activate", "card": "苻坚", "discard": ["漠北征伐"]}
+{"player": "north", "type": "play_card", "card": "邓羌", "payment": ["尊奉江东", "招抚", "司马道子"]}
+{"player": "north", "type": "court_action", "card": "士卒"}
+{"player": "north", "type": "activate", "card": "姚苌"}
+{"player": "north", "type": "activate", "card": "邓羌"}
+{"player": "north", "type": "march", "target": "雍丘"}
+{"player": "north", "type": "occupy", "target": "雍丘", "use_sima": false}
+{"player": "north", "type": "march", "target": "谯"}
+{"player": "north", "type": "occupy", "target": "谯", "use_sima": false}
+{"player": "north", "type": "march", "target": "太原"}
+{"player": "north", "type": "play_card", "card": "击楫中流", "payment": ["王猛", "慕容恪", "修缮城防"]}
+{"player": "north", "type": "occupy", "target": "太原", "use_sima": false}
+{"player": "north", "type": "march", "target": "上党"}
+{"player": "north", "type": "occupy", "target": "上党", "use_sima": false}
+{"player": "north", "type": "end_turn"}
+{"player": "jin_1", "type": "play_card", "card": "掠夺"}
+{"player": "jin_1", "type": "court_action", "card": "北伐"}
+{"player": "jin_1", "type": "march", "target": "谯"}
+{"player": "jin_1", "type": "occupy", "target": "谯", "use_sima": false}
+{"player": "jin_1", "type": "march", "target": "彭城"}
+{"player": "jin_1", "type": "recruit", "card": "王敦"}
+{"player": "jin_1", "type": "occupy", "target": "彭城", "use_sima": false}
+{"player": "jin_1", "type": "activate", "card": "王羲之"}
+{"player": "jin_1", "type": "end_turn"}
+{"player": "jin_2", "type": "play_card", "card": "兴修水利", "payment": ["流芳百世", "北征赋"]}
+{"player": "jin_2", "type": "court_action", "card": "佛寺", "target": "江南"}
+{"player": "jin_2", "type": "recruit", "card": "沈劲"}
+{"player": "jin_2", "type": "draw"}
+{"player": "jin_2", "type": "end_turn"}
