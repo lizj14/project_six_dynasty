@@ -655,6 +655,26 @@ def cmd_move(args):
           f"index={d.get('index', d.get('hero', '?'))}")
 
 
+def cmd_undo(args):
+    """回退 moves.jsonl 末尾 N 步（回合级规划执行失败时，撤销错误步骤）。"""
+    moves = _load_jsonl(_path("moves.jsonl"))
+    if not moves:
+        print("没有可回退的步骤")
+        return
+    count = max(0, args.count)
+    count = min(count, len(moves))
+    removed = moves[-count:]
+    keep = moves[:-count]
+    with open(_path("moves.jsonl"), "w", encoding="utf-8") as f:
+        for m in keep:
+            f.write(json.dumps(m, ensure_ascii=False) + "\n")
+    print(f"已回退 {count} 步:")
+    for r in removed:
+        detail = r.get('card', r.get('target', r.get('index', '')))
+        print(f"  - seq {r.get('seq')}: {r.get('player')} {r.get('type')} {detail}")
+    print("提示: claude_state.json 已过期，请重新运行 step")
+
+
 def cmd_show(args):
     dump = _load_json(_path("claude_state.json"))
     if dump is None:
@@ -707,6 +727,10 @@ def main():
     pm.add_argument("json", nargs="?", default=None)
     pm.add_argument("--file", type=str, default=None)
     pm.set_defaults(func=cmd_move)
+
+    pu = sub.add_parser("undo")
+    pu.add_argument("--count", type=int, default=1, help="回退步数（默认1）")
+    pu.set_defaults(func=cmd_undo)
 
     pw = sub.add_parser("show")
     pw.add_argument("--full", action="store_true")
