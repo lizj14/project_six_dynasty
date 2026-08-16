@@ -9,6 +9,10 @@ Usage:
     # 4-player hot-seat (all human, pass the keyboard)
     python play_game.py --all-human
 
+    # 1 human + 3 Claude Code agents (requires claude-agent-sdk)
+    python play_game.py --claude-agents north
+    python play_game.py --claude-agents jin
+
     # Custom initial hand (for testing specific cards):
     python play_game.py jin --preset jin_1=慧远,尊奉江东
     python play_game.py north --preset north=司马道子,流民四起
@@ -187,6 +191,35 @@ class HotSeatProxy:
         except (EOFError, KeyboardInterrupt):
             pass
 
+    def _ensure_player_screen(self, state, phase_label: str = "行动"):
+        """Switch the terminal to this player if they don't already hold it.
+
+        Shared by every prompt method (decide_action / select_target /
+        choose_discards / make_choice) so any cross-player prompt — capital
+        relocation, 土断 making other Jin players discard, cost payment,
+        effect choice — clears the screen and shows the "pass keyboard" banner
+        before revealing private info.  No-op when the keyboard is already
+        with this player.
+        """
+        if HotSeatProxy._last_player != self.player_id:
+            HotSeatProxy._last_player = self.player_id
+            player = state.get_player(self.player_id)
+            faction_label = ""
+            if player:
+                from models.enums import FactionType
+                faction_label = "北方" if player.faction == FactionType.NORTH else "东晋"
+            HotSeatProxy._clear_and_prompt(
+                f"[{faction_label}] {self.player_id}", phase_label)
+            # Print viewport summary so the player has board context
+            try:
+                from viewport import create_viewport, QueryEngine
+                vp = create_viewport(state, self.player_id, [], mode="live")
+                qe = QueryEngine(vp)
+                print(qe.query("summary"))
+                print()
+            except Exception:
+                pass
+
     # ---- GameAgent delegation ----
 
     def setup_decision(self, ctx) -> "SetupDecision":
@@ -196,56 +229,22 @@ class HotSeatProxy:
         return self._agent.setup_decision(ctx)
 
     def decide_action(self, state, available_actions):
-        if HotSeatProxy._last_player != self.player_id:
-            HotSeatProxy._last_player = self.player_id
-            # Build a quick summary of whose turn it is
-            player = state.get_player(self.player_id)
-            faction_label = ""
-            if player:
-                from models.enums import FactionType
-                faction_label = "北方" if player.faction == FactionType.NORTH else "东晋"
-            HotSeatProxy._clear_and_prompt(
-                f"[{faction_label}] {self.player_id}", f"第{state.round}回合行动")
-            # Print viewport summary after switching
-            try:
-                from viewport import create_viewport, QueryEngine
-                vp = create_viewport(state, self.player_id, [], mode="live")
-                qe = QueryEngine(vp)
-                print(qe.query("summary"))
-                print()
-            except Exception:
-                pass
+        self._ensure_player_screen(state, f"第{state.round}回合行动")
         return self._agent.decide_action(state, available_actions)
 
     def make_choice(self, state, prompt):
+        self._ensure_player_screen(
+            state, prompt.get("title", "选择效果") if isinstance(prompt, dict) else "选择效果")
         return self._agent.make_choice(state, prompt)
 
     def choose_discards(self, state, hand_cards, count, reason="hand_limit"):
+        label = "弃置手牌" if reason != "hand_limit" else "弃置超出上限的手牌"
+        self._ensure_player_screen(state, label)
         return self._agent.choose_discards(state, hand_cards, count, reason=reason)
 
     def select_target(self, state, prompt):
-        # If the target selection is for a different player than the one
-        # currently holding the keyboard (e.g. capital relocation during
-        # another player's march), clear screen and switch.
-        if HotSeatProxy._last_player != self.player_id:
-            HotSeatProxy._last_player = self.player_id
-            player = state.get_player(self.player_id)
-            faction_label = ""
-            if player:
-                from models.enums import FactionType
-                faction_label = "北方" if player.faction == FactionType.NORTH else "东晋"
-            HotSeatProxy._clear_and_prompt(
-                f"[{faction_label}] {self.player_id}",
-                prompt.get("message", "选择目标"))
-            # Print viewport summary
-            try:
-                from viewport import create_viewport, QueryEngine
-                vp = create_viewport(state, self.player_id, [], mode="live")
-                qe = QueryEngine(vp)
-                print(qe.query("summary"))
-                print()
-            except Exception:
-                pass
+        self._ensure_player_screen(
+            state, prompt.get("message", "选择目标") if isinstance(prompt, dict) else "选择目标")
         return self._agent.select_target(state, prompt)
 
     def request_card_play(self, state, eligible_indices, filter_spec=None, free=False):
@@ -459,6 +458,7 @@ def main():
     # Parse preset hands and detect --all-human flag
     preset_hands, bare_presets = parse_preset_hands(sys.argv)
     all_human = "--all-human" in sys.argv
+    claude_mode = "--claude-agents" in sys.argv
 
     if all_human:
         # ================================================================
@@ -584,7 +584,10 @@ def main():
     print(f"\n  你选择了: {faction_label}")
     if chosen_faction == "jin":
         print(f"  你将扮演东晋玩家 ({human_pid})")
-    print(f"  其他三位玩家由 HeuristicAI 控制")
+    if claude_mode:
+        print(f"  其他三位玩家由 Claude Code agent 控制")
+    else:
+        print(f"  其他三位玩家由 HeuristicAI 控制")
     print(f"  输入 q 可随时退出并保存日志")
     print(f"  游戏开始...\n")
 
@@ -594,13 +597,17 @@ def main():
     # Create human player first so we can reference it in callbacks
     human_player = HumanPlayer(player_id=human_pid)
 
-    # Create agents: 1 HumanPlayer + 3 HeuristicAI (wrapped for logging)
+    # Create agents: 1 HumanPlayer + 3 AI opponents (HeuristicAI or Claude)
     agents = []
     for pid in ["north", "jin_1", "jin_2", "jin_3"]:
         if pid == human_pid:
             agents.append(human_player)
         else:
-            ai = HeuristicAI(player_id=pid, seed=AI_SEEDS[pid])
+            if claude_mode:
+                from ai.claude_agent import ClaudeCodeAgent
+                ai = ClaudeCodeAgent(player_id=pid)
+            else:
+                ai = HeuristicAI(player_id=pid, seed=AI_SEEDS[pid])
             agents.append(LoggingAgentWrapper(ai))
 
     # Enable setup buffer: AI setup decisions are buffered during the

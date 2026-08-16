@@ -740,6 +740,12 @@ class HumanPlayer(GameAgent):
                     print(f"     ↳ 摸牌: 「{evt.get('card', '?')}」")
                 else:
                     print(f"     ↳ {player_id} 摸牌")
+            elif t == "forced_event_drawn":
+                card_name = evt.get("card", "?")
+                card_text = evt.get("card_text", "")
+                print(f"     ↳ ⚡ 强制事件「{card_name}」触发")
+                if card_text:
+                    print(f"        效果: {card_text}")
             elif t == "friend_played":
                 print(f"     ↳ 幕僚入场: 「{evt.get('card', '?')}」")
             elif t == "strategy_played":
@@ -851,7 +857,10 @@ class HumanPlayer(GameAgent):
                     print(f"     ↳ 目标化效果 (跳过: {evt.get('reason', '')})")
                 elif targets:
                     target_str = ", ".join(targets)
-                    print(f"     ↳ 影响玩家: {target_str}")
+                    ttype = evt.get("target_type", "")
+                    label = {"location": "影响地点",
+                             "sima": "影响司马家"}.get(ttype, "影响玩家")
+                    print(f"     ↳ {label}: {target_str}")
                 else:
                     print(f"     ↳ 目标化效果")
             elif t == "discard":

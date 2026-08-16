@@ -414,7 +414,7 @@ class QueryEngine:
                     loc_strs = []
                     for lid in locs:
                         loc_info = all_locs.get(lid, {})
-                        fortified = loc_info.get("fortified", False)
+                        fortified = loc_info.get("is_fortified", False)
                         loc_strs.append(f"{lid}★" if fortified else lid)
                     lines.append(f"  {label}: 控制 {' '.join(loc_strs)}")
                 else:

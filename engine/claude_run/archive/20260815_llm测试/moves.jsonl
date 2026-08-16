@@ -1,0 +1,55 @@
+{"player": "north", "type": "setup", "hero": 1, "face_down": 7, "payment": [], "seq": 1}
+{"player": "jin_1", "type": "setup", "hero": 1, "public_goal": 2, "secret_goal": 1, "face_down": 1, "payment": [3, 6], "seq": 2}
+{"player": "jin_2", "type": "setup", "hero": 0, "public_goal": 0, "secret_goal": 1, "face_down": 0, "payment": [], "seq": 3}
+{"player": "jin_3", "type": "setup", "hero": 0, "public_goal": 0, "secret_goal": 1, "face_down": 2, "payment": [], "seq": 4}
+{"player": "jin_3", "type": "target", "index": 8, "seq": 5}
+{"player": "jin_3", "type": "target", "index": 10, "seq": 6}
+{"player": "north", "type": "target", "index": 0, "seq": 7}
+{"player": "north", "type": "target", "index": 3, "seq": 8}
+{"player": "north", "type": "action", "index": 31, "seq": 9}
+{"player": "north", "type": "action", "index": 35, "seq": 10}
+{"player": "north", "type": "action", "index": 4, "seq": 11}
+{"player": "north", "type": "action", "index": 0, "seq": 12}
+{"player": "north", "type": "action", "index": 5, "seq": 13}
+{"player": "north", "type": "action", "index": 0, "seq": 14}
+{"player": "north", "type": "action", "index": 10, "seq": 15}
+{"player": "north", "type": "action", "index": 5, "seq": 16}
+{"player": "north", "type": "discard", "indices": [2], "seq": 17}
+{"player": "north", "type": "card_play", "index": 3, "seq": 18}
+{"player": "north", "type": "action", "index": 1, "seq": 19}
+{"player": "north", "type": "action", "index": 0, "seq": 20}
+{"player": "north", "type": "action", "index": 9, "seq": 21}
+{"player": "north", "type": "action", "index": 6, "seq": 22}
+{"player": "north", "type": "action", "index": 0, "seq": 23}
+{"player": "north", "type": "action", "index": -1, "seq": 24}
+{"player": "jin_2", "type": "action", "index": 33, "seq": 25}
+{"player": "jin_2", "type": "action", "index": 0, "seq": 26}
+{"player": "jin_2", "type": "action", "index": 0, "seq": 27}
+{"player": "jin_2", "type": "action", "index": 13, "seq": 28}
+{"player": "jin_2", "type": "action", "index": 8, "seq": 29}
+{"player": "jin_2", "type": "action", "index": 0, "seq": 30}
+{"player": "jin_2", "type": "action", "index": 1, "seq": 31}
+{"player": "jin_2", "type": "action", "index": 5, "seq": 32}
+{"player": "jin_2", "type": "action", "index": 0, "seq": 33}
+{"player": "jin_2", "type": "action", "index": 0, "seq": 34}
+{"player": "jin_2", "type": "action", "index": -1, "seq": 35}
+{"player": "jin_1", "type": "action", "index": 50, "seq": 36}
+{"player": "jin_1", "type": "choice", "index": 0, "seq": 37}
+{"player": "jin_1", "type": "action", "index": 35, "payment": [5], "seq": 38}
+{"player": "jin_1", "type": "action", "index": 38, "seq": 39}
+{"player": "jin_1", "type": "target", "index": 2, "seq": 40}
+{"player": "jin_1", "type": "action", "index": 28, "seq": 41}
+{"player": "jin_1", "type": "target", "index": 2, "seq": 42}
+{"player": "jin_1", "type": "action", "index": 7, "seq": 43}
+{"player": "jin_1", "type": "action", "index": 0, "seq": 44}
+{"player": "jin_1", "type": "action", "index": 0, "seq": 45}
+{"player": "jin_1", "type": "action", "index": -1, "seq": 46}
+{"player": "jin_3", "type": "action", "index": 32, "seq": 47}
+{"player": "jin_3", "type": "target", "index": 4, "seq": 48}
+{"player": "jin_3", "type": "action", "index": 29, "seq": 49}
+{"player": "jin_3", "type": "action", "index": 3, "seq": 50}
+{"player": "jin_3", "type": "action", "index": 0, "seq": 51}
+{"player": "jin_3", "type": "action", "index": 3, "seq": 52}
+{"player": "jin_3", "type": "action", "index": 25, "seq": 53}
+{"player": "jin_3", "type": "action", "index": -1, "seq": 54}
+{"player": "jin_3", "type": "discard", "indices": [4], "seq": 55}

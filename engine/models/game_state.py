@@ -233,6 +233,30 @@ class GameState:
 
         return events
 
+    def draw_national_card(self, player_id: str, rng=None) -> Optional[Card]:
+        """Draw one card from the player's national deck, reshuffling the
+        national discard pile into the deck when it runs empty.
+
+        This is the general reshuffle logic for ANY national-deck draw —
+        court supply (兴修水利 / 尹纬), court refresh, court fill — so the
+        reshuffle rule lives in exactly one place.  Accepts an optional rng
+        so deterministic callers (phases.py) can pass their sequential rng;
+        otherwise derives one from seed+round like draw_cards().
+        """
+        deck = self.get_national_deck(player_id)
+        if not deck:
+            discard = self.get_national_discard(player_id)
+            if discard:
+                import random as _random
+                if rng is None:
+                    rng = _random.Random(self.seed + self.round)
+                rng.shuffle(discard)
+                deck.extend(discard)
+                discard.clear()
+        if deck:
+            return deck.pop(0)
+        return None
+
     # ======== Helper Methods ========
 
     def get_player(self, player_id: str) -> Optional[PlayerState]:

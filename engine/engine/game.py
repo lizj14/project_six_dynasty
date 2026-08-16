@@ -678,24 +678,6 @@ class GameEngine:
                 from .game_logger import log_action_result
                 log_action_result(self.logger, action, result, state)
 
-            # Check emperor task completion
-            if result.success:
-                from rules.emperor import check_task_completion
-                atype = getattr(action, 'action_type', '')
-                context = self._build_emperor_context(state, player_id, action, atype, result)
-                emperor_task_events = check_task_completion(
-                    state, player_id, atype, context)
-                if emperor_task_events:
-                    result.events.extend(emperor_task_events)
-                    if self._has_human_player():
-                        for evt in emperor_task_events:
-                            if evt.get("type") == "emperor_task_completed":
-                                print(f"  👑 皇帝任务完成! {evt.get('task', '?')} "
-                                      f"— {evt.get('player', '?')} +2VP")
-                            elif evt.get("type") == "emperor_all_tasks_complete":
-                                print(f"  👑 全部皇帝任务完成! "
-                                      f"司马家威望+1 → {evt.get('sima_prestige', '?')}")
-
             # Notify observer (e.g. human player UI) about the action result
             if self.on_action_executed:
                 self.on_action_executed(state, player_id, action, result)
@@ -737,7 +719,9 @@ class GameEngine:
                                 player.extra_hand_actions -= 1
                                 raise
                             # else: player declined — continue
-                        break  # Only handle one play_card_requested per action
+                        # NOTE: do NOT break here — effects like 标新立异
+                        # (play_card count=2) emit one play_card_requested event
+                        # per card, so we must handle all of them in sequence.
 
             # Handle extra_action_granted events with card_type filter (e.g. 刘裕,
             # 谢玄, 谢道蕴, 招抚 — effects that grant a "may play" extra action).
@@ -969,9 +953,12 @@ class GameEngine:
     def _on_action_executed(self, action, state, player_id, result):
         """Callback invoked by ActionSystem after every successful action.
 
-        Dispatches passive triggers so card effects that execute actions
-        internally (e.g. 王镇恶 march) also fire matching triggers.
+        Dispatches passive triggers AND emperor-task completion so card effects
+        that execute actions internally (王镇恶 march, 沈劲 fortify, etc.) also
+        fire matching triggers and complete emperor tasks — not just actions the
+        player chose directly in the main loop.
         """
+        # Passive triggers
         trigger_type = self._ACTION_TRIGGER_MAP.get(
             getattr(action, 'action_type', ''))
         if trigger_type:
@@ -980,6 +967,22 @@ class GameEngine:
                 "action": action,
                 "result": result,
             })
+
+        # Emperor task completion
+        from rules.emperor import check_task_completion
+        atype = getattr(action, 'action_type', '')
+        context = self._build_emperor_context(state, player_id, action, atype, result)
+        emperor_task_events = check_task_completion(state, player_id, atype, context)
+        if emperor_task_events:
+            result.events.extend(emperor_task_events)
+            if self._has_human_player():
+                for evt in emperor_task_events:
+                    if evt.get("type") == "emperor_task_completed":
+                        print(f"  👑 皇帝任务完成! {evt.get('task', '?')} "
+                              f"— {evt.get('player', '?')} +2VP")
+                    elif evt.get("type") == "emperor_all_tasks_complete":
+                        print(f"  👑 全部皇帝任务完成! "
+                              f"司马家威望+1 → {evt.get('sima_prestige', '?')}")
 
     # Maps action_type → trigger_type for action-level hooks
     _ACTION_TRIGGER_MAP: dict[str, str] = {

@@ -77,13 +77,13 @@ class CultureType(Enum):
 
 
 class Region(Enum):
-    """Map regions (11 regions)."""
+    """Map regions (12 regions)."""
     XILIANG = "西凉"        # 张掖, 姑臧, 金城
     GUANZHONG = "关中"      # 安定, 天水, 长安
     BASHU = "巴蜀"          # 汉中, 巴郡, 蜀郡
-    JINGXIANG = "荆襄"      # 襄阳, 南郡, 巴东, 武昌, 宛城
-    JIANGNAN = "江南"       # 豫章, 建康, 京口, 吴, 会稽
-    ZHONGYUAN = "中原"      # 弘农, 洛阳, 上洛, 雍丘, 彭城, 谯, 东平
+    JINGXIANG = "荆襄"      # 襄阳, 南郡, 巴东, 武昌, 宛城, 上洛
+    JIANGNAN = "江南"       # 浔阳, 建康, 京口, 吴, 会稽
+    ZHONGYUAN = "中原"      # 弘农, 洛阳, 雍丘, 彭城, 谯, 东平
     SHANXI = "山西"          # 平阳, 太原, 上党
     SHANDONG = "山东"        # 济南, 广固, 琅琊
     HUAINAN = "淮南"         # 寿春, 合肥, 广陵

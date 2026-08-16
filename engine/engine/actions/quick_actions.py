@@ -385,17 +385,22 @@ class RecruitAction(GameAction):
 
 @dataclass
 class FortifyAction(GameAction):
-    """加固：支付1军力，对友方地点执行加固。每回合限1次。"""
+    """加固：支付1军力，对友方地点执行加固。每回合限1次。
+
+    from_effect=True 表示由卡牌效果触发（沈劲/朱序等），不消耗每回合1次
+    的快速加固限制（rulebook：加固的限制只作用于快速行动）。
+    """
     action_type: str = "fortify"
     player_id: str = ""
     target_location: str = ""
+    from_effect: bool = False
 
     def validate(self, state: "GameState") -> ActionResult:
         player = state.get_player(self.player_id)
         if not player:
             return ActionResult.fail(f"Player {self.player_id} not found")
 
-        if player.has_fortified_quick:
+        if not self.from_effect and player.has_fortified_quick:
             return ActionResult.fail("Already used quick fortify this turn")
 
         if player.military < 1:
@@ -420,7 +425,8 @@ class FortifyAction(GameAction):
 
         player = state.get_player(self.player_id)
         player.military -= 1
-        player.has_fortified_quick = True
+        if not self.from_effect:
+            player.has_fortified_quick = True
 
         loc = state.locations[self.target_location]
         loc.is_fortified = True

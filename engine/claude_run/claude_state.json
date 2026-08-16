@@ -1,0 +1,1966 @@
+{
+  "player": "north",
+  "type": "action",
+  "human": false,
+  "round": 2,
+  "phase": "action",
+  "viewport": {
+    "viewer_id": "north",
+    "mode": "snapshot",
+    "round": 2,
+    "phase": "action",
+    "turn_order": [
+      "north",
+      "jin_2",
+      "jin_1",
+      "jin_3"
+    ],
+    "active_player_index": 0,
+    "game_end_marker": null,
+    "game_end_reason": null,
+    "public": {
+      "map": {
+        "locations": {
+          "张掖": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "西凉",
+            "is_capital": false
+          },
+          "姑臧": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "西凉",
+            "is_capital": false
+          },
+          "金城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "西凉",
+            "is_capital": false
+          },
+          "安定": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "关中",
+            "is_capital": false
+          },
+          "天水": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "关中",
+            "is_capital": false
+          },
+          "长安": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "关中",
+            "is_capital": false
+          },
+          "汉中": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "巴蜀",
+            "is_capital": false
+          },
+          "巴郡": {
+            "controller": "jin_p1",
+            "is_fortified": false,
+            "region": "巴蜀",
+            "is_capital": false
+          },
+          "蜀郡": {
+            "controller": "jin_p1",
+            "is_fortified": false,
+            "region": "巴蜀",
+            "is_capital": false
+          },
+          "襄阳": {
+            "controller": "jin_p2",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "南郡": {
+            "controller": "jin_p2",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "巴东": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "武昌": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "宛城": {
+            "controller": "jin_p2",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "上洛": {
+            "controller": "jin_p2",
+            "is_fortified": false,
+            "region": "荆襄",
+            "is_capital": false
+          },
+          "浔阳": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "江南",
+            "is_capital": false
+          },
+          "建康": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "江南",
+            "is_capital": true
+          },
+          "京口": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "江南",
+            "is_capital": false
+          },
+          "吴": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "江南",
+            "is_capital": false
+          },
+          "会稽": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "江南",
+            "is_capital": false
+          },
+          "弘农": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "洛阳": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "雍丘": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "彭城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "谯": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "东平": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "中原",
+            "is_capital": false
+          },
+          "平阳": {
+            "controller": "north",
+            "is_fortified": false,
+            "region": "山西",
+            "is_capital": false
+          },
+          "太原": {
+            "controller": "jin_p3",
+            "is_fortified": false,
+            "region": "山西",
+            "is_capital": false
+          },
+          "上党": {
+            "controller": "jin_p3",
+            "is_fortified": true,
+            "region": "山西",
+            "is_capital": false
+          },
+          "济南": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "山东",
+            "is_capital": false
+          },
+          "广固": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "山东",
+            "is_capital": false
+          },
+          "琅琊": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "山东",
+            "is_capital": false
+          },
+          "寿春": {
+            "controller": "jin_p3",
+            "is_fortified": false,
+            "region": "淮南",
+            "is_capital": false
+          },
+          "合肥": {
+            "controller": "sima",
+            "is_fortified": false,
+            "region": "淮南",
+            "is_capital": false
+          },
+          "广陵": {
+            "controller": "jin_p3",
+            "is_fortified": false,
+            "region": "淮南",
+            "is_capital": false
+          },
+          "中山": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "河北",
+            "is_capital": false
+          },
+          "襄国": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "河北",
+            "is_capital": false
+          },
+          "邺城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "河北",
+            "is_capital": false
+          },
+          "信都": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "河北",
+            "is_capital": false
+          },
+          "蓟城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "幽燕",
+            "is_capital": false
+          },
+          "龙城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "幽燕",
+            "is_capital": false
+          },
+          "盛乐": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "塞外",
+            "is_capital": false
+          },
+          "平城": {
+            "controller": "neutral",
+            "is_fortified": false,
+            "region": "塞外",
+            "is_capital": false
+          }
+        },
+        "regions": {
+          "西凉": {
+            "name": "西凉",
+            "control_marker": "sima",
+            "locations": [
+              "张掖",
+              "姑臧",
+              "金城"
+            ],
+            "location_details": {
+              "张掖": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "姑臧": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "金城": {
+                "controller": "neutral",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [
+              {
+                "type": "buddhism",
+                "locked": false
+              }
+            ],
+            "culture_slot_count": 1
+          },
+          "关中": {
+            "name": "关中",
+            "control_marker": "north",
+            "locations": [
+              "安定",
+              "天水",
+              "长安"
+            ],
+            "location_details": {
+              "安定": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "天水": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "长安": {
+                "controller": "north",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "巴蜀": {
+            "name": "巴蜀",
+            "control_marker": "jin_p1",
+            "locations": [
+              "汉中",
+              "巴郡",
+              "蜀郡"
+            ],
+            "location_details": {
+              "汉中": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "巴郡": {
+                "controller": "jin_p1",
+                "is_fortified": false
+              },
+              "蜀郡": {
+                "controller": "jin_p1",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "荆襄": {
+            "name": "荆襄",
+            "control_marker": "jin_p2",
+            "locations": [
+              "襄阳",
+              "南郡",
+              "巴东",
+              "武昌",
+              "宛城",
+              "上洛"
+            ],
+            "location_details": {
+              "襄阳": {
+                "controller": "jin_p2",
+                "is_fortified": false
+              },
+              "南郡": {
+                "controller": "jin_p2",
+                "is_fortified": false
+              },
+              "巴东": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "武昌": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "宛城": {
+                "controller": "jin_p2",
+                "is_fortified": false
+              },
+              "上洛": {
+                "controller": "jin_p2",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "江南": {
+            "name": "江南",
+            "control_marker": "sima",
+            "locations": [
+              "浔阳",
+              "建康",
+              "京口",
+              "吴",
+              "会稽"
+            ],
+            "location_details": {
+              "浔阳": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "建康": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "京口": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "吴": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "会稽": {
+                "controller": "sima",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [
+              {
+                "type": "taoism",
+                "locked": false
+              }
+            ],
+            "culture_slot_count": 1
+          },
+          "中原": {
+            "name": "中原",
+            "control_marker": "north",
+            "locations": [
+              "弘农",
+              "洛阳",
+              "雍丘",
+              "彭城",
+              "谯",
+              "东平"
+            ],
+            "location_details": {
+              "弘农": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "洛阳": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "雍丘": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "彭城": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "谯": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "东平": {
+                "controller": "north",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "山西": {
+            "name": "山西",
+            "control_marker": "jin_p3",
+            "locations": [
+              "平阳",
+              "太原",
+              "上党"
+            ],
+            "location_details": {
+              "平阳": {
+                "controller": "north",
+                "is_fortified": false
+              },
+              "太原": {
+                "controller": "jin_p3",
+                "is_fortified": false
+              },
+              "上党": {
+                "controller": "jin_p3",
+                "is_fortified": true
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "山东": {
+            "name": "山东",
+            "control_marker": null,
+            "locations": [
+              "济南",
+              "广固",
+              "琅琊"
+            ],
+            "location_details": {
+              "济南": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "广固": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "琅琊": {
+                "controller": "neutral",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [
+              {
+                "type": "confucianism",
+                "locked": false
+              }
+            ],
+            "culture_slot_count": 1
+          },
+          "淮南": {
+            "name": "淮南",
+            "control_marker": "jin_p3",
+            "locations": [
+              "寿春",
+              "合肥",
+              "广陵"
+            ],
+            "location_details": {
+              "寿春": {
+                "controller": "jin_p3",
+                "is_fortified": false
+              },
+              "合肥": {
+                "controller": "sima",
+                "is_fortified": false
+              },
+              "广陵": {
+                "controller": "jin_p3",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "河北": {
+            "name": "河北",
+            "control_marker": null,
+            "locations": [
+              "中山",
+              "襄国",
+              "邺城",
+              "信都"
+            ],
+            "location_details": {
+              "中山": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "襄国": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "邺城": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "信都": {
+                "controller": "neutral",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "幽燕": {
+            "name": "幽燕",
+            "control_marker": null,
+            "locations": [
+              "蓟城",
+              "龙城"
+            ],
+            "location_details": {
+              "蓟城": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "龙城": {
+                "controller": "neutral",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          },
+          "塞外": {
+            "name": "塞外",
+            "control_marker": null,
+            "locations": [
+              "盛乐",
+              "平城"
+            ],
+            "location_details": {
+              "盛乐": {
+                "controller": "neutral",
+                "is_fortified": false
+              },
+              "平城": {
+                "controller": "neutral",
+                "is_fortified": false
+              }
+            },
+            "culture_markers": [],
+            "culture_slot_count": 0
+          }
+        }
+      },
+      "players": {
+        "north": {
+          "player_id": "north",
+          "faction": "north",
+          "hero": {
+            "name": "苻坚",
+            "card_id": "苻坚_苻坚_1",
+            "cost": -1,
+            "card_type": "hero",
+            "card_category": "hero_north",
+            "effect_text": "主动：弃1张手牌，然后摸1张牌，可以执行1个手牌行动。登场：转化[长安][弘农][安定][平阳]",
+            "effect_summary": "摸牌 | 转化",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "苻坚",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          "staff_count": 2,
+          "staff_names": [
+            "姚苌",
+            "邓羌"
+          ],
+          "history_count": 0,
+          "history_names": [],
+          "military": 10,
+          "vp": 22,
+          "army_placed_count": 8,
+          "army_reserve_count": 24,
+          "army_reserve_revealed_vp": 16,
+          "army_reserve_revealed_military": 2,
+          "hand_count": 2,
+          "marker_military": 2,
+          "marker_culture": 0,
+          "marker_affair": 1,
+          "marker_power": 0,
+          "has_expedition_marker": false,
+          "game_end_marker": false,
+          "start_order": 0,
+          "culture_contributions": {
+            "confucianism": 0,
+            "taoism": 0,
+            "buddhism": 0
+          }
+        },
+        "jin_1": {
+          "player_id": "jin_1",
+          "faction": "jin",
+          "hero": {
+            "name": "祖逖",
+            "card_id": "祖逖_祖逖_1",
+            "cost": -1,
+            "card_type": "hero",
+            "card_category": "hero_jin",
+            "effect_text": "被动：每次结算[转化]后，摸1张牌并获得1vp。登场：先动值6。获得4军力。获得2威望。",
+            "effect_summary": "摸牌 | +1VP | +4军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "祖逖",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          "staff_count": 2,
+          "staff_names": [
+            "刘穆之",
+            "桓宣"
+          ],
+          "history_count": 1,
+          "history_names": [
+            "流民"
+          ],
+          "military": 1,
+          "vp": 5,
+          "army_placed_count": 2,
+          "army_reserve_count": 14,
+          "army_reserve_revealed_vp": 4,
+          "army_reserve_revealed_military": 0,
+          "hand_count": 6,
+          "marker_military": 1,
+          "marker_culture": 0,
+          "marker_affair": 1,
+          "marker_power": 1,
+          "has_expedition_marker": false,
+          "game_end_marker": false,
+          "start_order": 3,
+          "prestige": 4,
+          "contribution": 1,
+          "order": 1,
+          "order_seq": 2,
+          "public_goal": "清言世业",
+          "culture_contributions": {
+            "confucianism": 0,
+            "taoism": 0,
+            "buddhism": 0
+          }
+        },
+        "jin_2": {
+          "player_id": "jin_2",
+          "faction": "jin",
+          "hero": {
+            "name": "桓温",
+            "card_id": "桓温_桓温_1",
+            "cost": -1,
+            "card_type": "hero",
+            "card_category": "hero_jin",
+            "effect_text": "被动：每次存档1张牌时，获得2vp。登场：先动值4。转化[南郡][襄阳]。获得1功绩和1威望。",
+            "effect_summary": "+2VP | 转化",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 1
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "桓温",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          "staff_count": 1,
+          "staff_names": [
+            "谢艾"
+          ],
+          "history_count": 1,
+          "history_names": [
+            "入幕之宾"
+          ],
+          "military": 2,
+          "vp": 2,
+          "army_placed_count": 4,
+          "army_reserve_count": 12,
+          "army_reserve_revealed_vp": 6,
+          "army_reserve_revealed_military": 1,
+          "hand_count": 5,
+          "marker_military": 1,
+          "marker_culture": 0,
+          "marker_affair": 1,
+          "marker_power": 1,
+          "has_expedition_marker": false,
+          "game_end_marker": false,
+          "start_order": 5,
+          "prestige": 3,
+          "contribution": 1,
+          "order": 1,
+          "order_seq": 3,
+          "public_goal": "加九锡",
+          "culture_contributions": {
+            "confucianism": 0,
+            "taoism": 0,
+            "buddhism": 0
+          }
+        },
+        "jin_3": {
+          "player_id": "jin_3",
+          "faction": "jin",
+          "hero": {
+            "name": "谢安",
+            "card_id": "谢安_谢安_1",
+            "cost": -1,
+            "card_type": "hero",
+            "card_category": "hero_jin",
+            "effect_text": "被动：每次获得功绩后，摸1张牌。登场：先动值7。获得1威望和1功绩（不触发被动效果）。在其他东晋玩家完成登场效果后，转化2个[建康]以外的司马家地点。",
+            "effect_summary": "摸牌 | 转化",
+            "markers": {
+              "军事": 0,
+              "文化": 1,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "谢安",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          "staff_count": 0,
+          "staff_names": [],
+          "history_count": 1,
+          "history_names": [
+            "高卧东山"
+          ],
+          "military": 2,
+          "vp": 3,
+          "army_placed_count": 4,
+          "army_reserve_count": 12,
+          "army_reserve_revealed_vp": 6,
+          "army_reserve_revealed_military": 1,
+          "hand_count": 8,
+          "marker_military": 0,
+          "marker_culture": 1,
+          "marker_affair": 1,
+          "marker_power": 0,
+          "has_expedition_marker": false,
+          "game_end_marker": false,
+          "start_order": 2,
+          "prestige": 3,
+          "contribution": 1,
+          "order": 1,
+          "order_seq": 1,
+          "public_goal": "表里山河",
+          "culture_contributions": {
+            "confucianism": 0,
+            "taoism": 0,
+            "buddhism": 0
+          }
+        }
+      },
+      "court": {
+        "north": [
+          {
+            "name": "营造宫殿",
+            "card_id": "通用_营造宫殿_1",
+            "cost": 2,
+            "card_type": "strategy",
+            "card_category": "strategy_special",
+            "effect_text": "东晋行动：6vp，司马家获得7vp；北方行动：9vp",
+            "effect_summary": "+6VP | +9VP",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": true,
+            "is_event": false,
+            "owner_faction": "通用",
+            "owner_player_id": null,
+            "history_vp": -9,
+            "resource_option_army": 0,
+            "resource_option_vp": 5,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "流民",
+            "card_id": "初始_流民_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "",
+            "effect_summary": "",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 2,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "流民",
+            "card_id": "初始_流民_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "",
+            "effect_summary": "",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 2,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "宫廷",
+            "card_id": "初始_宫廷_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：存档1张候选策略牌。",
+            "effect_summary": "存档",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "征辟人才",
+            "card_id": "初始_征辟人才_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：摸2张牌。如果[内政]标记数>2，额外摸1张牌。",
+            "effect_summary": "摸牌 | 摸牌",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "轻骑兵",
+            "card_id": "初始_轻骑兵_1",
+            "cost": 2,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：2军力。选择1个玩家，随机抽取他的1张手牌。",
+            "effect_summary": "+2军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": -9,
+            "resource_option_army": 2,
+            "resource_option_vp": 1,
+            "culture_tags": {}
+          }
+        ],
+        "jin": [
+          {
+            "name": "流民",
+            "card_id": "初始_流民_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "",
+            "effect_summary": "",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 2,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "加官进爵",
+            "card_id": "初始_加官进爵_1",
+            "cost": 1,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：支付1张手牌，提高1级顺位，传播1次[玄学]。被动：[加官进爵]不能被存档、征发或弃置。",
+            "effect_summary": "+1顺位 | 传播玄学",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 1
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 1,
+            "resource_option_vp": 2,
+            "culture_tags": {
+              "taoism": 1
+            }
+          },
+          {
+            "name": "征辟人才",
+            "card_id": "初始_征辟人才_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：摸2张牌。如果[内政]标记数>2，额外摸1张牌。",
+            "effect_summary": "摸牌 | 摸牌",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "北伐",
+            "card_id": "初始_北伐_1",
+            "cost": 1,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：2军力。从东晋面板获得[北伐]标记。被动：[北伐]不能被存档、征发或弃置。",
+            "effect_summary": "+2军力 | 远征标记",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 0,
+            "resource_option_army": 2,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "流民",
+            "card_id": "初始_流民_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "",
+            "effect_summary": "",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 2,
+            "resource_option_army": 0,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "清谈",
+            "card_id": "初始_清谈_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：6vp",
+            "effect_summary": "+6VP",
+            "markers": {
+              "军事": 0,
+              "文化": 1,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 0,
+            "resource_option_vp": 2,
+            "culture_tags": {}
+          },
+          {
+            "name": "士卒",
+            "card_id": "初始_士卒_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：3军力",
+            "effect_summary": "+3军力",
+            "markers": {
+              "军事": 1,
+              "文化": 0,
+              "内政": 0,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          },
+          {
+            "name": "宫廷",
+            "card_id": "初始_宫廷_1",
+            "cost": 0,
+            "card_type": "initial",
+            "card_category": "initial",
+            "effect_text": "行动：存档1张候选策略牌。",
+            "effect_summary": "存档",
+            "markers": {
+              "军事": 0,
+              "文化": 0,
+              "内政": 1,
+              "权谋": 0
+            },
+            "is_friend": false,
+            "is_strategy": false,
+            "is_event": false,
+            "owner_faction": "初始",
+            "owner_player_id": null,
+            "history_vp": 1,
+            "resource_option_army": 1,
+            "resource_option_vp": 0,
+            "culture_tags": {}
+          }
+        ]
+      },
+      "played_this_round": {
+        "north": [],
+        "jin": []
+      },
+      "public_actions": [
+        {
+          "name": "清君侧",
+          "card_id": "公共_清君侧_1",
+          "cost": 0,
+          "card_type": "public",
+          "card_category": "public",
+          "effect_text": "支付7军力。选择威望、功绩或者顺位，提高1级，其他所有东晋玩家降低1级。[僭越]司马家威望降低1级，获得4vp。",
+          "effect_summary": "+4VP",
+          "markers": {
+            "军事": 0,
+            "文化": 0,
+            "内政": 0,
+            "权谋": 1
+          },
+          "is_friend": false,
+          "owner_faction": "公共",
+          "history_vp": 0,
+          "resource_option_army": 0,
+          "resource_option_vp": 0
+        },
+        {
+          "name": "著书立说",
+          "card_id": "公共_著书立说_1",
+          "cost": 3,
+          "card_type": "public",
+          "card_category": "public",
+          "effect_text": "传播1次文化，获得2vp。",
+          "effect_summary": "传播文化 | +2VP",
+          "markers": {
+            "军事": 0,
+            "文化": 1,
+            "内政": 0,
+            "权谋": 0
+          },
+          "is_friend": false,
+          "owner_faction": "公共",
+          "history_vp": 0,
+          "resource_option_army": 0,
+          "resource_option_vp": 0
+        },
+        {
+          "name": "拔才取士",
+          "card_id": "公共_拔才取士_1",
+          "cost": 1,
+          "card_type": "public",
+          "card_category": "public",
+          "effect_text": "摸2张牌。",
+          "effect_summary": "摸牌",
+          "markers": {
+            "军事": 0,
+            "文化": 0,
+            "内政": 1,
+            "权谋": 0
+          },
+          "is_friend": false,
+          "owner_faction": "公共",
+          "history_vp": 0,
+          "resource_option_army": 0,
+          "resource_option_vp": 0
+        },
+        {
+          "name": "出任藩镇",
+          "card_id": "公共_出任藩镇_1",
+          "cost": 0,
+          "card_type": "public",
+          "card_category": "public",
+          "effect_text": "降低1点[威望]或[功绩]，转化1个司马家地点。[僭越]可以转化1个东晋玩家地点。",
+          "effect_summary": "[牌组行动]",
+          "markers": {
+            "军事": 0,
+            "文化": 0,
+            "内政": 0,
+            "权谋": 1
+          },
+          "is_friend": false,
+          "owner_faction": "公共",
+          "history_vp": 0,
+          "resource_option_army": 0,
+          "resource_option_vp": 0
+        },
+        {
+          "name": "求田问舍",
+          "card_id": "公共_求田问舍_1",
+          "cost": 3,
+          "card_type": "public",
+          "card_category": "public",
+          "effect_text": "7vp。如果[玄学]贡献度>1，额外获得4vp",
+          "effect_summary": "+7VP | +4VP",
+          "markers": {
+            "军事": 0,
+            "文化": 0,
+            "内政": 1,
+            "权谋": 0
+          },
+          "is_friend": false,
+          "owner_faction": "公共",
+          "history_vp": 0,
+          "resource_option_army": 0,
+          "resource_option_vp": 0
+        }
+      ],
+      "tracks": {
+        "vp": {},
+        "culture": {
+          "confucianism": {
+            "supply_level": 1,
+            "map_count": 1
+          },
+          "taoism": {
+            "supply_level": 1,
+            "map_count": 1
+          },
+          "buddhism": {
+            "supply_level": 1,
+            "map_count": 1
+          }
+        },
+        "prestige": {
+          "jin_1": 4,
+          "jin_2": 3,
+          "jin_3": 3,
+          "sima": 4
+        },
+        "contribution": {
+          "jin_1": 1,
+          "jin_2": 1,
+          "jin_3": 1
+        },
+        "order": {
+          "jin_1": 1,
+          "jin_2": 1,
+          "jin_3": 1
+        }
+      },
+      "decks": {
+        "main": {
+          "deck_count": 69,
+          "discard": [
+            "幽州突骑",
+            "尊奉江东",
+            "流芳百世",
+            "菩萨木像",
+            "周处除三害",
+            "荀灌",
+            "刘琨",
+            "高句丽征伐",
+            "鸩酒",
+            "袁乔",
+            "凿壁偷光",
+            "一往情深",
+            "招抚",
+            "王猛",
+            "慕容恪",
+            "侨州郡县",
+            "兴修水利",
+            "司马道子",
+            "焉能有功",
+            "刘牢之",
+            "伊霍之事",
+            "桓石虔",
+            "通使建康",
+            "凉州大马",
+            "谯纵",
+            "崔宏",
+            "清商乐",
+            "流民帅",
+            "京口重镇",
+            "司马道子"
+          ]
+        },
+        "north": {
+          "deck_count": 1,
+          "discard": []
+        },
+        "jin": {
+          "deck_count": 0,
+          "discard": []
+        }
+      },
+      "forced_event_pile_count": 0,
+      "forced_event_pile_names": [],
+      "refugee_supply_count": 15,
+      "emperor": {
+        "age": 2,
+        "emperor_name": "",
+        "prestige": 0,
+        "tasks": []
+      },
+      "sima": {
+        "military": 6,
+        "vp": 18,
+        "prestige": 4,
+        "army_placed_count": 10,
+        "army_reserve_count": 6,
+        "capital_location": "建康"
+      },
+      "expedition_marker_location": null
+    },
+    "private": {
+      "hand": [
+        {
+          "name": "洛神赋图",
+          "card_id": "通用_洛神赋图_1",
+          "cost": 3,
+          "card_type": "event",
+          "card_category": "event_art",
+          "effect_text": "传播1次[儒学]，然后存档此牌。",
+          "effect_summary": "传播儒学 | 存档此牌",
+          "markers": {
+            "军事": 0,
+            "文化": 1,
+            "内政": 0,
+            "权谋": 0
+          },
+          "is_friend": false,
+          "is_strategy": false,
+          "is_event": true,
+          "owner_faction": "通用",
+          "owner_player_id": null,
+          "history_vp": 6,
+          "resource_option_army": 0,
+          "resource_option_vp": 0,
+          "culture_tags": {
+            "confucianism": 1
+          }
+        },
+        {
+          "name": "还都洛阳",
+          "card_id": "通用_还都洛阳_1",
+          "cost": 1,
+          "card_type": "event",
+          "card_category": "event_vp",
+          "effect_text": "占据[洛阳]时，可以打出。存档此牌。[僭越]交换东晋首都和洛阳的部队。获得1[威望]。",
+          "effect_summary": "存档此牌 | +1威望",
+          "markers": {
+            "军事": 0,
+            "文化": 0,
+            "内政": 0,
+            "权谋": 1
+          },
+          "is_friend": false,
+          "is_strategy": false,
+          "is_event": true,
+          "owner_faction": "通用",
+          "owner_player_id": null,
+          "history_vp": 7,
+          "resource_option_army": 0,
+          "resource_option_vp": 0,
+          "culture_tags": {}
+        }
+      ],
+      "staff": [
+        {
+          "name": "姚苌",
+          "card_id": "北方_姚苌_1",
+          "cost": 2,
+          "card_type": "friend",
+          "card_category": "friend_special",
+          "effect_text": "主动：1军力。登场：转化2个相邻中立地点。被动：此牌离开幕僚区时，将2个己方控制地点转化为中立地点。",
+          "effect_summary": "+1军力 | 转化",
+          "markers": {
+            "军事": 1,
+            "文化": 0,
+            "内政": 0,
+            "权谋": 0
+          },
+          "is_friend": true,
+          "is_strategy": false,
+          "is_event": false,
+          "owner_faction": "北方",
+          "owner_player_id": "north",
+          "history_vp": 5,
+          "resource_option_army": 0,
+          "resource_option_vp": 0,
+          "culture_tags": {}
+        },
+        {
+          "name": "邓羌",
+          "card_id": "苻坚_邓羌_1",
+          "cost": 3,
+          "card_type": "friend",
+          "card_category": "friend_military",
+          "effect_text": "主动：获得X军力，X=[军事]标记数（最多4）。",
+          "effect_summary": "+marker_count_military军力",
+          "markers": {
+            "军事": 1,
+            "文化": 0,
+            "内政": 0,
+            "权谋": 0
+          },
+          "is_friend": true,
+          "is_strategy": false,
+          "is_event": false,
+          "owner_faction": "苻坚",
+          "owner_player_id": "north",
+          "history_vp": 7,
+          "resource_option_army": 0,
+          "resource_option_vp": 0,
+          "culture_tags": {}
+        }
+      ],
+      "history": [],
+      "hero": {
+        "name": "苻坚",
+        "card_id": "苻坚_苻坚_1",
+        "cost": -1,
+        "card_type": "hero",
+        "card_category": "hero_north",
+        "effect_text": "主动：弃1张手牌，然后摸1张牌，可以执行1个手牌行动。登场：转化[长安][弘农][安定][平阳]",
+        "effect_summary": "摸牌 | 转化",
+        "markers": {
+          "军事": 0,
+          "文化": 0,
+          "内政": 1,
+          "权谋": 0
+        },
+        "is_friend": false,
+        "is_strategy": false,
+        "is_event": false,
+        "owner_faction": "苻坚",
+        "owner_player_id": null,
+        "history_vp": 0,
+        "resource_option_army": 0,
+        "resource_option_vp": 0,
+        "culture_tags": {}
+      },
+      "secret_goal": null,
+      "can_take_hand_action": true,
+      "can_take_court_action": true,
+      "extra_hand_actions": 0,
+      "extra_court_actions": 0,
+      "extra_hand_action_filter": null,
+      "has_drawn_quick": false,
+      "has_fortified_quick": false,
+      "has_taken_hand_action": false,
+      "has_taken_court_action": false,
+      "hand_action_taken_count": 0,
+      "court_action_taken_count": 0,
+      "activated_card_ids": [],
+      "staff_free_slots": 2,
+      "staff_limit": 4,
+      "hand_limit": 8
+    },
+    "available_actions": {}
+  },
+  "actions": [
+    {
+      "action_type": "march",
+      "description": "进军 → 金城",
+      "target": "金城",
+      "cost": "3+军力",
+      "index": 0
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 汉中",
+      "target": "汉中",
+      "cost": "3+军力",
+      "index": 1
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 宛城",
+      "target": "宛城",
+      "cost": "3+军力",
+      "index": 2
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 上洛",
+      "target": "上洛",
+      "cost": "3+军力",
+      "index": 3
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 谯",
+      "target": "谯",
+      "cost": "3+军力",
+      "index": 4
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 太原",
+      "target": "太原",
+      "cost": "3+军力",
+      "index": 5
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 上党",
+      "target": "上党",
+      "cost": "3+军力",
+      "index": 6
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 济南",
+      "target": "济南",
+      "cost": "3+军力",
+      "index": 7
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 琅琊",
+      "target": "琅琊",
+      "cost": "3+军力",
+      "index": 8
+    },
+    {
+      "action_type": "march",
+      "description": "进军 → 邺城",
+      "target": "邺城",
+      "cost": "3+军力",
+      "index": 9
+    },
+    {
+      "action_type": "draw",
+      "description": "摸牌 (快速行动)",
+      "cost": "2军力",
+      "index": 10
+    },
+    {
+      "action_type": "recruit",
+      "description": "征募: 弃「洛神赋图」换1军力",
+      "cost": "弃1手牌",
+      "card_index": 0,
+      "index": 11
+    },
+    {
+      "action_type": "recruit",
+      "description": "征募: 弃「还都洛阳」换1军力",
+      "cost": "弃1手牌",
+      "card_index": 1,
+      "index": 12
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 安定",
+      "target": "安定",
+      "cost": "1军力",
+      "index": 13
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 天水",
+      "target": "天水",
+      "cost": "1军力",
+      "index": 14
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 长安",
+      "target": "长安",
+      "cost": "1军力",
+      "index": 15
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 弘农",
+      "target": "弘农",
+      "cost": "1军力",
+      "index": 16
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 洛阳",
+      "target": "洛阳",
+      "cost": "1军力",
+      "index": 17
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 雍丘",
+      "target": "雍丘",
+      "cost": "1军力",
+      "index": 18
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 东平",
+      "target": "东平",
+      "cost": "1军力",
+      "index": 19
+    },
+    {
+      "action_type": "fortify",
+      "description": "加固 → 平阳",
+      "target": "平阳",
+      "cost": "1军力",
+      "index": 20
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "通用_营造宫殿_1",
+      "description": "牌组行动: 「营造宫殿」",
+      "card_name": "营造宫殿",
+      "effect_summary": "+6VP，targeted_effect，+9VP",
+      "block_costs": "",
+      "index": 21
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_士卒_1",
+      "description": "牌组行动: 「士卒」",
+      "card_name": "士卒",
+      "effect_summary": "+3军力",
+      "block_costs": "",
+      "index": 22
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_宫廷_1",
+      "description": "牌组行动: 「宫廷」",
+      "card_name": "宫廷",
+      "effect_summary": "存档",
+      "block_costs": "",
+      "index": 23
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_士卒_1",
+      "description": "牌组行动: 「士卒」",
+      "card_name": "士卒",
+      "effect_summary": "+3军力",
+      "block_costs": "",
+      "index": 24
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_士卒_1",
+      "description": "牌组行动: 「士卒」",
+      "card_name": "士卒",
+      "effect_summary": "+3军力",
+      "block_costs": "",
+      "index": 25
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_士卒_1",
+      "description": "牌组行动: 「士卒」",
+      "card_name": "士卒",
+      "effect_summary": "+3军力",
+      "block_costs": "",
+      "index": 26
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_征辟人才_1",
+      "description": "牌组行动: 「征辟人才」",
+      "card_name": "征辟人才",
+      "effect_summary": "摸2张牌，摸1张牌",
+      "block_costs": "",
+      "index": 27
+    },
+    {
+      "action_type": "court_action",
+      "card_id": "初始_轻骑兵_1",
+      "description": "牌组行动: 「轻骑兵」",
+      "card_name": "轻骑兵",
+      "effect_summary": "+2军力，targeted_effect",
+      "block_costs": "",
+      "index": 28
+    },
+    {
+      "action_type": "play_public_card",
+      "card_id": "公共_拔才取士_1",
+      "payment_indices": [
+        0
+      ],
+      "description": "公共行动: 「拔才取士」(费用1)",
+      "card_name": "拔才取士",
+      "effect_summary": "摸2张牌",
+      "block_costs": "",
+      "index": 29
+    },
+    {
+      "action_type": "activate_effect",
+      "card_id": "苻坚_苻坚_1",
+      "block_index": 0,
+      "choice_index": 0,
+      "description": "激活「苻坚」",
+      "index": 30
+    },
+    {
+      "action_type": "activate_effect",
+      "card_id": "北方_姚苌_1",
+      "block_index": 0,
+      "choice_index": 0,
+      "description": "激活「姚苌」",
+      "index": 31
+    },
+    {
+      "action_type": "activate_effect",
+      "card_id": "苻坚_邓羌_1",
+      "block_index": 0,
+      "choice_index": 0,
+      "description": "激活「邓羌」",
+      "index": 32
+    }
+  ],
+  "pass_hint": "index = -1 表示结束行动/空过"
+}

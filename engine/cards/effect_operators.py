@@ -190,20 +190,11 @@ class DiscardCardsOperator(EffectOperator):
     def execute(self, step, state, player_id, context, resolver):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
-        player = state.get_player(player_id)
         count = step.params.get("count", 1)
         target = step.params.get("target", "main")  # "main" or "national"
-        discarded = []
-        for _ in range(count):
-            if player and player.hand:
-                discarded.append(player.hand.pop())
-        if discarded:
-            events = state.discard_cards(
-                player_id, discarded, target=target, source="hand",
-                reason="effect")
-            result.events.extend(events)
-            for _ in discarded:
-                resolver._fire_trigger("on_discard", player_id)
+        result.events.extend(resolver._discard_hand_cards(
+            state, player_id, count, target=target,
+            source="hand", reason="effect"))
         return result
 
 
@@ -560,12 +551,15 @@ class SupplyCourtOperator(EffectOperator):
         from .effect_resolver import ResolveResult
         result = ResolveResult()
         count = step.params.get("count", 1)
-        deck = state.get_national_deck(player_id)
         court = state.get_court_cards(player_id)
+        supplied = 0
         for _ in range(count):
-            if deck:
-                court.append(deck.pop(0))
-        result.events.append({"type": "supply_court", "count": count})
+            card = state.draw_national_card(player_id)
+            if card:
+                court.append(card)
+                supplied += 1
+        result.events.append({"type": "supply_court",
+                              "count": count, "supplied": supplied})
         return result
 
 
@@ -904,7 +898,8 @@ class FortifyOperator(_TargetedMapOperator):
             target = self._select_target(step, state, player_id, context,
                                          resolver, i)
             if target:
-                action = FortifyAction(player_id=player_id, target_location=target)
+                action = FortifyAction(player_id=player_id, target_location=target,
+                                       from_effect=True)
                 player = state.get_player(player_id)
                 if free and player:
                     player.military += 1  # Grant 1 military temporarily
@@ -1730,10 +1725,15 @@ class ChooseOperator(EffectOperator):
                 "title": step.params.get("prompt_text", "选择一个选项"),
                 "options": [],
             }
-            for i, opt_steps in enumerate(options):
-                # Summarize each option from its steps
+            for i, opt in enumerate(options):
+                costs, steps = self._normalize_choice_option(opt)
+                # Summarize each option: cost labels first, then step labels
                 labels = []
-                for s in opt_steps:
+                for cost in costs:
+                    clabel = self._cost_label(cost)
+                    if clabel:
+                        labels.append(clabel)
+                for s in steps:
                     if isinstance(s, dict):
                         et = s.get("effect_type", "")
                         p = s.get("params", {})
@@ -1772,6 +1772,7 @@ class ChooseOperator(EffectOperator):
                             "raise_culture_level": f"提高{culture_label}等级" if culture_label else "提高文化等级",
                             "remove_culture_marker": f"移除{culture_label}标记" if culture_label else "移除文化标记",
                             "archive_card": "存档",
+                            "archive_this": "存档此牌",
                             "search": search_label,
                         }
                         labels.append(label_map.get(et, et))
@@ -1790,10 +1791,18 @@ class ChooseOperator(EffectOperator):
                               "chosen": choice_idx,
                               "chosen_label": chosen_label})
 
-        # Execute the chosen option's sub-steps
+        # Execute the chosen option's costs, then its sub-steps
         if options and 0 <= choice_idx < len(options):
-            chosen_option = options[choice_idx]
-            for sub_step_dict in chosen_option:
+            costs, steps = self._normalize_choice_option(options[choice_idx])
+            # Pay option costs first (e.g. 苏峻: 支付3vp / 支付3军力)
+            for cost in costs:
+                cost_result = resolver._pay_cost_dict(cost, state, player_id)
+                result.events.extend(cost_result.events)
+                result.errors.extend(cost_result.errors)
+                if not cost_result.success:
+                    result.success = False
+                    return result
+            for sub_step_dict in steps:
                 if isinstance(sub_step_dict, dict):
                     # Build params from the dict, moving step-level keys into params
                     # (mirrors _dict_to_step logic for filter/target/choice_options)
@@ -1811,6 +1820,34 @@ class ChooseOperator(EffectOperator):
                     result.events.extend(inner.events)
                     result.errors.extend(inner.errors)
         return result
+
+    @staticmethod
+    def _normalize_choice_option(option):
+        """Normalize a choice option to (costs, steps).
+
+        Supports both forms:
+          - list form:  [step1, step2, ...]  → costs=[], steps=[step1, ...]
+          - dict form:  {"costs": [...], "steps": [...]} (e.g. 苏峻)
+        """
+        if isinstance(option, dict) and ("steps" in option or "costs" in option):
+            return option.get("costs", []), option.get("steps", [])
+        return [], option
+
+    @staticmethod
+    def _cost_label(cost):
+        """Short Chinese label for an option cost (pay_vp / pay_military / ...)."""
+        ct = cost.get("cost_type", "")
+        p = cost.get("params", {})
+        amount = p.get("amount", p.get("count", 1))
+        if ct == "pay_vp":
+            return f"支付{amount}vp"
+        elif ct == "pay_military":
+            return f"支付{amount}军力"
+        elif ct == "discard_cards":
+            return f"弃{p.get('count', 1)}手牌"
+        elif ct == "abandon_court_card":
+            return f"弃{p.get('count', 1)}朝堂牌"
+        return ""
 
 
 @register

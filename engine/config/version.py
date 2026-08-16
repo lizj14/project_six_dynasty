@@ -151,15 +151,22 @@ class Version:
             ))
 
         # === Goal cards ===
+        # 目标条件文本以 GOAL_DEFINITIONS（rules/goals.py 终局计分所用）为唯一真源。
+        # 编译 JSON 里的 *_condition_ast 既未被读取，且 compile_cards 有解析误差
+        # （如「威望大于等于6」被解析成 prestige>6），故不从这里取文本。
+        from rules.goals import GOAL_DEFINITIONS as _GOAL_DEFS
+        _goal_text = {g["name"]: g for g in _GOAL_DEFS}
         for d in data.get("goal_cards", []):
+            _g = _goal_text.get(d["name"], {})
             all_cards.append(CardDef(
                 card_id=d["card_id"], name=d["name"],
                 owner_faction="通用", cost=-1,
                 card_type=CardType.GOAL, card_category=CardCategory.GOAL,
-                effect_text=f"{d.get('simple_condition','')} / {d.get('full_condition','')}",
-                goal_simple_vp=d.get("simple_vp", 0), goal_full_vp=d.get("full_vp", 0),
-                goal_simple_condition=d.get("simple_condition", ""),
-                goal_full_condition=d.get("full_condition", ""),
+                effect_text=f"{_g.get('simple','')} / {_g.get('full','')}",
+                goal_simple_vp=_g.get("simple_vp", d.get("simple_vp", 0)),
+                goal_full_vp=_g.get("full_vp", d.get("full_vp", 0)),
+                goal_simple_condition=_g.get("simple", ""),
+                goal_full_condition=_g.get("full", ""),
             ))
 
         # === Emperor cards ===

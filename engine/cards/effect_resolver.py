@@ -116,26 +116,10 @@ class EffectResolver:
                     result.errors.append(
                         f"Not enough hand cards to pay cost: need {count}, have {len(player.hand)}")
                     return result
-                discarded = []
-                if self.choose_discard_callback:
-                    hand_names = [c.name for c in player.hand]
-                    chosen = self.choose_discard_callback(player_id, hand_names, count)
-                    for idx in sorted(chosen, reverse=True):
-                        if 0 <= idx < len(player.hand):
-                            discarded.append(player.hand.pop(idx))
-                else:
-                    for _ in range(count):
-                        if player and player.hand:
-                            discarded.append(player.hand.pop())
-                if discarded:
-                    target = cost.params.get("target", "main")
-                    events = state.discard_cards(
-                        player_id, discarded, target=target, source="hand",
-                        reason="cost")
-                    result.events.extend(events)
-                    for card in discarded:
-                        self._fire_trigger("on_discard", player_id,
-                                          {"card": card})
+                target = cost.params.get("target", "main")
+                result.events.extend(self._discard_hand_cards(
+                    state, player_id, count, target=target,
+                    source="hand", reason="cost"))
             elif cost.cost_type == "pay_military":
                 amount = cost.params.get("amount", 0)
                 if player:
@@ -234,6 +218,37 @@ class EffectResolver:
             if context:
                 ctx.update(context)
             self.trigger_callback(trigger_type, ctx)
+
+    def _discard_hand_cards(self, state: "GameState", player_id: str,
+                            count: int = 1, target: str = "main",
+                            source: str = "hand", reason: str = "effect") -> list[dict]:
+        """Discard `count` hand cards, asking the player to choose which.
+
+        Uses choose_discard_callback to let the player pick cards (auto-pop
+        the last card only as a fallback when no callback is wired, e.g. in
+        automated tests).  Shared by block-cost payment and the
+        DiscardCardsOperator so both paths behave identically.
+        Returns the events emitted by state.discard_cards().
+        """
+        player = state.get_player(player_id)
+        discarded = []
+        if self.choose_discard_callback and player and player.hand:
+            hand_names = [c.name for c in player.hand]
+            chosen = self.choose_discard_callback(player_id, hand_names, count)
+            for idx in sorted(chosen, reverse=True):
+                if 0 <= idx < len(player.hand):
+                    discarded.append(player.hand.pop(idx))
+        else:
+            for _ in range(count):
+                if player and player.hand:
+                    discarded.append(player.hand.pop())
+        if not discarded:
+            return []
+        events = state.discard_cards(
+            player_id, discarded, target=target, source=source, reason=reason)
+        for card in discarded:
+            self._fire_trigger("on_discard", player_id, {"card": card})
+        return events
 
     # ================================================================
     # Step dispatch (thin — delegates to operators)
@@ -600,32 +615,15 @@ class EffectResolver:
 
         elif cost_type == "discard_cards":
             count = cost_params.get("count", 1)
-            from_hand = cost_params.get("from_hand", True)
-            if from_hand and player and len(player.hand) < count:
+            if player and len(player.hand) < count:
                 result.success = False
                 result.errors.append(
                     f"Not enough hand cards to pay cost: need {count}, have {len(player.hand)}")
                 return result
-            if player and from_hand:
-                discarded = []
-                if self.choose_discard_callback:
-                    hand_names = [c.name for c in player.hand]
-                    chosen = self.choose_discard_callback(player_id, hand_names, count)
-                    for idx in sorted(chosen, reverse=True):
-                        if 0 <= idx < len(player.hand):
-                            discarded.append(player.hand.pop(idx))
-                else:
-                    for _ in range(count):
-                        if player.hand:
-                            discarded.append(player.hand.pop())
-                if discarded:
-                    target = cost_params.get("target", "main")
-                    events = state.discard_cards(
-                        player_id, discarded, target=target, source="hand",
-                        reason="cost")
-                    result.events.extend(events)
-                    for card in discarded:
-                        self._fire_trigger("on_discard", player_id, {"card": card})
+            target = cost_params.get("target", "main")
+            result.events.extend(self._discard_hand_cards(
+                state, player_id, count, target=target,
+                source="hand", reason="cost"))
 
         elif cost_type == "abandon_court_card":
             count = cost_params.get("count", 1)

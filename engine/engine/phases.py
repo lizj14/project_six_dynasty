@@ -784,6 +784,13 @@ def run_settlement_phase(state: GameState, rng: random.Random):
     from rules.scoring import reset_region_control_markers
     reset_region_control_markers(state)
 
+    # Return expedition (北伐) marker to the Jin national board
+    # (rulebook §北伐标记: "每回合结算阶段归还东晋国家板").  Without this,
+    # a Jin player keeps the "all friendly locations as adjacency sources"
+    # ability forever once they gain the marker.
+    for p in state.jin_players:
+        p.has_expedition_marker = False
+
     # Emperor age check — use real emperor module
     from rules.emperor import check_emperor_age
     emperor_age_events = check_emperor_age(state, rng)
@@ -805,23 +812,15 @@ def _refresh_court(state: GameState, faction: str, rng: random.Random):
     if faction == "north":
         state.north_discard.extend(state.north_court)
         state.north_court = []
-        deck = state.north_deck
-        discard = state.north_discard
-        target = state.north_court
     else:
         state.jin_discard.extend(state.jin_court)
         state.jin_court = []
-        deck = state.jin_deck
-        discard = state.jin_discard
-        target = state.jin_court
 
+    court = state.get_court_cards(faction)
     for _ in range(10):
-        if not deck and discard:
-            rng.shuffle(discard)
-            deck.extend(discard)
-            discard.clear()
-        if deck:
-            target.append(deck.pop(0))
+        card = state.draw_national_card(faction, rng)
+        if card:
+            court.append(card)
 
 
 def _fill_court_to(state: GameState, faction: str, target_size: int = 10,
@@ -834,22 +833,12 @@ def _fill_court_to(state: GameState, faction: str, target_size: int = 10,
     """
     if rng is None:
         rng = random.Random()
-    if faction == "north":
-        court = state.north_court
-        deck = state.north_deck
-        discard = state.north_discard
-    else:
-        court = state.jin_court
-        deck = state.jin_deck
-        discard = state.jin_discard
+    court = state.get_court_cards(faction)
 
     while len(court) < target_size:
-        if not deck and discard:
-            rng.shuffle(discard)
-            deck.extend(discard)
-            discard.clear()
-        if deck:
-            court.append(deck.pop(0))
+        card = state.draw_national_card(faction, rng)
+        if card:
+            court.append(card)
         else:
             break
 
