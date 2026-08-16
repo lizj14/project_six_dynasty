@@ -132,14 +132,11 @@ class PayMilitaryOperator(EffectOperator):
     effect_type = EffectType.PAY_MILITARY
 
     def execute(self, step, state, player_id, context, resolver):
-        from .effect_resolver import ResolveResult
-        result = ResolveResult()
-        player = state.get_player(player_id)
-        amount = step.params.get("amount", 0)
-        if player:
-            player.military = max(0, player.military - amount)
-            result.events.append({"type": "pay_military", "amount": amount})
-        return result
+        # Unified cost cell — same validation as block-level/choice-level costs.
+        return resolver._pay_cost_dict(
+            {"cost_type": "pay_military",
+             "params": {"amount": step.params.get("amount", 0)}},
+            state, player_id)
 
 
 @register
@@ -147,14 +144,11 @@ class PayVPOperator(EffectOperator):
     effect_type = EffectType.PAY_VP
 
     def execute(self, step, state, player_id, context, resolver):
-        from .effect_resolver import ResolveResult
-        result = ResolveResult()
-        player = state.get_player(player_id)
-        amount = step.params.get("amount", 0)
-        if player:
-            player.vp = max(0, player.vp - amount)
-            result.events.append({"type": "pay_vp", "amount": amount})
-        return result
+        # Unified cost cell — same validation as block-level/choice-level costs.
+        return resolver._pay_cost_dict(
+            {"cost_type": "pay_vp",
+             "params": {"amount": step.params.get("amount", 0)}},
+            state, player_id)
 
 
 # ============================================================

@@ -693,7 +693,7 @@ class GameEngine:
                         filter_spec = evt.get("filter") or {}
                         eligible = []
                         for i, c in enumerate(player.hand):
-                            if self._card_matches_filter(c, filter_spec):
+                            if c.definition.is_playable_by(player.faction) and self._card_matches_filter(c, filter_spec):
                                 eligible.append(i)
                         if eligible:
                             # Grant a temporary extra hand action so
@@ -743,7 +743,7 @@ class GameEngine:
                                 combined_filter["card_type"] = card_type_filter
                             eligible = []
                             for i, c in enumerate(player.hand):
-                                if self._card_matches_filter(c, combined_filter):
+                                if c.definition.is_playable_by(player.faction) and self._card_matches_filter(c, combined_filter):
                                     eligible.append(i)
                             if eligible:
                                 # Extra action already granted by effect;

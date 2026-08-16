@@ -15,6 +15,12 @@ from .effect_operators import OPERATOR_REGISTRY
 from .condition_operators import CONDITION_REGISTRY
 
 
+# EffectStep types that represent a cost (支付Nvp / 支付N军力). When these appear
+# inside a choice option, they are paid through _pay_cost_dict (the unified cost
+# cell) before the option's other steps run — same validation as block-level costs.
+_COST_EFFECT_TYPES = {"pay_vp", "pay_military"}
+
+
 @dataclass
 class ResolveResult:
     """Result of resolving a card effect."""
@@ -173,23 +179,40 @@ class EffectResolver:
         # fire_card_leave_triggers() call _resolve_block directly and DO
         # expect passives to execute.
 
-        # Handle strategy action (牌组行动) — these are resource gains
+        # Handle strategy action (牌组行动) — these are resource gains.
+        # NOTE: event cards with 选择一项 (e.g. 苏峻/谯纵) parse as strategy_action
+        # but carry choice_options + empty steps. Do NOT early-return for those —
+        # fall through to the choice branch below so their choice actually fires.
         if block.ability_type == AbilityType.STRATEGY_ACTION:
             for step in block.steps:
                 step_result = self._execute_step(step, state, player_id, context)
                 result.events.extend(step_result.events)
                 result.errors.extend(step_result.errors)
-            return result
+            if not block.choice_options:
+                return result
 
         # Handle choice blocks
         if block.choice_options:
             choice_idx = 0
             if context and 'choice_index' in context:
                 choice_idx = context['choice_index']
-            if choice_idx < len(block.choice_options):
+            if 0 <= choice_idx < len(block.choice_options):
                 for step in block.choice_options[choice_idx]:
-                    step_result = self._execute_step(step, state, player_id, context)
-                    result.events.extend(step_result.events)
+                    if step.effect_type in _COST_EFFECT_TYPES:
+                        # Pay cost steps via the unified cost cell, validating
+                        # affordability and aborting the option on failure.
+                        cost_result = self._pay_cost_dict(
+                            {"cost_type": step.effect_type, "params": step.params},
+                            state, player_id)
+                        result.events.extend(cost_result.events)
+                        result.errors.extend(cost_result.errors)
+                        if not cost_result.success:
+                            result.success = False
+                            return result
+                    else:
+                        step_result = self._execute_step(step, state, player_id, context)
+                        result.events.extend(step_result.events)
+                        result.errors.extend(step_result.errors)
             return result
 
         # Regular steps

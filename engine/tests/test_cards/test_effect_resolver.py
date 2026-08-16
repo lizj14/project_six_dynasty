@@ -117,12 +117,14 @@ class TestPayMilitary:
         resolver._execute_step(step, minimal_state, "north")
         assert player.military == 6
 
-    def test_floor_at_zero(self, minimal_state, resolver):
+    def test_insufficient_returns_error(self, minimal_state, resolver):
         player = minimal_state.get_player("north")
         player.military = 2
         step = _mk_step("pay_military", {"amount": 5})
-        resolver._execute_step(step, minimal_state, "north")
-        assert player.military == 0
+        result = resolver._execute_step(step, minimal_state, "north")
+        assert not result.success
+        assert len(result.errors) > 0
+        assert player.military == 2  # unchanged — payment rejected, not floored
 
 
 class TestPayVP:
@@ -404,6 +406,43 @@ class TestBlockResolution:
         old_mil = player.military
         resolver._resolve_block(block, minimal_state, "north", {"choice_index": 1})
         assert player.military == old_mil + 2
+
+    def test_choice_strategy_action_with_pay_vp(self, minimal_state, resolver):
+        """苏峻: 选择一项：支付3vp，然后获得5军力。choice must fire (not early-return)."""
+        player = minimal_state.get_player("north")
+        player.vp = 10
+        player.military = 0
+        block = AbilityBlock(
+            ability_type=AbilityType.STRATEGY_ACTION,  # event choice cards parse as this
+            steps=[],
+            choice_options=[
+                [_mk_step("pay_vp", {"amount": 3}),
+                 _mk_step("gain_military", {"amount": 5})],
+                [_mk_step("pay_military", {"amount": 3}), _mk_step("archive_this")],
+            ],
+        )
+        resolver._resolve_block(block, minimal_state, "north", {"choice_index": 0})
+        assert player.vp == 7          # 10 - 3
+        assert player.military == 5    # 0 + 5
+
+    def test_choice_insufficient_pay_vp_aborts(self, minimal_state, resolver):
+        """支付3vp but only 1vp — option aborts, +5军力 must NOT apply."""
+        player = minimal_state.get_player("north")
+        player.vp = 1
+        player.military = 0
+        block = AbilityBlock(
+            ability_type=AbilityType.STRATEGY_ACTION,
+            steps=[],
+            choice_options=[
+                [_mk_step("pay_vp", {"amount": 3}),
+                 _mk_step("gain_military", {"amount": 5})],
+            ],
+        )
+        result = resolver._resolve_block(block, minimal_state, "north", {"choice_index": 0})
+        assert not result.success
+        assert len(result.errors) > 0
+        assert player.vp == 1          # unchanged
+        assert player.military == 0    # effect not applied
 
     def test_usurp_steps(self, minimal_state, resolver):
         """Jin player with highest prestige executes usurp_steps."""

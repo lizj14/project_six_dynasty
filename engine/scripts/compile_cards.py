@@ -100,8 +100,15 @@ def _serialize_action(cdef) -> dict:
         "card_category": cdef.card_category.value,
         "owner_faction": cdef.owner_faction,
     }
-    if cdef.effect_text:
-        d["text"] = cdef.effect_text
+    text = cdef.effect_text
+    if text:
+        # 把阵营限定拼进 text，让只读 text 的玩家/agent 能感知「仅限东晋/北方」
+        fr = cdef.faction_restriction
+        if fr == "jin":
+            text = "【仅限东晋】" + text
+        elif fr == "north":
+            text = "【仅限北方】" + text
+        d["text"] = text
 
     if pe:
         d["parsed_effect"] = {

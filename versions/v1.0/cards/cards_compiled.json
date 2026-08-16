@@ -25,7 +25,6 @@
               {
                 "effect_type": "extra_hand_action",
                 "params": {
-                  "action_type": "hand_action",
                   "may": true
                 }
               }
@@ -86,7 +85,6 @@
               {
                 "effect_type": "extra_court_action",
                 "params": {
-                  "action_type": "court_action",
                   "may": true
                 }
               }
@@ -143,7 +141,9 @@
               {
                 "effect_type": "gain_military",
                 "params": {
-                  "amount": "marker_count_military",
+                  "amount": "X",
+                  "variable": true,
+                  "variable_source": "军事",
                   "max": 5
                 }
               }
@@ -193,7 +193,7 @@
       "initial_prestige": 2,
       "initial_order": 2,
       "staff_limit": 3,
-      "text": "被动：任意玩家提高行动顺位时，获得2vp。每次打出[权谋]标记时，获得2vp。登场：先动值1。获得2顺位，2功绩和2威望，转化[合肥][寿春]。",
+      "text": "被动：任意玩家提高行动顺位时，获得2vp。每次打出[权谋]标记时，获得2vp。登场：先动值8。获得2顺位，2功绩和2威望，转化[合肥][寿春]。",
       "markers": {
         "power": 1
       },
@@ -253,7 +253,7 @@
       "initial_prestige": 1,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次获得功绩后，摸1张牌。登场：先动值7。获得1威望和1功绩（不触发被动效果）。在其他东晋玩家完成登场效果后，转化2个[建康]以外的司马家地点。",
+      "text": "被动：每次获得功绩后，摸1张牌。登场：先动值2。获得1威望和1功绩（不触发被动效果）。在其他东晋玩家完成登场效果后，转化2个[建康]以外的司马家地点。",
       "markers": {
         "culture": 1
       },
@@ -271,6 +271,12 @@
           {
             "ability_type": "enter",
             "steps": [
+              {
+                "effect_type": "raise_contribution",
+                "params": {
+                  "amount": 1
+                }
+              },
               {
                 "effect_type": "convert",
                 "params": {
@@ -299,7 +305,7 @@
       "initial_prestige": 1,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次存档或弃置[流民]时，获得1军力或2vp。登场：先动值5。转化[京口][广陵]。获得1功绩和1威望。",
+      "text": "被动：每次存档或弃置[流民]时，获得1军力或2vp。登场：先动值4。转化[京口][广陵]。获得1功绩和1威望。",
       "markers": {
         "affair": 1
       },
@@ -307,63 +313,55 @@
         "blocks": [
           {
             "ability_type": "passive",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "gain_military",
-                      "params": {
-                        "amount": 1
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "gain_vp",
-                      "params": {
-                        "amount": 2
-                      }
-                    }
-                  ]
-                ]
-              }
-            ],
+            "steps": [],
             "trigger": "on_archive",
             "trigger_filter": {
               "card": "流民"
-            }
+            },
+            "choice_options": [
+              [
+                {
+                  "effect_type": "gain_military",
+                  "params": {
+                    "amount": 1
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "gain_vp",
+                  "params": {
+                    "amount": 2
+                  }
+                }
+              ]
+            ]
           },
           {
             "ability_type": "passive",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "gain_military",
-                      "params": {
-                        "amount": 1
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "gain_vp",
-                      "params": {
-                        "amount": 2
-                      }
-                    }
-                  ]
-                ]
-              }
-            ],
+            "steps": [],
             "trigger": "on_discard",
             "trigger_filter": {
               "card": "流民"
-            }
+            },
+            "choice_options": [
+              [
+                {
+                  "effect_type": "gain_military",
+                  "params": {
+                    "amount": 1
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "gain_vp",
+                  "params": {
+                    "amount": 2
+                  }
+                }
+              ]
+            ]
           },
           {
             "ability_type": "enter",
@@ -394,7 +392,7 @@
       "initial_prestige": 1,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次打出[文化]牌或者执行[文化]策略时，获得2vp。登场：先动值3。转化[张掖][姑臧]。获得1功绩和1威望。",
+      "text": "被动：每次打出[文化]牌或者执行[文化]策略时，获得2vp。登场：先动值6。转化[张掖][姑臧]。获得1功绩和1威望。",
       "markers": {
         "culture": 1
       },
@@ -459,7 +457,7 @@
       "initial_prestige": 1,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次存档1张牌时，获得2vp。登场：先动值4。转化[南郡][襄阳]。获得1功绩和1威望。",
+      "text": "被动：每次存档1张牌时，获得2vp。登场：先动值5。转化[南郡][襄阳]。获得1功绩和1威望。",
       "markers": {
         "power": 1
       },
@@ -506,109 +504,12 @@
       "initial_prestige": 0,
       "initial_order": 1,
       "staff_limit": 5,
-      "text": "被动：幕僚区空位总数为5。主动：如果拥有4种不同的标记，获得1个朝堂行动；否则，可以打出1张幕僚牌。登场：先动值8。",
+      "text": "被动：幕僚区空位总数为5。主动：如果拥有4种不同的标记，获得1个朝堂行动；否则，可以打出1张幕僚牌。登场：先动值1。",
       "markers": {
         "military": 1
       },
       "parsed_effect": {
-        "blocks": [
-          {
-            "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "extra_court_action",
-                "params": {
-                  "action_type": "court_action",
-                  "may": true
-                },
-                "condition": {
-                  "condition_type": "and",
-                  "params": {
-                    "conditions": [
-                      {
-                        "condition_type": "marker_count_gt",
-                        "params": {
-                          "marker": "military",
-                          "threshold": 0
-                        }
-                      },
-                      {
-                        "condition_type": "marker_count_gt",
-                        "params": {
-                          "marker": "affair",
-                          "threshold": 0
-                        }
-                      },
-                      {
-                        "condition_type": "marker_count_gt",
-                        "params": {
-                          "marker": "culture",
-                          "threshold": 0
-                        }
-                      },
-                      {
-                        "condition_type": "marker_count_gt",
-                        "params": {
-                          "marker": "power",
-                          "threshold": 0
-                        }
-                      }
-                    ]
-                  }
-                },
-                "source_text": "获得1个朝堂行动"
-              },
-              {
-                "effect_type": "play_card",
-                "params": {
-                  "card_type": "friend",
-                  "may": true
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "and",
-                      "params": {
-                        "conditions": [
-                          {
-                            "condition_type": "marker_count_gt",
-                            "params": {
-                              "marker": "military",
-                              "threshold": 0
-                            }
-                          },
-                          {
-                            "condition_type": "marker_count_gt",
-                            "params": {
-                              "marker": "affair",
-                              "threshold": 0
-                            }
-                          },
-                          {
-                            "condition_type": "marker_count_gt",
-                            "params": {
-                              "marker": "culture",
-                              "threshold": 0
-                            }
-                          },
-                          {
-                            "condition_type": "marker_count_gt",
-                            "params": {
-                              "marker": "power",
-                              "threshold": 0
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                },
-                "source_text": "可以打出1张幕僚牌"
-              }
-            ]
-          }
-        ],
+        "blocks": [],
         "restrictions": []
       }
     },
@@ -622,7 +523,7 @@
       "initial_prestige": 2,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次结算[转化]后，摸1张牌并获得1vp。登场：先动值6。获得4军力。获得2威望。",
+      "text": "被动：每次结算[转化]后，摸1张牌并获得1vp。登场：先动值3。获得4军力。获得2威望。",
       "markers": {
         "military": 1
       },
@@ -668,7 +569,7 @@
       "initial_prestige": 1,
       "initial_order": 1,
       "staff_limit": 3,
-      "text": "被动：每次执行[内政]策略或者打出[内政]牌时，获得2vp。登场：先动值2。转化[吴][会稽]。获得1功绩和1威望。",
+      "text": "被动：每次执行[内政]策略或者打出[内政]牌时，获得2vp。登场：先动值7。转化[吴][会稽]。获得1功绩和1威望。",
       "markers": {
         "affair": 1
       },
@@ -866,7 +767,7 @@
                 "condition": {
                   "condition_type": "marker_count_gt",
                   "params": {
-                    "marker": "affair",
+                    "marker": "内政",
                     "threshold": 2
                   }
                 }
@@ -1066,7 +967,9 @@
               {
                 "effect_type": "gain_military",
                 "params": {
-                  "amount": "marker_count_military",
+                  "amount": "X",
+                  "variable": true,
+                  "variable_source": "军事",
                   "max": 4
                 }
               }
@@ -1170,7 +1073,7 @@
       "card_type": "strategy",
       "card_category": "strategy_special",
       "owner_faction": "慕容",
-      "text": "行动：选择1个东晋玩家，给予其1张手牌。传播1次文化，转化1个相邻中立地点。",
+      "text": "【仅限北方】行动：选择1个东晋玩家，给予其1张手牌。传播1次文化，转化1个相邻中立地点。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "north",
@@ -1341,7 +1244,7 @@
       "card_type": "strategy",
       "card_category": "strategy_special",
       "owner_faction": "拓跋",
-      "text": "行动：3军力，存档此牌。被动：每回合前2次[进军]时，费用减1。区域奖励改为0/1vp。",
+      "text": "【仅限北方】行动：3军力，存档此牌。被动：每回合前2次[进军]时，费用减1。区域奖励改为0/1vp。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "north",
@@ -1474,7 +1377,6 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
-                  "target": "troop",
                   "from_reserve": true
                 }
               }
@@ -1616,7 +1518,7 @@
             "ability_type": "active",
             "steps": [
               {
-                "effect_type": "place_refugee",
+                "effect_type": "add_refugee",
                 "params": {
                   "target": "jin_discard"
                 }
@@ -1696,20 +1598,12 @@
                         "culture_region": "taoism"
                       }
                     ]
-                  },
-                  "sub_effects": [
-                    {
-                      "effect_type": "convert_to_neutral",
-                      "params": {}
-                    }
-                  ]
-                },
-                "sub_effects": [
-                  {
-                    "effect_type": "convert_to_neutral",
-                    "params": {}
                   }
-                ]
+                },
+                "sub_effect": {
+                  "effect_type": "convert_to_neutral",
+                  "params": {}
+                }
               },
               {
                 "effect_type": "targeted_effect",
@@ -1825,7 +1719,9 @@
               {
                 "effect_type": "gain_vp",
                 "params": {
-                  "amount": "marker_count_culture"
+                  "amount": "X",
+                  "variable": true,
+                  "variable_source": "文化"
                 }
               },
               {
@@ -1892,7 +1788,7 @@
       "card_type": "strategy",
       "card_category": "strategy_special",
       "owner_faction": "王导",
-      "text": "行动：转化1个相邻中立地点。获得2军力。",
+      "text": "【仅限东晋】行动：转化1个相邻中立地点。获得2军力。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -1947,35 +1843,32 @@
             "ability_type": "active",
             "steps": [
               {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "play_card",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "military"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "draft",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "military"
-                      }
-                    }
-                  ]
-                ]
-              },
-              {
                 "effect_type": "draw_cards"
               }
+            ],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "play_card",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "military"
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "draft",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "military"
+                  }
+                }
+              ]
             ]
           }
         ]
@@ -2000,34 +1893,30 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "play_card",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "culture"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "draft",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "culture"
-                      }
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "play_card",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "culture"
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "draft",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "culture"
+                  }
+                }
+              ]
             ]
           }
         ]
@@ -2175,7 +2064,7 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "place_refugee",
+                "effect_type": "add_refugee",
                 "params": {
                   "target": "own_national_discard"
                 }
@@ -2207,7 +2096,7 @@
       "card_type": "event",
       "card_category": "event_vp",
       "owner_faction": "张轨",
-      "text": "如果有一条从[姑臧]到[建康]的全部地点被东晋势力占据的线路，可以打出，然后存档此牌。",
+      "text": "【仅限东晋】如果有一条从[姑臧]到[建康]的全部地点被东晋势力占据的线路，可以打出，然后存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -2400,34 +2289,30 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "play_card",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "military"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "draft",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "military"
-                      }
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "play_card",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "military"
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "draft",
+                  "params": {
+                    "count": 1
+                  },
+                  "filter": {
+                    "marker": "military"
+                  }
+                }
+              ]
             ]
           }
         ]
@@ -2444,7 +2329,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "桓温",
-      "text": "[僭越]重洗当前君主牌，并根据牌面描述重置司马家威望，获得1威望，然后存档此牌。",
+      "text": "【仅限东晋】[僭越]重洗当前君主牌，并根据牌面描述重置司马家威望，获得1威望，然后存档此牌。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -2547,22 +2432,18 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "draw_cards"
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "draft"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "draw_cards"
+                }
+              ],
+              [
+                {
+                  "effect_type": "draft"
+                }
+              ]
             ]
           }
         ]
@@ -2579,7 +2460,7 @@
       "card_type": "strategy",
       "card_category": "strategy_military",
       "owner_faction": "刘裕",
-      "text": "行动：3军力。[僭越]其他每个东晋玩家各弃1张手牌。3军力。",
+      "text": "【仅限东晋】行动：3军力。[僭越]其他每个东晋玩家各弃1张手牌。3军力。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -2600,26 +2481,15 @@
                   "target": {
                     "type": "other_jin_player",
                     "selection": "each"
-                  },
-                  "sub_effects": [
-                    {
-                      "effect_type": "discard_cards",
-                      "params": {
-                        "count": 1,
-                        "from_hand": true
-                      }
-                    }
-                  ]
-                },
-                "sub_effects": [
-                  {
-                    "effect_type": "discard_cards",
-                    "params": {
-                      "count": 1,
-                      "from_hand": true
-                    }
                   }
-                ],
+                },
+                "sub_effect": {
+                  "effect_type": "discard_cards",
+                  "params": {
+                    "count": 1,
+                    "from_hand": true
+                  }
+                },
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
@@ -2657,7 +2527,7 @@
       "card_type": "event",
       "card_category": "event_military",
       "owner_faction": "祖逖",
-      "text": "转化[太原][平阳]，然后存档此牌。",
+      "text": "【仅限东晋】转化[太原][平阳]，然后存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -2903,17 +2773,7 @@
                       }
                     ],
                     "type": "player"
-                  },
-                  "sub_effects": [
-                    {
-                      "effect_type": "archive_card",
-                      "params": {
-                        "from": "staff",
-                        "count": 1,
-                        "highest_cost": true
-                      }
-                    }
-                  ]
+                  }
                 }
               },
               {
@@ -2955,22 +2815,30 @@
                   },
                   "sub_effects": [
                     {
-                      "effect_type": "lose_contribution",
+                      "effect_type": "lower_contribution",
                       "params": {
                         "amount": 1
                       },
                       "condition": null,
                       "source_text": "该玩家-1[功绩]"
-                    },
-                    {
-                      "effect_type": "gain_vp",
-                      "params": {
-                        "amount": 6
-                      },
-                      "condition": null,
-                      "source_text": "该玩家+6vp"
                     }
                   ]
+                },
+                "sub_effects": [
+                  {
+                    "effect_type": "lower_contribution",
+                    "params": {
+                      "amount": 1
+                    },
+                    "condition": null,
+                    "source_text": "该玩家-1[功绩]"
+                  }
+                ]
+              },
+              {
+                "effect_type": "gain_vp",
+                "params": {
+                  "amount": 6
                 }
               },
               {
@@ -2998,13 +2866,13 @@
             "ability_type": "forced",
             "steps": [
               {
-                "effect_type": "place_refugee",
+                "effect_type": "add_refugee",
                 "params": {
                   "target": "jin_discard"
                 }
               },
               {
-                "effect_type": "place_refugee",
+                "effect_type": "add_refugee",
                 "params": {
                   "target": "north_discard"
                 }
@@ -3044,7 +2912,8 @@
                         "type": "not_fortified"
                       },
                       {
-                        "culture_region": "taoism"
+                        "type": "region",
+                        "value": "玄学"
                       }
                     ],
                     "type": "location"
@@ -3057,7 +2926,15 @@
                       "source_text": "转为中立控制"
                     }
                   ]
-                }
+                },
+                "sub_effects": [
+                  {
+                    "effect_type": "convert_to_neutral",
+                    "params": {},
+                    "condition": null,
+                    "source_text": "转为中立控制"
+                  }
+                ]
               },
               {
                 "effect_type": "draw_cards"
@@ -3087,33 +2964,22 @@
             "ability_type": "forced",
             "steps": [
               {
-                "effect_type": "place_refugee",
+                "effect_type": "add_refugee",
                 "params": {
                   "target": "jin_discard"
                 }
               },
               {
-                "effect_type": "targeted_effect",
-                "params": {
-                  "target": {
-                    "type": "north_player",
-                    "selection": "each"
-                  },
-                  "sub_effects": [
-                    {
-                      "effect_type": "discard_cards",
-                      "params": {
-                        "count": 1,
-                        "from_hand": true
-                      },
-                      "condition": null,
-                      "source_text": "北方玩家弃1张手牌"
-                    }
-                  ]
-                }
-              },
-              {
                 "effect_type": "draw_cards"
+              }
+            ],
+            "costs": [
+              {
+                "cost_type": "discard_cards",
+                "params": {
+                  "count": 1,
+                  "from_hand": true
+                }
               }
             ]
           }
@@ -3137,52 +3003,53 @@
             "ability_type": "forced",
             "steps": [
               {
-                "effect_type": "targeted_effect",
+                "effect_type": "raise_prestige",
                 "params": {
-                  "target": {
-                    "type": "sima"
-                  },
-                  "sub_effects": [
-                    {
-                      "effect_type": "raise_prestige",
-                      "params": {
-                        "amount": 1
-                      },
-                      "condition": {
-                        "condition_type": "compare",
-                        "params": {
-                          "left": "culture_level_confucianism",
-                          "op": ">=",
-                          "right": "culture_level_taoism"
-                        }
-                      },
-                      "source_text": "司马家威望+1"
-                    },
-                    {
-                      "effect_type": "lower_prestige",
-                      "params": {
-                        "amount": 1
-                      },
-                      "condition": {
-                        "condition_type": "not",
-                        "params": {
-                          "condition": {
-                            "condition_type": "compare",
-                            "params": {
-                              "left": "culture_level_confucianism",
-                              "op": ">=",
-                              "right": "culture_level_taoism"
-                            }
-                          }
-                        }
-                      },
-                      "source_text": "司马家威望-1"
-                    }
-                  ]
+                  "amount": 1
+                },
+                "condition": {
+                  "condition_type": "compare",
+                  "params": {
+                    "left": "culture_level_confucianism",
+                    "op": ">=",
+                    "right": "culture_level_taoism"
+                  }
                 }
               },
               {
-                "effect_type": "draw_cards"
+                "effect_type": "lower_prestige",
+                "params": {
+                  "amount": 1
+                },
+                "condition": {
+                  "condition_type": "not",
+                  "params": {
+                    "condition": {
+                      "condition_type": "compare",
+                      "params": {
+                        "left": "culture_level_confucianism",
+                        "op": ">=",
+                        "right": "culture_level_taoism"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "effect_type": "draw_cards",
+                "condition": {
+                  "condition_type": "not",
+                  "params": {
+                    "condition": {
+                      "condition_type": "compare",
+                      "params": {
+                        "left": "culture_level_confucianism",
+                        "op": ">=",
+                        "right": "culture_level_taoism"
+                      }
+                    }
+                  }
+                }
               }
             ]
           }
@@ -3249,7 +3116,6 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
-                  "target": "troop",
                   "count": 2,
                   "from_reserve": true
                 }
@@ -3291,7 +3157,6 @@
               {
                 "effect_type": "remove_from_game",
                 "params": {
-                  "target": "troop",
                   "count": 2,
                   "from_reserve": true
                 }
@@ -3318,7 +3183,7 @@
       "card_type": "event",
       "card_category": "event_vp",
       "owner_faction": "通用",
-      "text": "占据[洛阳]时，可以打出。存档此牌。[僭越]交换东晋首都和洛阳的部队。获得1[威望]。",
+      "text": "【仅限东晋】占据[洛阳]时，可以打出。存档此牌。[僭越]交换东晋首都和洛阳的部队。获得1[威望]。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -3333,14 +3198,13 @@
               {
                 "effect_type": "swap_troops",
                 "params": {
-                  "location_a": "jin_capital",
+                  "location_a": "东晋首都",
                   "location_b": "洛阳"
                 },
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
-                },
-                "source_text": "交换东晋首都和洛阳的部队"
+                }
               },
               {
                 "effect_type": "raise_prestige",
@@ -3356,9 +3220,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "occupy_location",
+          "condition_type": "control_region",
           "params": {
-            "location": "洛阳"
+            "region": "洛阳"
           }
         }
       },
@@ -3398,7 +3262,7 @@
           }
         ],
         "play_condition": {
-          "condition_type": "friendly_control_region",
+          "condition_type": "control_region",
           "params": {
             "region": "巴蜀"
           }
@@ -3435,38 +3299,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "and",
+          "condition_type": "raw_text",
           "params": {
-            "conditions": [
-              {
-                "condition_type": "marker_count_gt",
-                "params": {
-                  "marker": "military",
-                  "threshold": 0
-                }
-              },
-              {
-                "condition_type": "marker_count_gt",
-                "params": {
-                  "marker": "affair",
-                  "threshold": 0
-                }
-              },
-              {
-                "condition_type": "marker_count_gt",
-                "params": {
-                  "marker": "culture",
-                  "threshold": 0
-                }
-              },
-              {
-                "condition_type": "marker_count_gt",
-                "params": {
-                  "marker": "power",
-                  "threshold": 0
-                }
-              }
-            ]
+            "text": "具有至少4个不同的标记时"
           }
         }
       },
@@ -3498,9 +3333,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "archive_count_ge",
+          "condition_type": "raw_text",
           "params": {
-            "threshold": 7
+            "text": "史书区有至少7张牌时"
           }
         }
       },
@@ -3532,10 +3367,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "marker_count_gt",
+          "condition_type": "raw_text",
           "params": {
-            "marker": "culture",
-            "threshold": 2
+            "text": "有至少3个[文化]符号时"
           }
         }
       },
@@ -3654,13 +3488,7 @@
             "ability_type": "enter",
             "steps": [
               {
-                "effect_type": "convert",
-                "params": {
-                  "count": 1,
-                  "filter": {
-                    "controller": "sima"
-                  }
-                }
+                "effect_type": "convert"
               }
             ]
           }
@@ -3764,8 +3592,7 @@
               {
                 "effect_type": "archive_card",
                 "params": {
-                  "card_type": "friend",
-                  "from": "staff"
+                  "card_type": "friend"
                 }
               },
               {
@@ -3798,26 +3625,15 @@
             "steps": [
               {
                 "effect_type": "archive_this"
-              }
-            ]
-          },
-          {
-            "ability_type": "passive",
-            "steps": [
+              },
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "X",
-                  "variable": true,
-                  "variable_source": "refugee_count",
-                  "sources": [
-                    "jin_deck",
-                    "north_deck"
-                  ]
+                  "variable": true
                 }
               }
-            ],
-            "trigger": "on_end_game"
+            ]
           }
         ]
       },
@@ -3833,7 +3649,7 @@
       "card_type": "event",
       "card_category": "event_art",
       "owner_faction": "通用",
-      "text": "拥有[北伐]标记时，可以打出，存档此牌。",
+      "text": "【仅限东晋】拥有[北伐]标记时，可以打出，存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -3849,9 +3665,9 @@
           }
         ],
         "play_condition": {
-          "condition_type": "has_token",
+          "condition_type": "raw_text",
           "params": {
-            "token": "expedition"
+            "text": "拥有[北伐]标记时"
           }
         }
       },
@@ -3981,22 +3797,15 @@
             "steps": [
               {
                 "effect_type": "archive_this"
-              }
-            ]
-          },
-          {
-            "ability_type": "passive",
-            "steps": [
+              },
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "X",
-                  "variable": true,
-                  "variable_source": "regions_with_troops"
+                  "variable": true
                 }
               }
-            ],
-            "trigger": "on_end_game"
+            ]
           }
         ]
       },
@@ -4034,7 +3843,7 @@
           }
         ],
         "play_condition": {
-          "condition_type": "friendly_control_region",
+          "condition_type": "control_region",
           "params": {
             "region": "江南"
           }
@@ -4065,7 +3874,7 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "raise_culture_contribution",
+                "effect_type": "raise_culture_level",
                 "params": {
                   "amount": 1,
                   "culture": "buddhism"
@@ -4074,7 +3883,7 @@
               {
                 "effect_type": "remove_culture_marker",
                 "params": {
-                  "culture": "buddhism"
+                  "culture": "佛学"
                 }
               },
               {
@@ -4259,7 +4068,9 @@
               {
                 "effect_type": "gain_vp",
                 "params": {
-                  "amount": "marker_count_culture"
+                  "amount": "X",
+                  "variable": true,
+                  "variable_source": "文化"
                 }
               }
             ]
@@ -4307,6 +4118,14 @@
                   "may": true
                 }
               }
+            ],
+            "costs": [
+              {
+                "cost_type": "pay_vp",
+                "params": {
+                  "amount": 1
+                }
+              }
             ]
           }
         ]
@@ -4340,62 +4159,16 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "raise_culture_contribution",
-                      "params": {
-                        "amount": 1,
-                        "culture": "confucianism"
-                      }
-                    },
-                    {
-                      "effect_type": "remove_culture_marker",
-                      "params": {
-                        "count": 1,
-                        "culture": "confucianism"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "raise_culture_contribution",
-                      "params": {
-                        "amount": 1,
-                        "culture": "taoism"
-                      }
-                    },
-                    {
-                      "effect_type": "remove_culture_marker",
-                      "params": {
-                        "count": 1,
-                        "culture": "taoism"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "raise_culture_contribution",
-                      "params": {
-                        "amount": 1,
-                        "culture": "buddhism"
-                      }
-                    },
-                    {
-                      "effect_type": "remove_culture_marker",
-                      "params": {
-                        "count": 1,
-                        "culture": "buddhism"
-                      }
-                    }
-                  ]
-                ]
+                "effect_type": "raise_culture_level",
+                "params": {
+                  "amount": 1
+                }
               },
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": "sum",
+                  "variable": true,
                   "sources": [
                     "confucianism_contribution",
                     "taoism_contribution",
@@ -4423,7 +4196,7 @@
       "card_type": "strategy",
       "card_category": "strategy_culture",
       "owner_faction": "通用",
-      "text": "行动：传播1次[玄学]。打出1张不含[军事]标记的手牌。",
+      "text": "【仅限东晋】行动：传播1次[玄学]。打出1张不含[军事]标记的手牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -4441,10 +4214,9 @@
               {
                 "effect_type": "play_card",
                 "params": {
-                  "count": 1
-                },
-                "filter": {
-                  "exclude_marker": "military"
+                  "filter": {
+                    "exclude_marker": "military"
+                  }
                 }
               }
             ]
@@ -4481,19 +4253,9 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "targeted_effect",
+                "effect_type": "lose_military",
                 "params": {
-                  "target": {
-                    "count": 1,
-                    "selection": "choose",
-                    "type": "jin_player"
-                  }
-                },
-                "sub_effect": {
-                  "effect_type": "lose_military",
-                  "params": {
-                    "amount": 1
-                  }
+                  "amount": 1
                 }
               },
               {
@@ -4536,7 +4298,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "[佛学]贡献度>1时，可以打出。支付2vp，然后转化1个东晋地点。",
+      "text": "【仅限东晋】[佛学]贡献度>1时，可以打出。支付2vp，然后转化1个东晋地点。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -4546,11 +4308,14 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "convert",
+                "effect_type": "convert"
+              }
+            ],
+            "costs": [
+              {
+                "cost_type": "pay_vp",
                 "params": {
-                  "filter": {
-                    "controller": "jin"
-                  }
+                  "amount": 2
                 }
               }
             ]
@@ -4559,7 +4324,7 @@
         "play_condition": {
           "condition_type": "culture_contribution_gt",
           "params": {
-            "culture": "buddhism",
+            "culture": "佛学",
             "threshold": 1
           }
         }
@@ -4579,7 +4344,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "转化1个东晋地点，然后存档此牌。[僭越]获得1威望。",
+      "text": "【仅限东晋】转化1个东晋地点，然后存档此牌。[僭越]获得1威望。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -4589,25 +4354,10 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "convert",
-                "params": {
-                  "filter": {
-                    "controller": "jin"
-                  }
-                }
+                "effect_type": "convert"
               },
               {
                 "effect_type": "archive_this"
-              },
-              {
-                "effect_type": "gain_prestige",
-                "params": {
-                  "amount": 1
-                },
-                "condition": {
-                  "condition_type": "can_usurp",
-                  "params": {}
-                }
               }
             ]
           }
@@ -4627,7 +4377,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "提高1级顺位，然后存档此牌。[僭越]额外提高1级顺位。",
+      "text": "【仅限东晋】提高1级顺位，然后存档此牌。[僭越]额外提高1级顺位。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -4682,35 +4432,23 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "targeted_effect",
+                "effect_type": "lower_order",
                 "params": {
-                  "target": {
-                    "count": 1,
-                    "selection": "choose",
-                    "type": "jin_player"
-                  }
-                },
-                "sub_effects": [
-                  {
-                    "effect_type": "lower_order",
-                    "params": {
-                      "amount": 1
-                    }
-                  },
-                  {
-                    "effect_type": "lower_order",
-                    "params": {
-                      "amount": 1
-                    },
-                    "condition": {
-                      "condition_type": "can_usurp",
-                      "params": {}
-                    }
-                  }
-                ]
+                  "amount": 1
+                }
               },
               {
                 "effect_type": "archive_this"
+              },
+              {
+                "effect_type": "lower_order",
+                "params": {
+                  "amount": 1
+                },
+                "condition": {
+                  "condition_type": "can_usurp",
+                  "params": {}
+                }
               }
             ]
           }
@@ -4729,7 +4467,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "顺位最低时可以打出。提高2级顺位，然后存档此牌。",
+      "text": "【仅限东晋】顺位最低时可以打出。提高2级顺位，然后存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -4749,11 +4487,7 @@
               }
             ]
           }
-        ],
-        "play_condition": {
-          "condition_type": "is_lowest_order",
-          "params": {}
-        }
+        ]
       },
       "history_vp": 1,
       "markers": {
@@ -4768,7 +4502,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "存档1个幕僚，然后选择1个友方玩家的幕僚，该玩家存档被选择的幕僚。[僭越]改为选择1个友方玩家的幕僚，该玩家存档被选择的幕僚。",
+      "text": "【仅限东晋】存档1个幕僚，然后选择1个友方玩家的幕僚，该玩家存档被选择的幕僚。[僭越]改为选择1个友方玩家的幕僚，该玩家存档被选择的幕僚。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -4782,14 +4516,16 @@
                 "params": {
                   "card_type": "friend",
                   "from": "staff"
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "can_usurp",
-                      "params": {}
-                    }
+                }
+              },
+              {
+                "effect_type": "targeted_effect",
+                "params": {
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "filters": [],
+                    "type": "friendly_player"
                   }
                 }
               },
@@ -4799,57 +4535,9 @@
                   "target": {
                     "count": 1,
                     "selection": "choose",
-                    "type": "card",
-                    "filters": [
-                      {
-                        "card_type": "friend"
-                      },
-                      {
-                        "location": "staff"
-                      },
-                      {
-                        "controller": "friendly"
-                      }
-                    ]
+                    "filters": [],
+                    "type": "friendly_player"
                   }
-                },
-                "sub_effect": {
-                  "effect_type": "owner_archive_card",
-                  "params": {}
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "can_usurp",
-                      "params": {}
-                    }
-                  }
-                }
-              },
-              {
-                "effect_type": "targeted_effect",
-                "params": {
-                  "target": {
-                    "count": 1,
-                    "selection": "choose",
-                    "type": "card",
-                    "filters": [
-                      {
-                        "card_type": "friend"
-                      },
-                      {
-                        "location": "staff"
-                      },
-                      {
-                        "controller": "friendly"
-                      }
-                    ]
-                  }
-                },
-                "sub_effect": {
-                  "effect_type": "owner_archive_card",
-                  "params": {}
                 },
                 "condition": {
                   "condition_type": "can_usurp",
@@ -4873,7 +4561,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "[威望]最高的东晋玩家，失去2[威望]。[僭越]改为选择1个东晋玩家，失去2[威望]，存档此牌。",
+      "text": "【仅限东晋】[威望]最高的东晋玩家，失去2[威望]。[僭越]改为选择1个东晋玩家，失去2[威望]，存档此牌。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -4883,55 +4571,23 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "targeted_effect",
+                "effect_type": "lower_prestige",
                 "params": {
-                  "target": {
-                    "count": 1,
-                    "selection": "choose",
-                    "filters": [
-                      {
-                        "type": "highest_prestige"
-                      }
-                    ],
-                    "type": "jin_player"
-                  }
-                },
-                "sub_effect": {
-                  "effect_type": "lower_prestige",
-                  "params": {
-                    "amount": 2
-                  }
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "can_usurp",
-                      "params": {}
-                    }
-                  }
+                  "amount": 2
                 }
               },
               {
-                "effect_type": "targeted_effect",
+                "effect_type": "lower_prestige",
                 "params": {
-                  "target": {
-                    "count": 1,
-                    "selection": "choose",
-                    "type": "jin_player"
-                  }
+                  "amount": 2
                 },
-                "sub_effects": [
-                  {
-                    "effect_type": "lower_prestige",
-                    "params": {
-                      "amount": 2
-                    }
-                  },
-                  {
-                    "effect_type": "archive_this"
-                  }
-                ],
+                "condition": {
+                  "condition_type": "can_usurp",
+                  "params": {}
+                }
+              },
+              {
+                "effect_type": "archive_this",
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
@@ -4955,7 +4611,7 @@
       "card_type": "event",
       "card_category": "event_power",
       "owner_faction": "通用",
-      "text": "[僭越]转化1个东晋占据地点，然后存档此牌。",
+      "text": "【仅限东晋】[僭越]转化1个东晋占据地点，然后存档此牌。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -4966,11 +4622,6 @@
             "steps": [
               {
                 "effect_type": "convert",
-                "params": {
-                  "filter": {
-                    "controller": "jin"
-                  }
-                },
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
@@ -5079,53 +4730,15 @@
             "ability_type": "active",
             "steps": [
               {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "search",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "culture"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "search",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "affair"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "search",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "military"
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "search",
-                      "params": {
-                        "count": 1
-                      },
-                      "filter": {
-                        "marker": "power"
-                      }
-                    }
-                  ]
-                ]
+                "effect_type": "targeted_effect",
+                "params": {
+                  "target": {
+                    "count": 1,
+                    "selection": "choose",
+                    "filters": [],
+                    "type": "marker_type"
+                  }
+                }
               }
             ],
             "costs": [
@@ -5200,7 +4813,7 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "raise_culture_contribution",
+                "effect_type": "raise_culture_level",
                 "params": {
                   "amount": 2,
                   "culture": "buddhism"
@@ -5210,7 +4823,7 @@
                 "effect_type": "remove_culture_marker",
                 "params": {
                   "count": 2,
-                  "culture": "buddhism"
+                  "culture": "佛学"
                 }
               },
               {
@@ -5264,14 +4877,7 @@
               }
             ]
           }
-        ],
-        "play_condition": {
-          "condition_type": "culture_contribution_gt",
-          "params": {
-            "culture": "confucianism",
-            "threshold": 1
-          }
-        }
+        ]
       },
       "markers": {
         "affair": 1
@@ -5338,11 +4944,7 @@
               }
             ]
           }
-        ],
-        "play_condition": {
-          "condition_type": "is_lowest_culture_sum",
-          "params": {}
-        }
+        ]
       },
       "history_vp": 6,
       "markers": {
@@ -5364,28 +4966,24 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "discard_cards"
-                    },
-                    {
-                      "effect_type": "draw_cards"
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "abandon_court_card"
-                    },
-                    {
-                      "effect_type": "supply_court"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "discard_cards"
+                },
+                {
+                  "effect_type": "draw_cards"
+                }
+              ],
+              [
+                {
+                  "effect_type": "abandon_court_card"
+                },
+                {
+                  "effect_type": "supply_court"
+                }
+              ]
             ]
           }
         ]
@@ -5410,28 +5008,24 @@
         "blocks": [
           {
             "ability_type": "active",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "discard_cards"
-                    },
-                    {
-                      "effect_type": "draw_cards"
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "abandon_court_card"
-                    },
-                    {
-                      "effect_type": "supply_court"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "discard_cards"
+                },
+                {
+                  "effect_type": "draw_cards"
+                }
+              ],
+              [
+                {
+                  "effect_type": "abandon_court_card"
+                },
+                {
+                  "effect_type": "supply_court"
+                }
+              ]
             ]
           }
         ]
@@ -5452,24 +5046,11 @@
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": null,
-        "play_condition": {
-          "condition_type": "culture_contribution_gt",
-          "params": {
-            "culture": "confucianism",
-            "threshold": 0
-          }
-        },
         "restrictions": [],
         "blocks": [
           {
             "ability_type": "active",
             "steps": [
-              {
-                "effect_type": "gain_vp",
-                "params": {
-                  "amount": 1
-                }
-              },
               {
                 "effect_type": "raise_order",
                 "params": {
@@ -5483,10 +5064,23 @@
                 "params": {
                   "amount": 1
                 }
+              },
+              {
+                "cost_type": "pay_vp",
+                "params": {
+                  "amount": 1
+                }
               }
             ]
           }
-        ]
+        ],
+        "play_condition": {
+          "condition_type": "culture_contribution_gt",
+          "params": {
+            "culture": "confucianism",
+            "threshold": 0
+          }
+        }
       },
       "history_vp": 1,
       "markers": {
@@ -5521,15 +5115,7 @@
                   "amount": 1
                 }
               }
-            ],
-            "condition": {
-              "condition_type": "compare",
-              "params": {
-                "left": "hand_count",
-                "op": "==",
-                "right": 0
-              }
-            }
+            ]
           }
         ]
       },
@@ -5555,6 +5141,9 @@
             "ability_type": "passive",
             "steps": [
               {
+                "effect_type": "spread_culture"
+              },
+              {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": 1
@@ -5562,7 +5151,7 @@
               }
             ],
             "trigger": "on_spread_culture",
-            "trigger_scope": "friendly"
+            "trigger_scope": "any"
           },
           {
             "ability_type": "active",
@@ -5598,12 +5187,7 @@
               {
                 "effect_type": "draw_cards"
               }
-            ],
-            "trigger": "on_spread_culture",
-            "trigger_filter": {
-              "culture": "buddhism"
-            },
-            "trigger_scope": "any"
+            ]
           },
           {
             "ability_type": "active",
@@ -5639,14 +5223,6 @@
           {
             "ability_type": "active",
             "steps": [
-              {
-                "effect_type": "play_card",
-                "params": {
-                  "count": 1,
-                  "card_type": "friend",
-                  "free": true
-                }
-              },
               {
                 "effect_type": "archive_this"
               }
@@ -5788,26 +5364,11 @@
         "is_usurp": false,
         "faction_restriction": null,
         "restrictions": [],
-        "blocks": [
-          {
-            "ability_type": "strategy_action",
-            "steps": [
-              {
-                "effect_type": "gain_military",
-                "params": {
-                  "amount": 5
-                }
-              },
-              {
-                "effect_type": "get_expedition"
-              }
-            ]
-          }
-        ],
+        "blocks": [],
         "play_condition": {
           "condition_type": "culture_level_gt",
           "params": {
-            "culture": "confucianism",
+            "culture": "儒学",
             "threshold": 1
           }
         }
@@ -5923,37 +5484,30 @@
                 "effect_type": "gain_military",
                 "params": {
                   "amount": 3
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "jin"
-                  }
                 }
               },
               {
                 "effect_type": "fortify",
                 "params": {
                   "free": true
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "jin"
-                  }
                 }
               },
+              {
+                "effect_type": "faction_label",
+                "params": {
+                  "faction": "north"
+                }
+              }
+            ]
+          },
+          {
+            "ability_type": "strategy_action",
+            "steps": [
               {
                 "effect_type": "convert",
                 "params": {
                   "filter": {
                     "controller": "neutral"
-                  }
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "north"
                   }
                 }
               },
@@ -5961,12 +5515,6 @@
                 "effect_type": "gain_military",
                 "params": {
                   "amount": 1
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "north"
-                  }
                 }
               }
             ]
@@ -6133,7 +5681,7 @@
                 "condition": {
                   "condition_type": "marker_count_gt",
                   "params": {
-                    "marker": "affair",
+                    "marker": "内政",
                     "threshold": 2
                   }
                 }
@@ -6250,44 +5798,29 @@
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": 6
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "jin"
-                  }
-                }
-              },
-              {
-                "effect_type": "targeted_effect",
-                "params": {
-                  "target": {
-                    "type": "sima"
-                  }
-                },
-                "sub_effect": {
-                  "effect_type": "gain_vp",
-                  "params": {
-                    "amount": 7
-                  }
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "jin"
-                  }
                 }
               },
               {
                 "effect_type": "gain_vp",
                 "params": {
+                  "amount": 7
+                }
+              },
+              {
+                "effect_type": "faction_label",
+                "params": {
+                  "faction": "north"
+                }
+              }
+            ]
+          },
+          {
+            "ability_type": "strategy_action",
+            "steps": [
+              {
+                "effect_type": "gain_vp",
+                "params": {
                   "amount": 9
-                },
-                "condition": {
-                  "condition_type": "is_faction",
-                  "params": {
-                    "faction": "north"
-                  }
                 }
               }
             ]
@@ -6332,7 +5865,7 @@
           }
         ],
         "play_condition": {
-          "condition_type": "occupy_location_in_region",
+          "condition_type": "control_region",
           "params": {
             "region": "荆襄"
           }
@@ -6350,7 +5883,7 @@
       "card_type": "event",
       "card_category": "event_military",
       "owner_faction": "通用",
-      "text": "获得7军力。存档此牌。",
+      "text": "【仅限东晋】获得7军力。存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "jin",
@@ -6384,7 +5917,7 @@
       "card_type": "event",
       "card_category": "event_military",
       "owner_faction": "通用",
-      "text": "获得7军力。存档此牌。",
+      "text": "【仅限北方】获得7军力。存档此牌。",
       "parsed_effect": {
         "is_usurp": false,
         "faction_restriction": "north",
@@ -6426,47 +5959,29 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "location",
-                          "count": 1,
-                          "selection": "choose",
-                          "filters": [
-                            {
-                              "region_name": "关中"
-                            },
-                            {
-                              "type": "not_fortified"
-                            }
-                          ]
-                        },
-                        "sub_effect": {
-                          "effect_type": "convert_to_neutral",
-                          "params": {}
-                        }
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "pay_military",
-                      "params": {
-                        "amount": 5
-                      }
-                    },
-                    {
-                      "effect_type": "archive_this"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "convert",
+                  "params": {
+                    "specific_locations": [
+                      "关中"
+                    ]
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "pay_military",
+                  "params": {
+                    "amount": 5
+                  }
+                },
+                {
+                  "effect_type": "archive_this"
+                }
+              ]
             ]
           }
         ]
@@ -6493,12 +6008,6 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "place_refugee",
-                "params": {
-                  "target": "own_national_discard"
-                }
-              },
-              {
                 "effect_type": "gain_military",
                 "params": {
                   "amount": 4
@@ -6510,9 +6019,9 @@
                   "amount": 1
                 },
                 "condition": {
-                  "condition_type": "is_faction",
+                  "condition_type": "raw_text",
                   "params": {
-                    "faction": "north"
+                    "text": "是北方玩家"
                   }
                 }
               }
@@ -6539,50 +6048,31 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "location",
-                          "count": 1,
-                          "selection": "choose",
-                          "filters": [
-                            {
-                              "region_name": [
-                                "江南",
-                                "荆襄"
-                              ]
-                            },
-                            {
-                              "type": "not_fortified"
-                            }
-                          ]
-                        },
-                        "sub_effect": {
-                          "effect_type": "convert_to_neutral",
-                          "params": {}
-                        }
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "pay_military",
-                      "params": {
-                        "amount": 4
-                      }
-                    },
-                    {
-                      "effect_type": "archive_this"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "convert",
+                  "params": {
+                    "count": 2,
+                    "specific_locations": [
+                      "江南",
+                      "荆襄"
+                    ]
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "pay_military",
+                  "params": {
+                    "amount": 4
+                  }
+                },
+                {
+                  "effect_type": "archive_this"
+                }
+              ]
             ]
           }
         ]
@@ -6643,45 +6133,33 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  {
-                    "costs": [
-                      {
-                        "cost_type": "pay_vp",
-                        "params": {
-                          "amount": 3
-                        }
-                      }
-                    ],
-                    "steps": [
-                      {
-                        "effect_type": "gain_military",
-                        "params": {
-                          "amount": 5
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "costs": [
-                      {
-                        "cost_type": "pay_military",
-                        "params": {
-                          "amount": 3
-                        }
-                      }
-                    ],
-                    "steps": [
-                      {
-                        "effect_type": "archive_this"
-                      }
-                    ]
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "pay_vp",
+                  "params": {
+                    "amount": 3
                   }
-                ]
-              }
+                },
+                {
+                  "effect_type": "gain_military",
+                  "params": {
+                    "amount": 5
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "pay_military",
+                  "params": {
+                    "amount": 3
+                  }
+                },
+                {
+                  "effect_type": "archive_this"
+                }
+              ]
             ]
           }
         ]
@@ -6706,47 +6184,29 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "steps": [
-              {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "location",
-                          "count": 1,
-                          "selection": "choose",
-                          "filters": [
-                            {
-                              "region_name": "巴蜀"
-                            },
-                            {
-                              "type": "not_fortified"
-                            }
-                          ]
-                        },
-                        "sub_effect": {
-                          "effect_type": "convert_to_neutral",
-                          "params": {}
-                        }
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "pay_military",
-                      "params": {
-                        "amount": 3
-                      }
-                    },
-                    {
-                      "effect_type": "archive_this"
-                    }
-                  ]
-                ]
-              }
+            "steps": [],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "convert",
+                  "params": {
+                    "specific_locations": [
+                      "巴蜀"
+                    ]
+                  }
+                }
+              ],
+              [
+                {
+                  "effect_type": "pay_military",
+                  "params": {
+                    "amount": 3
+                  }
+                },
+                {
+                  "effect_type": "archive_this"
+                }
+              ]
             ]
           }
         ]
@@ -6783,7 +6243,8 @@
                         "type": "not_jin_controlled"
                       },
                       {
-                        "culture_region": "confucianism"
+                        "type": "region",
+                        "value": "儒学"
                       }
                     ],
                     "type": "location"
@@ -6792,33 +6253,31 @@
                     {
                       "effect_type": "convert_to_sima",
                       "params": {},
-                      "condition": {
-                        "condition_type": "not",
-                        "params": {
-                          "condition": {
-                            "condition_type": "can_usurp",
-                            "params": {}
-                          }
-                        }
-                      },
+                      "condition": null,
                       "source_text": "转为司马家占据"
-                    },
-                    {
-                      "effect_type": "convert",
-                      "params": {},
-                      "condition": {
-                        "condition_type": "can_usurp",
-                        "params": {}
-                      },
-                      "source_text": "转为玩家占据"
                     }
                   ]
-                }
+                },
+                "sub_effects": [
+                  {
+                    "effect_type": "convert_to_sima",
+                    "params": {},
+                    "condition": null,
+                    "source_text": "转为司马家占据"
+                  }
+                ]
               },
               {
                 "effect_type": "gain_vp",
                 "params": {
                   "amount": 3
+                }
+              },
+              {
+                "effect_type": "convert",
+                "condition": {
+                  "condition_type": "can_usurp",
+                  "params": {}
                 }
               }
             ]
@@ -6853,22 +6312,13 @@
                 "effect_type": "convert",
                 "params": {
                   "filter": {
-                    "adjacent": true,
-                    "controller": "non_friendly"
+                    "adjacent": true
                   }
                 }
               }
             ]
           }
-        ],
-        "play_condition": {
-          "condition_type": "compare",
-          "params": {
-            "left": "military",
-            "op": ">=",
-            "right": 7
-          }
-        }
+        ]
       },
       "markers": {
         "military": 1
@@ -7027,7 +6477,7 @@
       "card_type": "public",
       "card_category": "public",
       "owner_faction": "公共",
-      "text": "支付7军力。选择威望、功绩或者顺位，提高1级，其他所有东晋玩家降低1级。[僭越]司马家威望降低1级，获得4vp。",
+      "text": "【仅限东晋】支付7军力。选择威望、功绩或者顺位，提高1级，其他所有东晋玩家降低1级。[僭越]司马家威望降低1级，获得4vp。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -7035,101 +6485,11 @@
         "blocks": [
           {
             "ability_type": "strategy_action",
-            "costs": [
-              {
-                "cost_type": "pay_military",
-                "params": {
-                  "amount": 7
-                }
-              }
-            ],
             "steps": [
               {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "raise_prestige",
-                      "params": {
-                        "amount": 1
-                      }
-                    },
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "other_jin_player",
-                          "selection": "each"
-                        },
-                        "sub_effect": {
-                          "effect_type": "lower_prestige",
-                          "params": {
-                            "amount": 1
-                          }
-                        }
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "raise_contribution",
-                      "params": {
-                        "amount": 1
-                      }
-                    },
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "other_jin_player",
-                          "selection": "each"
-                        },
-                        "sub_effect": {
-                          "effect_type": "lower_contribution",
-                          "params": {
-                            "amount": 1
-                          }
-                        }
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "raise_order",
-                      "params": {
-                        "amount": 1
-                      }
-                    },
-                    {
-                      "effect_type": "targeted_effect",
-                      "params": {
-                        "target": {
-                          "type": "other_jin_player",
-                          "selection": "each"
-                        },
-                        "sub_effect": {
-                          "effect_type": "lower_order",
-                          "params": {
-                            "amount": 1
-                          }
-                        }
-                      }
-                    }
-                  ]
-                ]
-              },
-              {
-                "effect_type": "targeted_effect",
+                "effect_type": "lower_order",
                 "params": {
-                  "target": {
-                    "type": "sima"
-                  },
-                  "sub_effect": {
-                    "effect_type": "lower_prestige",
-                    "params": {
-                      "amount": 1
-                    }
-                  }
+                  "amount": 1
                 },
                 "condition": {
                   "condition_type": "can_usurp",
@@ -7229,7 +6589,7 @@
       "card_type": "public",
       "card_category": "public",
       "owner_faction": "公共",
-      "text": "降低1点[威望]或[功绩]，转化1个司马家地点。[僭越]可以转化1个东晋玩家地点。",
+      "text": "【仅限东晋】降低1点[威望]或[功绩]，转化1个司马家地点。[僭越]可以转化1个东晋玩家地点。",
       "parsed_effect": {
         "is_usurp": true,
         "faction_restriction": "jin",
@@ -7239,77 +6599,24 @@
             "ability_type": "strategy_action",
             "steps": [
               {
-                "effect_type": "choice",
-                "choice_options": [
-                  [
-                    {
-                      "effect_type": "lower_prestige",
-                      "params": {
-                        "amount": 1
-                      }
-                    }
-                  ],
-                  [
-                    {
-                      "effect_type": "lower_contribution",
-                      "params": {
-                        "amount": 1
-                      }
-                    }
-                  ]
-                ]
-              },
-              {
-                "effect_type": "targeted_effect",
-                "params": {
-                  "target": {
-                    "type": "location",
-                    "count": 1,
-                    "selection": "choose",
-                    "filters": [
-                      {
-                        "controller": "sima"
-                      }
-                    ]
-                  },
-                  "sub_effect": {
-                    "effect_type": "convert",
-                    "params": {}
-                  }
-                },
-                "condition": {
-                  "condition_type": "not",
-                  "params": {
-                    "condition": {
-                      "condition_type": "can_usurp",
-                      "params": {}
-                    }
-                  }
-                }
-              },
-              {
-                "effect_type": "targeted_effect",
-                "params": {
-                  "target": {
-                    "type": "location",
-                    "count": 1,
-                    "selection": "choose",
-                    "filters": [
-                      {
-                        "controller": "jin"
-                      }
-                    ]
-                  },
-                  "sub_effect": {
-                    "effect_type": "convert",
-                    "params": {}
-                  }
-                },
+                "effect_type": "convert",
                 "condition": {
                   "condition_type": "can_usurp",
                   "params": {}
                 }
               }
+            ],
+            "choice_options": [
+              [
+                {
+                  "effect_type": "convert"
+                }
+              ],
+              [
+                {
+                  "effect_type": "convert"
+                }
+              ]
             ]
           }
         ]
@@ -7351,7 +6658,7 @@
                 "condition": {
                   "condition_type": "culture_contribution_gt",
                   "params": {
-                    "culture": "taoism",
+                    "culture": "玄学",
                     "threshold": 1
                   }
                 }
@@ -7375,409 +6682,128 @@
       "name": "天府之土",
       "simple_vp": 7,
       "full_vp": 14,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "巴蜀"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "巴蜀"
-        }
-      }
+      "simple_condition": "友方控制[巴蜀]区域",
+      "full_condition": "玩家控制[巴蜀]区域"
     },
     {
       "card_id": "goal_河洛旧都_1",
       "name": "河洛旧都",
       "simple_vp": 16,
       "full_vp": 22,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "中原"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "中原"
-        }
-      }
+      "simple_condition": "友方控制[中原]区域",
+      "full_condition": "玩家控制[中原]区域"
     },
     {
       "card_id": "goal_关中故畿_1",
       "name": "关中故畿",
       "simple_vp": 14,
       "full_vp": 20,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "关中"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "关中"
-        }
-      }
+      "simple_condition": "友方控制[关中]区域",
+      "full_condition": "玩家控制[关中]区域"
     },
     {
       "card_id": "goal_海岱之地_1",
       "name": "海岱之地",
       "simple_vp": 7,
       "full_vp": 14,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "山东"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "山东"
-        }
-      }
+      "simple_condition": "友方控制[山东]区域",
+      "full_condition": "玩家控制[山东]区域"
     },
     {
       "card_id": "goal_赵魏雄藩_1",
       "name": "赵魏雄藩",
       "simple_vp": 14,
       "full_vp": 20,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "河北"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "河北"
-        }
-      }
+      "simple_condition": "友方控制[河北]区域",
+      "full_condition": "玩家控制[河北]区域"
     },
     {
       "card_id": "goal_表里山河_1",
       "name": "表里山河",
       "simple_vp": 11,
       "full_vp": 16,
-      "simple_condition_ast": {
-        "condition_type": "friendly_control_region",
-        "params": {
-          "region": "山西"
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "control_region",
-        "params": {
-          "region": "山西"
-        }
-      }
+      "simple_condition": "友方控制[山西]区域",
+      "full_condition": "玩家控制[山西]区域"
     },
     {
       "card_id": "goal_配享太庙_1",
       "name": "配享太庙",
       "simple_vp": 10,
       "full_vp": 18,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "contribution",
-          "op": ">=",
-          "right": 7
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "contribution",
-          "op": "==",
-          "right": 9
-        }
-      }
+      "simple_condition": "功绩大于等于7",
+      "full_condition": "功绩等于9"
     },
     {
       "card_id": "goal_加九锡_1",
       "name": "加九锡",
       "simple_vp": 8,
       "full_vp": 30,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "prestige",
-          "op": ">",
-          "right": 6
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "prestige_highest",
-              "params": {}
-            },
-            {
-              "condition_type": "compare",
-              "params": {
-                "left": "prestige_lead",
-                "op": ">=",
-                "right": 3
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "威望大于等于6",
+      "full_condition": "威望最高，且大于等于第二名至少3点。"
     },
     {
       "card_id": "goal_加九锡_2",
       "name": "加九锡",
       "simple_vp": 8,
       "full_vp": 30,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "prestige",
-          "op": ">",
-          "right": 6
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "prestige_highest",
-              "params": {}
-            },
-            {
-              "condition_type": "compare",
-              "params": {
-                "left": "prestige_lead",
-                "op": ">=",
-                "right": 3
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "威望大于等于6",
+      "full_condition": "威望最高，且大于等于第二名至少3点。"
     },
     {
       "card_id": "goal_家财万贯_1",
       "name": "家财万贯",
       "simple_vp": 6,
       "full_vp": 12,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "hand_count",
-          "op": ">=",
-          "right": 6
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "hand_count",
-          "op": ">=",
-          "right": 9
-        }
-      }
+      "simple_condition": "手牌大于等于5张",
+      "full_condition": "手牌大于等于8张"
     },
     {
       "card_id": "goal_遗臭万年_1",
       "name": "遗臭万年",
       "simple_vp": 7,
       "full_vp": 14,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "power_marker_count",
-          "op": ">=",
-          "right": 3
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "power_marker_count",
-          "op": ">=",
-          "right": 5
-        }
-      }
+      "simple_condition": "拥有3个权谋标记",
+      "full_condition": "拥有5个权谋标记"
     },
     {
       "card_id": "goal_敦悦五经_1",
       "name": "敦悦五经",
       "simple_vp": 6,
       "full_vp": 16,
-      "simple_condition_ast": {
-        "condition_type": "culture_contribution_gt",
-        "params": {
-          "culture": "confucianism",
-          "threshold": 3
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "culture_contribution_gt",
-              "params": {
-                "culture": "confucianism",
-                "threshold": 5
-              }
-            },
-            {
-              "condition_type": "culture_most_empty",
-              "params": {
-                "culture": "confucianism"
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "儒学贡献大于等于3",
+      "full_condition": "儒学贡献大于等于5，且儒学轨道露出的空格最多"
     },
     {
       "card_id": "goal_清言世业_1",
       "name": "清言世业",
       "simple_vp": 6,
       "full_vp": 16,
-      "simple_condition_ast": {
-        "condition_type": "culture_contribution_gt",
-        "params": {
-          "culture": "taoism",
-          "threshold": 3
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "culture_contribution_gt",
-              "params": {
-                "culture": "taoism",
-                "threshold": 5
-              }
-            },
-            {
-              "condition_type": "culture_most_empty",
-              "params": {
-                "culture": "taoism"
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "玄学贡献大于等于3",
+      "full_condition": "玄学贡献大于等于5，且玄学轨道露出的空格最多"
     },
     {
       "card_id": "goal_崇奉三宝_1",
       "name": "崇奉三宝",
       "simple_vp": 6,
       "full_vp": 16,
-      "simple_condition_ast": {
-        "condition_type": "culture_contribution_gt",
-        "params": {
-          "culture": "buddhism",
-          "threshold": 3
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "culture_contribution_gt",
-              "params": {
-                "culture": "buddhism",
-                "threshold": 5
-              }
-            },
-            {
-              "condition_type": "culture_most_empty",
-              "params": {
-                "culture": "buddhism"
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "佛学贡献大于等于3",
+      "full_condition": "佛学贡献大于等于5，且佛学轨道露出的空格最多"
     },
     {
       "card_id": "goal_配享武庙_1",
       "name": "配享武庙",
       "simple_vp": 10,
       "full_vp": 18,
-      "simple_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "compare",
-              "params": {
-                "left": "prestige",
-                "op": ">",
-                "right": 6
-              }
-            },
-            {
-              "condition_type": "not_completed_goal",
-              "params": {
-                "goal": "加九锡"
-              }
-            }
-          ]
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "and",
-        "params": {
-          "conditions": [
-            {
-              "condition_type": "compare",
-              "params": {
-                "left": "prestige",
-                "op": "==",
-                "right": 9
-              }
-            },
-            {
-              "condition_type": "not_completed_goal",
-              "params": {
-                "goal": "加九锡"
-              }
-            }
-          ]
-        }
-      }
+      "simple_condition": "威望大于等于6，且没有完成[加九锡]",
+      "full_condition": "威望等于9，且没有完成[加九锡]"
     },
     {
       "card_id": "goal_世说新语_1",
       "name": "世说新语",
       "simple_vp": 8,
       "full_vp": 16,
-      "simple_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "history_count",
-          "op": ">=",
-          "right": 5
-        }
-      },
-      "full_condition_ast": {
-        "condition_type": "compare",
-        "params": {
-          "left": "history_count",
-          "op": ">=",
-          "right": 8
-        }
-      }
+      "simple_condition": "史书区有5张牌",
+      "full_condition": "史书区有8张牌"
     }
   ],
   "emperor_cards": [
@@ -7786,66 +6812,63 @@
       "name": "纯质",
       "initial_prestige": 4,
       "emperor_tasks": [],
-      "effect_ast": {
-        "effect_type": "skip_emperor_die",
-        "params": {}
-      }
+      "effect_text": "不投掷君主骰"
     },
     {
       "card_id": "emperor_雅好_1",
       "name": "雅好",
       "initial_prestige": 6,
       "emperor_tasks": [
-        "march",
-        "march",
-        "reform",
-        "spread_culture",
-        "art",
-        "art"
+        "扩张",
+        "扩张",
+        "改革",
+        "文化",
+        "艺术",
+        "艺术"
       ],
-      "effect_ast": {}
+      "effect_text": ""
     },
     {
       "card_id": "emperor_守成_1",
       "name": "守成",
       "initial_prestige": 5,
       "emperor_tasks": [
-        "march",
-        "march",
-        "fortify",
-        "fortify",
-        "reform",
-        "spread_culture"
+        "扩张",
+        "扩张",
+        "加固",
+        "加固",
+        "改革",
+        "文化"
       ],
-      "effect_ast": {}
+      "effect_text": ""
     },
     {
       "card_id": "emperor_躬亲_1",
       "name": "躬亲",
       "initial_prestige": 7,
       "emperor_tasks": [
-        "march",
-        "march",
-        "march",
-        "reform",
-        "reform",
-        "spread_culture"
+        "扩张",
+        "扩张",
+        "扩张",
+        "改革",
+        "改革",
+        "文化"
       ],
-      "effect_ast": {}
+      "effect_text": ""
     },
     {
       "card_id": "emperor_中庸_1",
       "name": "中庸",
       "initial_prestige": 5,
       "emperor_tasks": [
-        "march",
-        "march",
-        "fortify",
-        "art",
-        "spread_culture",
-        "spread_culture"
+        "扩张",
+        "扩张",
+        "加固",
+        "艺术",
+        "文化",
+        "文化"
       ],
-      "effect_ast": {}
+      "effect_text": ""
     }
   ]
 }

@@ -99,9 +99,13 @@ class NeedsDecision(Exception):
 class ReplayController:
     """全局决策队列 + 游标，4 个 ReplayAgent 共享。"""
 
-    def __init__(self, decisions):
+    def __init__(self, decisions, discard_order=None):
         self.decisions = decisions
         self.cursor = 0
+        self.discard_order = discard_order or {}
+        self.pending_discard = {}  # player_id -> 指定弃牌牌名队列（activate 效果里的「弃X」）
+        self.pending_target = {}   # player_id -> 指定目标队列（activate 效果里的进军/转化目标）
+        self.pending_choice = {}   # player_id -> 指定选项队列（activate 效果里的二选一）
 
     def next(self):
         if self.cursor < len(self.decisions):
@@ -132,6 +136,134 @@ def _build_action_menu(state, player_id, available_actions):
         s["index"] = i
         menu.append(s)
     return menu
+
+
+def _names_to_indices(hand_names, payment_names):
+    """把支付牌名列表转成手牌下标列表。"""
+    result = []
+    for pn in payment_names:
+        for i, hn in enumerate(hand_names):
+            if hn == pn and i not in result:
+                result.append(i)
+                break
+    return result
+
+
+def _pick_discards_by_order(hand_cards, count, order):
+    """按弃牌顺序挑 count 张的下标。order 里的【新手牌】匹配任意未在 order 中点名的牌。"""
+    result = []
+    for name in order:
+        if len(result) >= count:
+            break
+        if name == "【新手牌】":
+            for i, hc in enumerate(hand_cards):
+                if hc not in order and i not in result:
+                    result.append(i)
+                    break
+        else:
+            for i, hc in enumerate(hand_cards):
+                if hc == name and i not in result:
+                    result.append(i)
+                    break
+    if len(result) < count:
+        for i in range(len(hand_cards) - 1, -1, -1):
+            if i not in result:
+                result.append(i)
+                if len(result) >= count:
+                    break
+    return result
+
+
+def _match_semantic_actions(state, player_id, available_actions, semantic):
+    """把一条语义行动匹配到 available_actions，返回匹配的 action 列表（0/1/多个）。
+
+    semantic 例：{"type":"march","target":"雍丘"} / {"type":"occupy","target":"宛城","use_sima":false}
+    """
+    atype = semantic.get("type")
+    # 类型别名：plan 里的 "activate" → 引擎的 "activate_effect"
+    atype = {"activate": "activate_effect"}.get(atype, atype)
+    player = state.get_player(player_id)
+    matches = []
+
+    def _card_name_of(action):
+        if atype == "recruit":
+            ci = getattr(action, "card_to_discard_index", -1)
+            if player and 0 <= ci < len(player.hand):
+                return player.hand[ci].name
+        elif atype == "play_card":
+            ci = getattr(action, "card_index", -1)
+            if player and 0 <= ci < len(player.hand):
+                return player.hand[ci].name
+        elif atype == "court_action":
+            cid = getattr(action, "card_id", "")
+            for c in state.get_court_cards(player_id):
+                if c.definition.card_id == cid:
+                    return c.name
+        elif atype == "play_public_card":
+            cid = getattr(action, "card_id", "")
+            for c in state.public_action_pool:
+                if c.definition.card_id == cid:
+                    return c.name
+        elif atype == "activate_effect":
+            cid = getattr(action, "card_id", "")
+            for c in ([player.hero] + (player.staff_area or [])):
+                if c and c.definition.card_id == cid:
+                    return c.name
+        return None
+
+    for action in available_actions:
+        if getattr(action, "action_type", "") != atype:
+            continue
+        if atype in ("march", "occupy", "fortify", "convert"):
+            target = semantic.get("target")
+            if target and getattr(action, "target_location", "") != target:
+                continue
+        if atype == "occupy":
+            use_sima = semantic.get("use_sima")
+            if use_sima is not None and bool(getattr(action, "use_sima_army", False)) != bool(use_sima):
+                continue
+        if atype in ("recruit", "play_card", "court_action", "play_public_card", "activate_effect"):
+            card_name = semantic.get("card")
+            if card_name and _card_name_of(action) != card_name:
+                continue
+        if atype == "play_card" and semantic.get("replace") is not None:
+            rsi = getattr(action, "replace_staff_index", None)
+            if rsi is None:
+                continue
+            if not (player and 0 <= rsi < len(player.staff_area)
+                    and player.staff_area[rsi].name == semantic["replace"]):
+                continue
+        if atype == "spread_culture":
+            culture = semantic.get("culture")
+            if culture and getattr(action, "culture_type", "") != culture:
+                continue
+            region = semantic.get("region")
+            if region and getattr(action, "target_region", "") != region:
+                continue
+        matches.append(action)
+    return matches
+
+
+def _matches_equivalent(matches):
+    """多个匹配是否等价（同一张牌/同一参数）。等价则任选其一，否则算真多义。"""
+    if len(matches) <= 1:
+        return True
+    key = None
+    for m in matches:
+        k = (
+            getattr(m, "action_type", ""),
+            getattr(m, "card_id", ""),
+            getattr(m, "use_sima_army", False),
+            getattr(m, "target_location", ""),
+            getattr(m, "replace_staff_index", None),
+            getattr(m, "block_index", None),
+            getattr(m, "choice_index", None),
+        )
+        if key is None:
+            key = k
+        elif k != key:
+            return False
+    return True
 
 
 class ReplayAgent(GameAgent):
@@ -185,15 +317,62 @@ class ReplayAgent(GameAgent):
                 "actions": menu,
                 "pass_hint": "index = -1 表示结束行动/空过",
             })
-        idx = d.get("index", -1)
-        if idx is None or idx == -1:
+        # 结束回合（语义）
+        if d.get("type") == "end_turn":
             return None
-        action = available_actions[idx]
-        if d.get("payment") is not None:
-            action.payment_indices = list(d["payment"])
-        return action
+        player = state.get_player(self.player_id)
+        # index 模式（终端测试/回放兼容）
+        if "index" in d:
+            idx = d["index"]
+            if idx is None or idx == -1:
+                return None
+            action = available_actions[idx]
+            if d.get("payment") is not None:
+                action.payment_indices = list(d["payment"])
+            return action
+        # 语义模式
+        matches = _match_semantic_actions(state, self.player_id, available_actions, d)
+        if len(matches) == 1 or (len(matches) > 1 and _matches_equivalent(matches)):
+            action = matches[0]
+            if d.get("discard") is not None:
+                discs = d["discard"] if isinstance(d["discard"], list) else [d["discard"]]
+                self.controller.pending_discard.setdefault(self.player_id, []).extend(discs)
+            if d.get("target") is not None and getattr(action, "action_type", "") not in ("march", "occupy", "fortify"):
+                self.controller.pending_target.setdefault(self.player_id, []).append(d["target"])
+            if d.get("choice") is not None:
+                self.controller.pending_choice.setdefault(self.player_id, []).append(d["choice"])
+            if d.get("payment") is not None:
+                hand_names = [c.name for c in (player.hand or [])]
+                action.payment_indices = _names_to_indices(hand_names, d["payment"])
+            return action
+        # 0 或 >1 匹配 → 计划中断，dump 供重规划（不静默选）
+        menu = _build_action_menu(state, self.player_id, available_actions)
+        reason = "no_match" if len(matches) == 0 else "ambiguous"
+        extra = {"semantic": d, "reason": reason, "actions": menu}
+        if reason == "ambiguous":
+            hand = player.hand if player else []
+            court = state.get_court_cards(self.player_id)
+            staff = player.staff_area if player else []
+            hero = player.hero if player else None
+            extra["matched"] = [
+                action_to_summary(m, self.player_id, hand_cards=hand, court_cards=court,
+                                  public_cards=state.public_action_pool, player_staff=staff,
+                                  player_hero=hero)
+                for m in matches
+            ]
+        self._needs("action", state=state, extra=extra)
 
     def make_choice(self, state, prompt):
+        # 指定选项优先（activate 效果里 plan 预写的 choice）
+        pending = self.controller.pending_choice.get(self.player_id, [])
+        if pending:
+            choice = pending.pop(0)
+            options = prompt.get("options", [])
+            for i, opt in enumerate(options):
+                label = opt.get("label", opt) if isinstance(opt, dict) else opt
+                if str(label) == str(choice) or str(i) == str(choice):
+                    return i
+            return 0
         d = self.controller.next()
         if d is None:
             self._needs("choice", state=state, extra={
@@ -203,6 +382,27 @@ class ReplayAgent(GameAgent):
         return d.get("index", 0)
 
     def choose_discards(self, state, hand_cards, count, reason="hand_limit"):
+        # 指定弃牌优先（activate 效果里 plan 预写的 discard 字段）
+        pending = self.controller.pending_discard.get(self.player_id, [])
+        if pending:
+            indices = []
+            while pending and len(indices) < count:
+                pn = pending.pop(0)
+                for i, hc in enumerate(hand_cards):
+                    if hc == pn and i not in indices:
+                        indices.append(i)
+                        break
+            if len(indices) < count:
+                for i in range(len(hand_cards) - 1, -1, -1):
+                    if i not in indices:
+                        indices.append(i)
+                        if len(indices) >= count:
+                            break
+            return indices
+        # 弃牌顺序自动选
+        order = self.controller.discard_order.get(self.player_id)
+        if order:
+            return _pick_discards_by_order(hand_cards, count, order)
         d = self.controller.next()
         if d is None:
             self._needs("discard", state=state, extra={
@@ -211,6 +411,18 @@ class ReplayAgent(GameAgent):
         return d.get("indices", [])
 
     def select_target(self, state, prompt):
+        # 指定目标优先（activate 效果里 plan 预写的 target）
+        pending = self.controller.pending_target.get(self.player_id, [])
+        if pending:
+            target = pending.pop(0)
+            options = prompt.get("options", [])
+            for opt in options:
+                if isinstance(opt, dict):
+                    if opt.get("id") == target or opt.get("label") == target:
+                        return opt.get("id", str(opt))
+                elif str(opt) == target:
+                    return str(opt)
+            return None
         d = self.controller.next()
         if d is None:
             self._needs("target", state=state, extra={
@@ -238,12 +450,30 @@ class ReplayAgent(GameAgent):
             self._needs("card_play", state=state, extra={
                 "eligible": names, "free": free, "filter": filter_spec,
             })
+        player = state.get_player(self.player_id)
+        from engine.actions.card_actions import PlayCardAction
+        # 语义模式：按牌名匹配
+        card_name = d.get("card")
+        if card_name:
+            for hi in eligible_indices:
+                if player and player.hand[hi].name == card_name:
+                    if free:
+                        payment = []
+                    else:
+                        cost = player.hand[hi].cost
+                        payment = d.get("payment")
+                        if payment is not None:
+                            payment = _names_to_indices([c.name for c in player.hand], payment)
+                        else:
+                            payment = [j for j in range(len(player.hand)) if j != hi][:cost]
+                    return PlayCardAction(player_id=self.player_id, card_index=hi,
+                                          payment_indices=payment, free=free)
+            return None
+        # index 模式
         idx = d.get("index", -1)
         if idx is None or idx == -1:
             return None
-        from engine.actions.card_actions import PlayCardAction
         card_index = eligible_indices[idx]
-        player = state.get_player(self.player_id)
         if free:
             payment = []
         else:
@@ -324,6 +554,13 @@ def _print_dump(dump):
             print(f"  {i}. {name} (费用{c})")
 
     elif t == "action":
+        if dump.get("semantic"):
+            reason = dump.get("reason", "")
+            print(f"\n  ⚠ 计划中断 ({reason}): 语义步骤 = {dump['semantic']}")
+            if dump.get("matched"):
+                print(f"  匹配到 {len(dump['matched'])} 个候选:")
+                for m in dump["matched"]:
+                    print(f"    [{m.get('action_type')}] {m.get('description','?')}")
         for line in _compact_my_state(dump):
             print(line)
         print(f"\n【可选行动】(index 下标)")
@@ -378,9 +615,10 @@ def cmd_step(args):
     seed = cfg["seed"]
     human = cfg.get("human", "north")
     moves = _load_jsonl(_path("moves.jsonl"))
+    discard_order = _load_json(_path("discard_order.json"), {})
 
     v = Version.load("v1.0")
-    controller = ReplayController(moves)
+    controller = ReplayController(moves, discard_order)
     agents = [ReplayAgent(pid, controller, human)
               for pid in ["north", "jin_1", "jin_2", "jin_3"]]
     engine = GameEngine(agents=agents, version=v, seed=seed)
@@ -428,6 +666,16 @@ def cmd_show(args):
         _print_dump(dump)
 
 
+def cmd_discard_order(args):
+    if args.file:
+        with open(args.file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    else:
+        data = json.loads(args.json)
+    _save_json(_path("discard_order.json"), data)
+    print(f"已设置弃牌顺序: {json.dumps(data, ensure_ascii=False)}")
+
+
 def cmd_status(args):
     cfg = _load_json(_path("claude_game.json"))
     moves = _load_jsonl(_path("moves.jsonl"))
@@ -463,6 +711,11 @@ def main():
     pw = sub.add_parser("show")
     pw.add_argument("--full", action="store_true")
     pw.set_defaults(func=cmd_show)
+
+    pd = sub.add_parser("discard_order")
+    pd.add_argument("json", nargs="?", default=None)
+    pd.add_argument("--file", type=str, default=None)
+    pd.set_defaults(func=cmd_discard_order)
 
     pt = sub.add_parser("status")
     pt.set_defaults(func=cmd_status)

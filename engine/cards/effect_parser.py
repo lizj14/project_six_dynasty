@@ -578,12 +578,18 @@ class EffectParser:
                 continue
 
             # Split compound resources: "2军力2vp" → "2军力", "2vp"
+            # "支付1军力1vp" → "支付1军力", "支付1vp" (carry the 支付 prefix)
             if re.search(r'\d+\s*军力\s*\d+\s*vp', segment, re.IGNORECASE):
                 # Split before the second number: "2军力2vp" → ["2军力", "2vp"]
                 sub_segs = re.split(r'(?<=\D)(?=\d+\s*vp)', segment, maxsplit=1)
+                pay_prefix = '支付' if segment.strip().startswith('支付') else ''
                 for sub in sub_segs:
                     sub = sub.strip()
                     if sub:
+                        # The trailing "Nvp" part lost the 支付 prefix — restore it
+                        # so it parses as pay_vp, not bare gain_vp.
+                        if pay_prefix and re.match(r'^\d+\s*vp', sub, re.IGNORECASE):
+                            sub = pay_prefix + sub
                         try:
                             step = self._parse_single_step(sub)
                             steps.append(step)
@@ -999,6 +1005,19 @@ def _parse_pay_military(text: str, orig: str) -> Optional[EffectStep]:
         return EffectStep(
             effect_type=EffectType.PAY_MILITARY,
             params={"amount": int(m.group(1))},
+            source_text=orig,
+        )
+    return None
+
+
+def _parse_pay_vp(text: str, orig: str) -> Optional[EffectStep]:
+    """支付Nvp"""
+    m = re.search(r'支付\s*(\d+|X)\s*vp', text, re.IGNORECASE)
+    if m:
+        val = m.group(1)
+        return EffectStep(
+            effect_type=EffectType.PAY_VP,
+            params={"amount": val if val == 'X' else int(val), "variable": val == 'X'},
             source_text=orig,
         )
     return None
@@ -2018,6 +2037,7 @@ _STEP_PATTERNS = [
     _parse_lose_military,
     _parse_lose_prestige,
     _parse_pay_military,
+    _parse_pay_vp,
     _parse_pay_hand_card,
     _parse_draw_cards,
     _parse_other_discard,

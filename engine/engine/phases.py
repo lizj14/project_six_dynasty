@@ -233,14 +233,16 @@ def _deal_and_select_cards(library: CardLibrary, players: list[PlayerState],
     rng.shuffle(main_deck_cards)
 
     # --- North: +2 faction friend cards ---
-    north_friend_cards = [c for c in library.all_cards
-                          if c.owner_faction == "北方"
-                          and c.card_type == CardType.FRIEND
-                          and c.card_id not in allocated_card_ids]
+    # 从主牌库「转移」而非从 library 再复制，避免唯一牌（如姚苌）在主牌库和北方手牌各出现一份
+    north_friend_cards = [c for c in main_deck_cards
+                          if c.definition.owner_faction == "北方"
+                          and c.card_type == CardType.FRIEND]
     chosen_north_friends = rng.sample(north_friend_cards, min(2, len(north_friend_cards)))
-    for cdef in chosen_north_friends:
-        north.hand.append(Card(definition=cdef, owner_player_id="north"))
-        allocated_card_ids.add(cdef.card_id)
+    for card in chosen_north_friends:
+        main_deck_cards.remove(card)
+        card.owner_player_id = "north"
+        north.hand.append(card)
+        allocated_card_ids.add(card.definition.card_id)
 
     # === Preset hands: pre-allocate specified cards before random draw ===
     if preset_hands:
