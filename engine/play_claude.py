@@ -399,10 +399,11 @@ class ReplayAgent(GameAgent):
                         if len(indices) >= count:
                             break
             return indices
-        # 弃牌顺序自动选
-        order = self.controller.discard_order.get(self.player_id)
-        if order:
-            return _pick_discards_by_order(hand_cards, count, order)
+        # 弃牌顺序只用于回合末手牌超限（hand_limit）；effect 的 cost 弃牌走队列
+        if reason == "hand_limit":
+            order = self.controller.discard_order.get(self.player_id)
+            if order:
+                return _pick_discards_by_order(hand_cards, count, order)
         d = self.controller.next()
         if d is None:
             self._needs("discard", state=state, extra={

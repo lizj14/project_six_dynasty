@@ -193,9 +193,16 @@ class EffectResolver:
 
         # Handle choice blocks
         if block.choice_options:
-            choice_idx = 0
-            if context and 'choice_index' in context:
-                choice_idx = context['choice_index']
+            choice_idx = context.get('choice_index', None) if context else None
+            if choice_idx is None:
+                # No pre-selected option (event cards via play_card, e.g. 苏峻/谯纵)
+                # — ask the agent. Friend cards via ActivateEffectAction already
+                # pass choice_index explicitly and skip this.
+                choice_idx = self._ask_block_choice(player_id, block)
+            result.events.append({"type": "choose",
+                                  "options": len(block.choice_options),
+                                  "chosen": choice_idx,
+                                  "chosen_label": f"option_{choice_idx + 1}"})
             if 0 <= choice_idx < len(block.choice_options):
                 for step in block.choice_options[choice_idx]:
                     if step.effect_type in _COST_EFFECT_TYPES:
@@ -229,6 +236,30 @@ class EffectResolver:
             self._fire_trigger("on_usurp", player_id)
 
         return result
+
+    def _ask_block_choice(self, player_id: str, block: AbilityBlock) -> int:
+        """Ask the agent to choose among block-level choice_options.
+
+        Used when a block has choice_options but no choice_index was supplied by
+        the caller (event cards played via play_card — 苏峻/谯纵). Friend cards
+        via ActivateEffectAction pass choice_index explicitly and skip this.
+
+        Returns the chosen index, or 0 when no choice callback is wired.
+        """
+        if not self.make_choice_callback:
+            return 0
+        from .effect_operators import effect_step_label
+        prompt = {"type": "choose_effect", "title": "选择一项", "options": []}
+        for i, opt in enumerate(block.choice_options):
+            labels = [effect_step_label(s.effect_type, s.params) for s in opt]
+            prompt["options"].append({
+                "id": str(i),
+                "label": f"选项{i+1}: {'，'.join(labels)}" if labels else f"选项{i+1}",
+            })
+        idx = self.make_choice_callback(player_id, prompt)
+        if not isinstance(idx, int) or not (0 <= idx < len(block.choice_options)):
+            idx = 0
+        return idx
 
     def _fire_trigger(self, trigger_type: str, player_id: str, context: dict = None):
         """Notify the engine that a sub-effect event occurred (e.g. gain_vp).

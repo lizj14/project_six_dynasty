@@ -444,6 +444,39 @@ class TestBlockResolution:
         assert player.vp == 1          # unchanged
         assert player.military == 0    # effect not applied
 
+    def test_choice_asks_agent_when_no_index(self, minimal_state, resolver):
+        """Event card (play_card) has no choice_index — resolver asks the agent."""
+        player = minimal_state.get_player("north")
+        player.vp = 10
+        player.military = 0
+        asked = []
+        resolver.make_choice_callback = lambda pid, prompt: asked.append(prompt) or 1
+        block = AbilityBlock(
+            ability_type=AbilityType.STRATEGY_ACTION,
+            steps=[],
+            choice_options=[
+                [_mk_step("gain_vp", {"amount": 3})],
+                [_mk_step("gain_military", {"amount": 5})],
+            ],
+        )
+        resolver._resolve_block(block, minimal_state, "north")  # no choice_index
+        assert len(asked) == 1
+        assert asked[0]["type"] == "choose_effect"
+        assert len(asked[0]["options"]) == 2
+        assert player.military == 5    # option 1 executed
+        assert player.vp == 10         # option 0 NOT executed
+
+    def test_choice_defaults_to_zero_without_callback(self, minimal_state, resolver):
+        player = minimal_state.get_player("north")
+        player.vp = 10
+        block = AbilityBlock(
+            ability_type=AbilityType.STRATEGY_ACTION,
+            steps=[],
+            choice_options=[[_mk_step("gain_vp", {"amount": 3})]],
+        )
+        resolver._resolve_block(block, minimal_state, "north")  # no callback, no index
+        assert player.vp == 13         # defaults to option 0
+
     def test_usurp_steps(self, minimal_state, resolver):
         """Jin player with highest prestige executes usurp_steps."""
         player = minimal_state.get_player("jin_1")

@@ -1691,6 +1691,46 @@ class RemoveFromGameOperator(EffectOperator):
         return result
 
 
+def effect_step_label(effect_type: str, params: dict) -> str:
+    """Short Chinese label for an effect step (used in choose prompts)."""
+    cnt = params.get("count", params.get("amount", 1))
+    try:
+        cnt = int(cnt)
+    except (ValueError, TypeError):
+        cnt = 1
+    culture = params.get("culture", "")
+    culture_label = ""
+    if culture:
+        culture_map = {"confucianism": "儒学", "taoism": "玄学", "buddhism": "佛学"}
+        culture_label = f"[{culture_map.get(culture, culture)}]"
+    search_label = "检索"
+    if effect_type == "search":
+        filter_spec = params.get("filter") or {}
+        marker = filter_spec.get("marker", "")
+        marker_map = {"culture": "文化", "affair": "内政", "military": "军事", "power": "权谋"}
+        if marker in marker_map:
+            search_label = f"检索[{marker_map[marker]}]"
+    label_map = {
+        "pay_vp": f"支付{cnt}vp",
+        "pay_military": f"支付{cnt}军力",
+        "discard_cards": f"弃{cnt}手牌",
+        "abandon_court_card": f"弃{cnt}朝堂牌",
+        "draw_cards": f"摸{cnt}张牌",
+        "draft": f"征发{cnt}张候选策略牌" if cnt > 1 else "征发1张候选策略牌",
+        "play_card": f"打出{cnt}张牌" if cnt > 1 else "打出1张牌",
+        "gain_military": f"+{cnt}军力",
+        "gain_vp": f"+{cnt}VP",
+        "spread_culture": f"传播{culture_label}文化" if culture_label else "传播文化",
+        "raise_culture_contribution": f"提高{culture_label}贡献度" if culture_label else f"提高文化贡献度",
+        "raise_culture_level": f"提高{culture_label}等级" if culture_label else "提高文化等级",
+        "remove_culture_marker": f"移除{culture_label}标记" if culture_label else "移除文化标记",
+        "archive_card": "存档",
+        "archive_this": "存档此牌",
+        "search": search_label,
+    }
+    return label_map.get(effect_type, effect_type)
+
+
 @register
 class ChooseOperator(EffectOperator):
     effect_type = EffectType.CHOOSE
@@ -1729,47 +1769,8 @@ class ChooseOperator(EffectOperator):
                         labels.append(clabel)
                 for s in steps:
                     if isinstance(s, dict):
-                        et = s.get("effect_type", "")
-                        p = s.get("params", {})
-                        cnt = p.get("count", p.get("amount", 1))
-                        try:
-                            cnt = int(cnt)
-                        except (ValueError, TypeError):
-                            cnt = 1
-                        # Include culture type in label for culture-related effects
-                        culture = p.get("culture", "")
-                        culture_label = ""
-                        if culture:
-                            culture_map = {
-                                "confucianism": "儒学", "taoism": "玄学",
-                                "buddhism": "佛学",
-                            }
-                            culture_label = f"[{culture_map.get(culture, culture)}]"
-                        # Include search marker in label (e.g. 检索[文化])
-                        search_label = "检索"
-                        if et == "search":
-                            filter_spec = p.get("filter") or {}
-                            marker = filter_spec.get("marker", "")
-                            marker_map = {"culture": "文化", "affair": "内政",
-                                          "military": "军事", "power": "权谋"}
-                            if marker in marker_map:
-                                search_label = f"检索[{marker_map[marker]}]"
-
-                        label_map = {
-                            "draw_cards": f"摸{cnt}张牌",
-                            "draft": f"征发{cnt}张候选策略牌" if cnt > 1 else "征发1张候选策略牌",
-                            "play_card": f"打出{cnt}张牌" if cnt > 1 else "打出1张牌",
-                            "gain_military": f"+{cnt}军力",
-                            "gain_vp": f"+{cnt}VP",
-                            "spread_culture": f"传播{culture_label}文化" if culture_label else "传播文化",
-                            "raise_culture_contribution": f"提高{culture_label}贡献度" if culture_label else f"提高文化贡献度",
-                            "raise_culture_level": f"提高{culture_label}等级" if culture_label else "提高文化等级",
-                            "remove_culture_marker": f"移除{culture_label}标记" if culture_label else "移除文化标记",
-                            "archive_card": "存档",
-                            "archive_this": "存档此牌",
-                            "search": search_label,
-                        }
-                        labels.append(label_map.get(et, et))
+                        labels.append(effect_step_label(
+                            s.get("effect_type", ""), s.get("params", {})))
                 prompt["options"].append({
                     "id": str(i),
                     "label": f"选项{i+1}: {'，'.join(labels)}" if labels else f"选项{i+1}",
@@ -1830,18 +1831,7 @@ class ChooseOperator(EffectOperator):
     @staticmethod
     def _cost_label(cost):
         """Short Chinese label for an option cost (pay_vp / pay_military / ...)."""
-        ct = cost.get("cost_type", "")
-        p = cost.get("params", {})
-        amount = p.get("amount", p.get("count", 1))
-        if ct == "pay_vp":
-            return f"支付{amount}vp"
-        elif ct == "pay_military":
-            return f"支付{amount}军力"
-        elif ct == "discard_cards":
-            return f"弃{p.get('count', 1)}手牌"
-        elif ct == "abandon_court_card":
-            return f"弃{p.get('count', 1)}朝堂牌"
-        return ""
+        return effect_step_label(cost.get("cost_type", ""), cost.get("params", {}))
 
 
 @register
