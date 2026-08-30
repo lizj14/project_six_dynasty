@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -41,7 +41,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -83,7 +83,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -97,8 +97,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -126,7 +126,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -168,7 +168,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -182,8 +182,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -211,7 +211,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -253,7 +253,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -267,8 +267,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -303,8 +303,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "-",
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -343,20 +342,6 @@
               }
             },
             {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "牌面背景",
               "data":
               {
@@ -367,8 +352,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -403,8 +388,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "-",
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -443,20 +427,6 @@
               }
             },
             {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "牌面背景",
               "data":
               {
@@ -467,8 +437,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -496,7 +466,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -538,7 +508,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}。"
+                "value": "朝堂：{save}1张{candidate}。"
               }
             },
             {
@@ -552,8 +522,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -616,7 +586,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{pay}1张{hand}，提高1级{order}，传播1次{NeoTaosim}。{newline}{passive}[加官进爵]不能被{save}、征发或{abandon}。"
+                "value": "朝堂：{pay}1张{hand}，然后提高1级{order}，传播1次{NeoTaosim}。{newline}{passive}[加官进爵]不能被{save}或{abandon}。"
               }
             },
             {
@@ -630,8 +600,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -701,7 +671,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。从{jin}面板获得{expedition}。{newline}{passive}[北伐]不能被{save}、征发或{abandon}。"
+                "value": "朝堂：2{battle}。从{jin}面板获得{expedition}。{newline}{passive}[北伐]不能被{save}或{abandon}。"
               }
             },
             {
@@ -715,8 +685,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
@@ -744,7 +714,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -786,7 +756,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}摸2张牌。如果{affair}标记数>2，额外摸1张牌。"
+                "value": "朝堂：摸2张牌。"
               }
             },
             {
@@ -800,26 +770,26 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345548,
-          "last_modification_date_unix": 1782345548,
+          "creation_date_unix": 1788052918,
+          "last_modification_date_unix": 1788052918,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "value": "2"
+                "visible": "False"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
-              "name": "军力符号",
+              "name": "vp符号",
               "data":
               {
                 "visible": "False"
@@ -829,7 +799,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -843,7 +813,7 @@
               "name": "text_top",
               "data":
               {
-                "value": "清谈"
+                "value": "太常寺"
               }
             },
             {
@@ -871,7 +841,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}6{vp}"
+                "value": "朝堂：2{vp}，提升1级等级。"
               }
             },
             {

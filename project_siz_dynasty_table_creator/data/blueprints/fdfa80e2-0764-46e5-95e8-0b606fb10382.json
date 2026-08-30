@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "blueprints":
   [
     {
@@ -13,7 +13,7 @@
       {
         "radius": "5"
       },
-      "front_layers":
+      "front_groups":
       [
         {
           "name": "default_front",
@@ -213,7 +213,7 @@
           ]
         }
       ],
-      "back_layers":
+      "back_groups":
       [
         {
           "name": "default_back",

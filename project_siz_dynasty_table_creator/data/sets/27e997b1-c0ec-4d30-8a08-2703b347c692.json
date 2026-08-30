@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -27,7 +27,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -38,17 +38,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-12"
               }
             },
             {
@@ -90,7 +83,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}获得X{battle}，X={military}标记数（最多4）。"
+                "value": "{courtier_001}{pay}2{vp}，然后获得3{battle}。{supple}1次。"
               }
             },
             {
@@ -104,43 +97,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-9"
               }
             },
             {
@@ -182,7 +161,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}2{battle}，{save}1张{candidate}。"
+                "value": "{courtier_001}{pay}1张{hand}，然后{save}1张{candidate}。{supple}1次。"
               }
             },
             {
@@ -196,8 +175,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -260,7 +239,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{supplant}1个{neighbor}{neutral}{location}，然后可以{play}1张{card_friend}。"
+                "value": "朝堂：{supplant}1个{neighbor}{neutral}{location}，可以{play}1张名臣牌。"
               }
             },
             {
@@ -274,8 +253,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -296,7 +275,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "2"
+                "value": "-6"
               }
             },
             {
@@ -338,7 +317,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}选择1个{jin}{player}，给予其1张{hand}。传播1次{emp_culture}，{supplant}1个{neighbor}{neutral}{location}。"
+                "value": "朝堂：选择1个{jin}{player}，给予其1张{hand}，然后传播1次{emp_culture}，{supplant}1个{neighbor}{neutral}{location}。"
               }
             },
             {
@@ -352,8 +331,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -423,7 +402,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。本回合{execute}[{march}]时，获得1{vp}"
+                "value": "朝堂：免费[{march}]1次。获得3{battle}"
               }
             },
             {
@@ -437,43 +416,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-12"
               }
             },
             {
@@ -515,7 +480,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}2{battle}，{discard}1张{hand}，然后摸1张{hand}。"
+                "value": "{courtier_001}{pay}1{vp}，然后获得1{battle}，摸1张牌，{supple}1次。"
               }
             },
             {
@@ -529,8 +494,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -558,7 +523,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "2"
               }
             },
             {
@@ -600,7 +565,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}，{save}{this}。{newline}{passive}每回合前2次[{march}]时，{fee}减1。{district}奖励改为0/1{vp}。"
+                "value": "朝堂：获得3{battle}，{save}{this}。{newline}{passive}每回合前2次[{march}]时，{fee}减1。{district}奖励改为0/1{vp}。"
               }
             },
             {
@@ -614,50 +579,36 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-6"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
@@ -692,7 +643,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，然后摸1张牌。可以{pay}2{battle}，{supplant}1个{neighbor}{neutral}{location}。"
+                "value": "{courtier_001}{pay}1张{hand}，然后摸1张牌。可以{pay}2{battle}，然后{supplant}1个{neighbor}{neutral}{location}。{supple}1次。"
               }
             },
             {
@@ -706,8 +657,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -742,7 +693,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "3"
               }
             },
             {
@@ -785,7 +736,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{save}{this}。将{reserve}的1个{army}放回游戏盒中。"
+                "value": "将{reserve}的1个{army}放回游戏盒中。{save}{this}。"
               }
             },
             {
@@ -799,26 +750,19 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "6"
               }
             },
             {
               "name": "军力数字",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
               "data":
               {
                 "visible": "False"
@@ -835,7 +779,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-12"
               }
             },
             {
@@ -877,7 +821,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}获得X {vp}，X={culture}标记数。然后，可以{pay}2{vp}，摸1张牌。"
+                "value": "{courtier_001}获得X {vp}，X={culture}等级。可以{pay}2{vp}，然后摸1张牌。{supple}1次。"
               }
             },
             {
@@ -891,8 +835,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -927,7 +871,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-3"
               }
             },
             {
@@ -941,7 +885,8 @@
               "name": "text_top",
               "data":
               {
-                "value": "王敦"
+                "value": "王敦",
+                "color": "#292929FF"
               }
             },
             {
@@ -962,29 +907,29 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}-{power}</align>"
+                "value": "<align=\"center\">{card_event}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{passive}当你的[{prestige}]是并列最高时，也可以{execute}{urusp}效果。每次{execute}{urusp}效果时，获得X {vp}，X=你的{power}标记数。"
+                "value": "提高1级{prestige}，{supplant}1个{sima}边境{location}，然后{save}{this}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "color": "#3E5F91FF"
+                "color": "#F5EDDAFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1005,7 +950,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "-6"
+                "value": "-9"
               }
             },
             {
@@ -1047,7 +992,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{supplant}1个{neighbor}{neutral}{location}。获得2{battle}。"
+                "value": "朝堂：{supplant}1个{neighbor}{neutral}{location}。获得2{battle}。"
               }
             },
             {
@@ -1061,50 +1006,36 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-6"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "3"
+                "value": "2"
               }
             },
             {
@@ -1139,7 +1070,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{play}1张{military}牌或征发1张{military}{candidate}，然后摸1张牌。"
+                "value": "{courtier_001}{play}1张{military}牌。{supple}1次。"
               }
             },
             {
@@ -1153,43 +1084,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-6"
               }
             },
             {
@@ -1231,7 +1148,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{play}1张{culture}牌或征发1张{culture}{candidate}。"
+                "value": "{courtier_001}{play}1张{culture}牌。{supple}1次。"
               }
             },
             {
@@ -1245,8 +1162,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1288,14 +1205,14 @@
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "高卧东山",
+                "value": "东山再起",
                 "color": "#292929FF"
               }
             },
@@ -1324,7 +1241,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{search}2次[策略]，然后{save}{this}。"
+                "value": "{search}1次[策略]，然后{save}{this}。"
               }
             },
             {
@@ -1338,8 +1255,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1353,7 +1270,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
@@ -1364,17 +1281,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "-6"
               }
             },
             {
@@ -1416,7 +1326,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{discard}1张{hand}，{abandon}1张{candidate}，然后摸1张{hand}并{supple}1张牌到{court}"
+                "value": "{courtier_001}{pay}1张{hand}，{abandon}1张{candidate}，然后摸1张{hand}，{supple}2次。"
               }
             },
             {
@@ -1430,8 +1340,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1473,7 +1383,7 @@
               "name": "text_limit",
               "data":
               {
-                "value": "{occupy}[京口]"
+                "visible": "False"
               }
             },
             {
@@ -1494,7 +1404,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}获得5{battle}"
+                "value": "朝堂：{abandon}1张{refugee}，然后获得5{battle}。"
               }
             },
             {
@@ -1508,8 +1418,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1587,7 +1497,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "在本国{discard}牌区放置1张{refugee}。{supplant}1个非[江南][荆襄]{district}的{neutral}{location}。"
+                "value": "在本国{discard}牌区放置1张{refugee}。{supplant}1个未被{control}{district}的{neutral}{location}。获得1{battle}。"
               }
             },
             {
@@ -1601,8 +1511,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1637,7 +1547,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "10"
+                "value": "8"
               }
             },
             {
@@ -1694,8 +1604,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1765,7 +1675,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。本回合{execute}[{march}]时，获得1{vp}"
+                "value": "朝堂：免费[{march}]1次。获得3{battle}"
               }
             },
             {
@@ -1779,43 +1689,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-9"
               }
             },
             {
@@ -1857,7 +1753,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}1{battle}。{newline}{passive}每次{play}{military}牌或{execute}{military}策略后，获得1{vp}。"
+                "value": "{courtier_001}获得1{battle}。{supple}1次。本回合，每次{play}{military}牌或{execute}{military}策略后，获得1{vp}。"
               }
             },
             {
@@ -1871,8 +1767,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -1914,7 +1810,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "0"
+                "value": "1"
               }
             },
             {
@@ -1950,7 +1846,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{search}2次[幕僚]，然后{save}{this}。"
+                "value": "{search}1次[名臣]，然后{save}{this}。"
               }
             },
             {
@@ -1964,43 +1860,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-9"
               }
             },
             {
@@ -2042,7 +1924,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{play}1张{military}牌或征发1张{military}{candidate}。"
+                "value": "{courtier_001}{pay}1{vp}，然后获得2{battle}。{supple}1次。"
               }
             },
             {
@@ -2056,8 +1938,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -2092,7 +1974,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "4"
+                "value": "1"
               }
             },
             {
@@ -2135,7 +2017,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{urusp}重洗当前{card_emperor}，并根据牌面描述重置{sima}{prestige}，获得1{prestige}，然后{save}{this}。"
+                "value": "{urusp}重置{jin}{card_emperor}，获得1{prestige}，然后{save}{this}。"
               }
             },
             {
@@ -2149,8 +2031,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052864,
           "details":
           [
             {
@@ -2164,7 +2046,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -2175,17 +2057,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "7"
+                "value": "-12"
               }
             },
             {
@@ -2227,7 +2102,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}[{march}]1次，{fee}减2。{newline}{passive}每次结算[{march}]后，获得1{vp}。"
+                "value": "{courtier_001}{pay}1{battle}，然后免费[{march}]1次。{supple}1次。"
               }
             },
             {
@@ -2241,8 +2116,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052864,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2277,21 +2152,22 @@
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "0"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "1"
               }
             },
             {
               "name": "text_top",
               "data":
               {
-                "value": "刘穆之"
+                "value": "刘穆之",
+                "color": "#292929FF"
               }
             },
             {
@@ -2312,29 +2188,29 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}-{affair}</align>"
+                "value": "<align=\"center\">{card_event}-{affair}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}选择1项：摸1张牌；或者征发1张{candidate}。"
+                "value": "提升1级等级，{save}{this}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "color": "#3E5F91FF"
+                "color": "#F5EDDAFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2397,7 +2273,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。3{battle}。"
+                "value": "朝堂：3{battle}。{urusp}其他每个{jin}{player}各{discard}1张{hand}。3{battle}。"
               }
             },
             {
@@ -2411,8 +2287,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2447,7 +2323,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -2490,7 +2366,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{supplant}[太原][平阳]，然后{save}{this}。"
+                "value": "{save}{this}。{end}如果{friend_player}{control}[山西]，获得10{vp}。"
               }
             },
             {
@@ -2504,8 +2380,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2519,7 +2395,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
@@ -2530,17 +2406,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "-6"
               }
             },
             {
@@ -2582,7 +2451,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}2{battle}，然后{supplant}1个{neighbor}{neutral}{location}。"
+                "value": "{courtier_001}{abandon}1张{candidate}。可以{pay}2{battle}，然后{supplant}1个{neighbor}{neutral}{location}。{supple}2次。"
               }
             },
             {
@@ -2596,8 +2465,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2654,7 +2523,7 @@
               "name": "text_limit",
               "data":
               {
-                "visible": "False"
+                "value": "{only}{jin}"
               }
             },
             {
@@ -2675,7 +2544,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "获得6{battle}，{save}{this}。"
+                "value": "获得5{battle}。{save}{this}。"
               }
             },
             {
@@ -2689,8 +2558,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2732,7 +2601,7 @@
               "name": "费用数字",
               "data":
               {
-                "value": "1"
+                "value": "2"
               }
             },
             {
@@ -2782,22 +2651,22 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "value": "3"
+                "value": "1"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "value": "1"
+                "value": "2"
               }
             },
             {
@@ -2846,7 +2715,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}2{vp}，然后{supple}1张牌到{court}。"
+                "value": "朝堂：2{battle}3{vp}，{supple}1次。"
               }
             },
             {
@@ -2860,8 +2729,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628430,
-          "last_modification_date_unix": 1782628430,
+          "creation_date_unix": 1788052865,
+          "last_modification_date_unix": 1788052865,
           "details":
           [
             {
@@ -2875,7 +2744,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
@@ -2886,17 +2755,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "-6"
               }
             },
             {
@@ -2938,7 +2800,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}免费[{emp_defense}]{friend_player}{location}1次。如果[{emp_defense}]的目标不是你{occupy}的{location}，额外获得1{vp}。"
+                "value": "{courtier_001}免费[{emp_defense}]{friend_player}{location}1次。{supple}1次。"
               }
             },
             {

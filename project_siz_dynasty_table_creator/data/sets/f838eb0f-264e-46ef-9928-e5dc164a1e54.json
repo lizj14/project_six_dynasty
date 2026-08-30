@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -41,7 +41,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -83,7 +83,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -97,8 +97,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -126,7 +126,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -168,7 +168,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -182,8 +182,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -211,7 +211,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -253,7 +253,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -267,8 +267,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -296,7 +296,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -338,7 +338,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -352,8 +352,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -381,7 +381,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -423,7 +423,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}3{battle}"
+                "value": "朝堂：3{battle}"
               }
             },
             {
@@ -437,8 +437,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -473,8 +473,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "-",
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -513,20 +512,6 @@
               }
             },
             {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "牌面背景",
               "data":
               {
@@ -537,8 +522,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -573,8 +558,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "-",
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -613,20 +597,6 @@
               }
             },
             {
-              "name": "text_bottom",
-              "data":
-              {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "牌面背景",
               "data":
               {
@@ -637,8 +607,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -666,7 +636,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -708,7 +678,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}{save}1张{candidate}。"
+                "value": "朝堂：{save}1张{candidate}。"
               }
             },
             {
@@ -722,8 +692,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -751,7 +721,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "1"
+                "value": "0"
               }
             },
             {
@@ -793,7 +763,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}摸2张牌。如果{affair}标记数>2，额外摸1张牌。"
+                "value": "朝堂：摸2张牌。"
               }
             },
             {
@@ -807,8 +777,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345558,
-          "last_modification_date_unix": 1782345558,
+          "creation_date_unix": 1788055665,
+          "last_modification_date_unix": 1788055665,
           "details":
           [
             {
@@ -871,7 +841,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{decision}2{battle}。选择1个{player}，随机抽取他的1张{hand}。"
+                "value": "朝堂：2{battle}。选择1个{player}，随机抽取他的1张{hand}。"
               }
             },
             {

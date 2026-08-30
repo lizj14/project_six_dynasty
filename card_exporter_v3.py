@@ -136,17 +136,18 @@ def parse_card_design(csv_path):
                 '效果': row[5] if len(row) > 5 else '',
                 '资源': row[6] if len(row) > 6 else '',
                 '史书vp': row[7] if len(row) > 7 else '',
-                '文化标记': get_int(row[8]) if len(row) > 8 else 0,
-                '军事标记': get_int(row[9]) if len(row) > 9 else 0,
-                '权谋标记': get_int(row[10]) if len(row) > 10 else 0,
-                '内政标记': get_int(row[11]) if len(row) > 11 else 0,
-                '限定东晋': get_int(row[12]) if len(row) > 12 else 0,
-                '限定北方': get_int(row[13]) if len(row) > 13 else 0,
-                '僭越': get_int(row[14]) if len(row) > 14 else 0,
-                '公共': get_int(row[30]) if len(row) > 30 else 0,
-                '儒学': get_int(row[33]) if len(row) > 33 else 0,
-                '玄学': get_int(row[34]) if len(row) > 34 else 0,
-                '佛学': get_int(row[35]) if len(row) > 35 else 0,
+                '名臣': get_int(row[8]) if len(row) > 8 else 0,
+                '文化标记': get_int(row[9]) if len(row) > 9 else 0,
+                '军事标记': get_int(row[10]) if len(row) > 10 else 0,
+                '权谋标记': get_int(row[11]) if len(row) > 11 else 0,
+                '内政标记': get_int(row[12]) if len(row) > 12 else 0,
+                '限定东晋': get_int(row[13]) if len(row) > 13 else 0,
+                '限定北方': get_int(row[14]) if len(row) > 14 else 0,
+                '僭越': get_int(row[15]) if len(row) > 15 else 0,
+                '公共': get_int(row[33]) if len(row) > 33 else 0,
+                '儒学': get_int(row[35]) if len(row) > 35 else 0,
+                '玄学': get_int(row[36]) if len(row) > 36 else 0,
+                '佛学': get_int(row[37]) if len(row) > 37 else 0,
             }
             cards.append(card)
 
@@ -192,33 +193,7 @@ def get_card_type_tag(card):
     card_type = card['类型']
     card_category = card['卡牌分类']
 
-    if '公共' in card_category:
-        return '{card_public}'
-
-    if card_type == '角色牌':
-        base = '{card_hero}'
-        if '北方' in card_category:
-            base += '-{north}'
-        else:
-            base += '-{jin}'
-        if card['文化标记']:
-            base += '-{culture}'
-        elif card['军事标记']:
-            base += '-{military}'
-        elif card['权谋标记']:
-            base += '-{power}'
-        elif card['内政标记']:
-            base += '-{affair}'
-        return base
-
-    type_prefix = {
-        '事件牌': '{card_event}',
-        '幕僚牌': '{card_friend}',
-        '策略牌': '{card_strategy}',
-        '机制牌': '{card_mechanism}',
-        '角色牌': '{card_hero}',
-    }.get(card_type, '{card_event}')
-
+    # 标记后缀（文化/军事/权谋/内政）
     tag_suffix = ''
     if card['文化标记']:
         tag_suffix = '-{culture}'
@@ -228,16 +203,45 @@ def get_card_type_tag(card):
         tag_suffix = '-{power}'
     elif card['内政标记']:
         tag_suffix = '-{affair}'
-    elif '事件-机制' in card_category:
+
+    # 公共事件牌：{card_public} + 标记后缀
+    if '公共' in card_category:
+        return '{card_public}' + tag_suffix
+
+    # 角色牌：{card_hero}-{阵营}-{标记}
+    if card_type == '角色牌':
+        base = '{card_hero}'
+        if '北方' in card_category:
+            base += '-{north}'
+        else:
+            base += '-{jin}'
+        return base + tag_suffix
+
+    # 名臣牌使用幕僚牌模板
+    if card['名臣']:
+        type_prefix = '{card_friend}'
+    else:
+        type_prefix = {
+            '事件牌': '{card_event}',
+            '幕僚牌': '{card_friend}',
+            '策略牌': '{card_strategy}',
+            '机制牌': '{card_mechanism}',
+            '角色牌': '{card_hero}',
+        }.get(card_type, '{card_event}')
+
+    # 强制性事件牌（无标记时）
+    if '事件-机制' in card_category and not tag_suffix:
         return '{card_mechanism}'
 
-    return f"{type_prefix}{tag_suffix}"
+    return type_prefix + tag_suffix
 
 
 def get_background_color(card):
     card_category = card['卡牌分类']
     if '事件-机制' in card_category:
         return '#882420FF'
+    elif card['名臣']:
+        return '#3E5F91FF'
     elif card['类型'] == '事件牌':
         return '#F5EDDAFF'
     elif card['类型'] == '幕僚牌':
@@ -369,11 +373,6 @@ def write_card_csv(file_path, cards, variables, file_type='common'):
         clean_effect = longest_match_replace(clean_effect, variables)
         clean_effect = format_effect_markers(clean_effect)
 
-        # Resource display (for text_bottom) — skip for strategy cards (shown via symbols)
-        if resource_str and card['类型'] != '策略牌':
-            resource_str_replaced = longest_match_replace(resource_str, variables)
-            clean_effect += f"{{newline}}{{resource}}{resource_str_replaced}。"
-
         # Cost
         cost = card['费用'] if card['费用'] and card['费用'] != '-' else ''
 
@@ -421,8 +420,8 @@ def write_card_csv(file_path, cards, variables, file_type='common'):
             score_sym_vis = '' if shishu_vp else 'False'
             cost_token_vis = '' if cost else 'False'
 
-        # Public cards and 流民: hide存档vp
-        if is_public or card['卡牌名称'] == '流民':
+        # Public cards: hide存档vp
+        if is_public:
             vp_num_vis = 'False'
             score_sym_vis = 'False'
 
@@ -548,11 +547,11 @@ def write_refugee_csv(file_path):
     for _ in range(16):
         rows.append([
             1, '', 'False', '', 'False', 'False', 'False',
-            '', 'False', '0', '',
+            '3', '', '0', '',
             '流民', '', '', 'False',
-            '流民', '',
-            '{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。',
-            'False', '', '', '#1a1a1aFF', '',
+            '流民', '<align="center">{card_strategy}</align>',
+            '',
+            '', '', '', '#1a1a1aFF', '',
         ])
     headers = [
         '[Item Amount]', 'vp产能数字', 'vp产能数字:visible',
@@ -589,10 +588,6 @@ def write_hero_group_csv(file_path, cards, variables):
         restriction = longest_match_replace(restriction, variables)
         clean_effect = longest_match_replace(clean_effect, variables)
         clean_effect = format_effect_markers(clean_effect)
-
-        if resource_str and card['类型'] != '策略牌':
-            resource_str_replaced = longest_match_replace(resource_str, variables)
-            clean_effect += f"{{newline}}{{resource}}{resource_str_replaced}。"
 
         cost = card['费用'] if card['费用'] and card['费用'] != '-' else ''
         shishu_vp = card['史书vp'] if card['史书vp'] else ''
@@ -691,7 +686,7 @@ def main():
     }
     jin_counts = {
         '士卒': 3, '流民': 2, '宫廷': 1, '加官进爵': 1,
-        '北伐': 1, '征辟人才': 1, '清谈': 1,
+        '北伐': 1, '征辟人才': 1, '太常寺': 1,
     }
 
     north_initial = generate_initial_deck(categories['north_initial'], north_counts)

@@ -1,7 +1,13 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "variables":
   [
+    {
+      "code": "courtier_001",
+      "replacement": "名臣：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
     {
       "code": "mark_culture",
       "replacement": "Book/paint-brush",
@@ -351,6 +357,12 @@
       "color": "#FFFFFF00"
     },
     {
+      "code": "courtier",
+      "replacement": "名臣：",
+      "force_tint": "False",
+      "color": "#FFFFFF00"
+    },
+    {
       "code": "action",
       "replacement": "主动：",
       "force_tint": "False",
@@ -472,7 +484,7 @@
     },
     {
       "code": "card_friend",
-      "replacement": "幕僚牌",
+      "replacement": "策略牌",
       "force_tint": "False",
       "color": "#FFFFFF00"
     },

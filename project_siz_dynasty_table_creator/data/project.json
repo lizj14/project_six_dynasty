@@ -1,14 +1,14 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "project_info":
   {
     "name": "六朝何事",
     "creation_app_version": "2026.1.1 r973 专业版（Steam） 4fa019538eb1ce05e4a70cd0ed5d0e76",
     "creation_date": "20260319_231551",
     "creation_date_unix": 1773962151,
-    "last_modification_app_version": "2026.5.1 r985 专业版（Steam） a9b3f5ae1d13402e3909611b9b99c382",
+    "last_modification_app_version": "2026.8.2 r996 专业版（Steam） 0692f01ab9867783e6ffd03ca82d9e99",
     "last_modification_user": "c1d39a75b0d8d9d765a30c47446ae3a5e19a2d98c46cb480e8dc34f197afcd14",
-    "last_modification_date": "20260628_063824",
-    "last_modification_date_unix": 1782628704
+    "last_modification_date": "20260830_020804",
+    "last_modification_date_unix": 1788055684
   }
 }

@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782628415,
-          "last_modification_date_unix": 1782628415,
+          "creation_date_unix": 1788050595,
+          "last_modification_date_unix": 1788050595,
           "details":
           [
             {
@@ -48,7 +48,7 @@
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "0"
               }
             },
             {
@@ -62,7 +62,8 @@
               "name": "text_top",
               "data":
               {
-                "value": "姚苌"
+                "value": "姚苌",
+                "color": "#292929FF"
               }
             },
             {
@@ -83,71 +84,57 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_friend}-{military}</align>"
+                "value": "<align=\"center\">{card_event}-{military}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}1{battle}。{newline}{enter}{supplant}2个{neighbor}{neutral}{location}。{newline}{passive}{this}离开{friend_area}时，将2个己方{control}{location}{supplant}为{neutral}{location}。"
+                "value": "{supplant}2个{neighbor}{neutral}{location}，{save}{this}。{end}如果{control}的{location}数<=24，失去12{vp}。"
               }
             },
             {
               "name": "牌面背景",
               "data":
               {
-                "color": "#3E5F91FF"
+                "color": "#F5EDDAFF"
               }
             }
           ]
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628415,
-          "last_modification_date_unix": 1782628415,
+          "creation_date_unix": 1788050595,
+          "last_modification_date_unix": 1788050595,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "4"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "5"
+                "value": "-12"
               }
             },
             {
               "name": "费用数字",
               "data":
               {
-                "value": "2"
+                "value": "3"
               }
             },
             {
@@ -182,7 +169,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}3{battle}，传播1次{emp_culture}。然后，获得X {vp}，X={emp_culture}贡献等级之和。"
+                "value": "{courtier}{pay}3{battle}，传播1次{emp_culture}，然后，获得X {vp}，X={emp_culture}贡献等级之和。{supple}1次。"
               }
             },
             {
@@ -196,43 +183,29 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628415,
-          "last_modification_date_unix": 1782628415,
+          "creation_date_unix": 1788050595,
+          "last_modification_date_unix": 1788050595,
           "details":
           [
             {
               "name": "vp产能数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "vp符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "1"
               }
             },
             {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "-6"
               }
             },
             {
@@ -274,7 +247,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}3{battle}，在{jin}{discard}牌区放置1张{refugee}。然后，{sima}和宰辅各失去X {vp}，X={jin}{court}的{refugee}数。"
+                "value": "{courtier}{pay}2{battle}，在{jin}{discard}牌区放置1张{refugee}。{supple}1次。"
               }
             },
             {
@@ -288,8 +261,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628415,
-          "last_modification_date_unix": 1782628415,
+          "creation_date_unix": 1788050595,
+          "last_modification_date_unix": 1788050595,
           "details":
           [
             {
@@ -303,7 +276,7 @@
               "name": "军力数字",
               "data":
               {
-                "visible": "False"
+                "value": "2"
               }
             },
             {
@@ -314,17 +287,10 @@
               }
             },
             {
-              "name": "军力符号",
-              "data":
-              {
-                "visible": "False"
-              }
-            },
-            {
               "name": "vp数字",
               "data":
               {
-                "value": "3"
+                "value": "-6"
               }
             },
             {
@@ -366,7 +332,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "{action}{pay}3{battle}，将1个玄学{district}的{location}转为{neutral}{control}。然后，{sima}和宰辅各失去X {vp}，X=[江南][荆襄][淮南]的{neutral}{location}数。"
+                "value": "{courtier}{pay}1{battle}，选择1个玄学{district}的未{emp_defense}{location}，转为{neutral}{control}。{supple}1次。"
               }
             },
             {
@@ -380,8 +346,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782628415,
-          "last_modification_date_unix": 1782628415,
+          "creation_date_unix": 1788050595,
+          "last_modification_date_unix": 1788050595,
           "details":
           [
             {

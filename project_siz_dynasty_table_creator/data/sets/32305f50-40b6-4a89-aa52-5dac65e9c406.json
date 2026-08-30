@@ -1,11 +1,11 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
       "name": "通用事件牌范例_v1",
       "blueprint_name": "通用事件牌模板_v1",
-      "hint_order_index": 21,
+      "hint_order_index": 14,
       "zoom": 0,
       "collapsed": false,
       "items":

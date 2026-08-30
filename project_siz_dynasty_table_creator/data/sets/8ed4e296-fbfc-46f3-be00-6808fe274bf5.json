@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781911941,
-          "last_modification_date_unix": 1781911941,
+          "creation_date_unix": 1788050824,
+          "last_modification_date_unix": 1788050824,
           "details":
           [
             {
@@ -85,7 +85,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_public}</align>"
+                "value": "<align=\"center\">{card_public}-{power}</align>"
               }
             },
             {
@@ -113,8 +113,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911941,
-          "last_modification_date_unix": 1781911941,
+          "creation_date_unix": 1788050824,
+          "last_modification_date_unix": 1788050824,
           "details":
           [
             {
@@ -186,7 +186,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_public}</align>"
+                "value": "<align=\"center\">{card_public}-{culture}</align>"
               }
             },
             {
@@ -214,8 +214,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911941,
-          "last_modification_date_unix": 1781911941,
+          "creation_date_unix": 1788050824,
+          "last_modification_date_unix": 1788050824,
           "details":
           [
             {
@@ -287,7 +287,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_public}</align>"
+                "value": "<align=\"center\">{card_public}-{affair}</align>"
               }
             },
             {
@@ -315,8 +315,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911941,
-          "last_modification_date_unix": 1781911941,
+          "creation_date_unix": 1788050824,
+          "last_modification_date_unix": 1788050824,
           "details":
           [
             {
@@ -388,14 +388,14 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_public}</align>"
+                "value": "<align=\"center\">{card_public}-{power}</align>"
               }
             },
             {
               "name": "text_bottom",
               "data":
               {
-                "value": "降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
+                "value": "降低1点[{prestige}]或[{contirbution}]，{supplant}1个{sima}边境{location}。{urusp}可以{supplant}1个{jin}{player}{location}。"
               }
             },
             {
@@ -416,8 +416,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911941,
-          "last_modification_date_unix": 1781911941,
+          "creation_date_unix": 1788050824,
+          "last_modification_date_unix": 1788050824,
           "details":
           [
             {
@@ -489,7 +489,7 @@
               "name": "text_card_type",
               "data":
               {
-                "value": "<align=\"center\">{card_public}</align>"
+                "value": "<align=\"center\">{card_public}-{affair}</align>"
               }
             },
             {

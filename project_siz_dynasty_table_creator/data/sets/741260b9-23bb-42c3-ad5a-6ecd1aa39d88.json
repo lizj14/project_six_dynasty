@@ -1,19 +1,19 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
       "name": "君主牌_导入",
       "blueprint_name": "君主牌",
-      "hint_order_index": 11,
+      "hint_order_index": 9,
       "zoom": 0,
       "collapsed": false,
       "items":
       [
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -34,8 +34,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -56,8 +56,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -78,8 +78,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -100,8 +100,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -122,8 +122,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1781911966,
-          "last_modification_date_unix": 1781911966,
+          "creation_date_unix": 1788051521,
+          "last_modification_date_unix": 1788051521,
           "details":
           [
             {
@@ -137,7 +137,7 @@
               "name": "text_bottom",
               "data":
               {
-                "value": "初始威望：5{newline}1-2：{emp_expansion}{newline}3：{emp_defense}{newline}4：{emp_art}{newline}5-6：{emp_culture}"
+                "value": "初始威望：5{newline}1-2：{emp_expansion}{newline}3：{emp_defense}{newline}4：{emp_reform}{newline}5：{emp_culture}{newline}6：{emp_art}"
               }
             }
           ]

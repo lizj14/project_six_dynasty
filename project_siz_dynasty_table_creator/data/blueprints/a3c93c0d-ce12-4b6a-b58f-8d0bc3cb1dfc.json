@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "blueprints":
   [
     {
@@ -13,7 +13,7 @@
       {
         "radius": "2"
       },
-      "front_layers":
+      "front_groups":
       [
         {
           "name": "default_front",
@@ -70,14 +70,13 @@
                 "layout_constraint_h": "left_and_right",
                 "layout_constraint_v": "top_and_bottom",
                 "panel_type": "procedural",
-                "panel_editable": "False",
                 "color": "#FF0000FF"
               }
             }
           ]
         }
       ],
-      "back_layers":
+      "back_groups":
       [
         {
           "name": "default_back",

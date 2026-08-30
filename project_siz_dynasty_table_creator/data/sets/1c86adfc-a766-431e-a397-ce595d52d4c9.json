@@ -1,5 +1,5 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
@@ -12,8 +12,8 @@
       [
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -48,7 +48,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -80,17 +80,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -104,8 +97,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -140,7 +133,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -172,17 +165,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -196,8 +182,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -232,7 +218,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -264,17 +250,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -288,8 +267,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -324,7 +303,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -356,17 +335,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -380,8 +352,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -416,7 +388,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -448,17 +420,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -472,8 +437,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -508,7 +473,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -540,17 +505,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -564,8 +522,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -600,7 +558,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -632,17 +590,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -656,8 +607,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -692,7 +643,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -724,17 +675,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -748,8 +692,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -784,7 +728,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -816,17 +760,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -840,8 +777,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -876,7 +813,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -908,17 +845,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -932,8 +862,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -968,7 +898,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1000,17 +930,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -1024,8 +947,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -1060,7 +983,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1092,17 +1015,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -1116,8 +1032,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -1152,7 +1068,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1184,17 +1100,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -1208,8 +1117,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -1244,7 +1153,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1276,17 +1185,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -1300,8 +1202,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -1336,7 +1238,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1368,17 +1270,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {
@@ -1392,8 +1287,8 @@
         },
         {
           "amount": 1,
-          "creation_date_unix": 1782345762,
-          "last_modification_date_unix": 1782345762,
+          "creation_date_unix": 1788052556,
+          "last_modification_date_unix": 1788052556,
           "details":
           [
             {
@@ -1428,7 +1323,7 @@
               "name": "vp数字",
               "data":
               {
-                "visible": "False"
+                "value": "3"
               }
             },
             {
@@ -1460,17 +1355,10 @@
               }
             },
             {
-              "name": "text_bottom",
+              "name": "text_card_type",
               "data":
               {
-                "value": "{passive}{refugee}被{save}时，自动放置回供应堆。{save}{refugee}的{player}获得2{vp}。"
-              }
-            },
-            {
-              "name": "分数符号",
-              "data":
-              {
-                "visible": "False"
+                "value": "<align=\"center\">{card_strategy}</align>"
               }
             },
             {

@@ -1,11 +1,11 @@
 {
-  "json_version": 4,
+  "json_version": 5,
   "sets":
   [
     {
       "name": "控制标记",
       "blueprint_name": "蓝图_区域控制",
-      "hint_order_index": 13,
+      "hint_order_index": 11,
       "zoom": 0,
       "collapsed": false,
       "items":
